@@ -1,0 +1,11 @@
+{
+    "btc_usd_bitstamp":   0.226189632,
+    "btc_usd_bitfinex":   0.1537782868,
+    "btc_usd_kraken":     0.1523461274,
+    "btc_usd_coinbase":   0.4033657328,
+    "btc_usd_gemini":     0.06432022093,
+    "rif_btc_bitfinex":   0.25,
+    "rif_btc_bithumbpro": 0.25,
+    "rif_btc_kucoin":     0.25,
+    "rif_btc_coinbene":   0.25
+}
