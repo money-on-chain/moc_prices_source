@@ -1,5 +1,5 @@
-from setuptools import setup, find_packages
-from easy_chain import __version__ as version
+from setuptools        import setup, find_packages
+from moc_prices_source import __version__ as version
 
 with open("README.md", "r") as file_:
     long_description = file_.read()
