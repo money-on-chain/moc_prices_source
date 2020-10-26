@@ -5,8 +5,7 @@ class Engine(Base):
 
     _name        = Base._name_from_file(__file__)
     _description = "Kraken"
-    _uri         = "https://api.bad_uri.com" # for test!
-    #_uri         = "https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD"
+    _uri         = "https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD"
     _coinpair    = BTC_USD
 
     def _map(self, data):
