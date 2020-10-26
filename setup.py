@@ -8,7 +8,7 @@ with open("requirements.txt", "r") as file_:
     requirements = file_.read().split()
 
 setup(
-    name='price_source',
+    name='moc_prices_source',
     version=version,
     packages=find_packages(),
     author='Juan S. Bokser',
@@ -23,7 +23,7 @@ setup(
         'Programming Language :: Python :: 3.6'
     ],
     package_data={
-        "easy_chain": ["data/*.json"]
+        "moc_prices_source": ["data/*.json"]
     },
     python_requires='>=3.6',
     install_requires=requirements,
