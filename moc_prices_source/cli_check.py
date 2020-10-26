@@ -84,9 +84,23 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
         print(tabulate(table, headers=[
             'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources'
         ]))
-    
+
     print()
     print('Response time {}s'.format(round(time, 2)))
+
+    errors = []
+    for p in prices:
+        if not p["ok"]:
+            errors.append((p["name"], p["error"]))
+
+    if errors:
+        print()
+        print("Errors detail")
+        print("------ ------")
+        for e in errors:
+            print()
+            print('{}: {}'.format(*e))
+
     print()
 
 

@@ -15,7 +15,7 @@ pip3 install .
 ## Check that all is working ok
 
 ```
-$ price_source_check 
+$ moc_prices_source_check 
 
 Coin pair    Exchnage        Response    Weigh     %    Time (s)
 -----------  ----------  ------------  -------  ----  ----------
@@ -40,8 +40,8 @@ $
 ```
 More options
 ```
-$ price_source_check --help
-Usage: price_source_check [OPTIONS]
+$ moc_prices_source_check --help
+Usage: moc_prices_source_check [OPTIONS]
 
 Options:
   -v, --version   Show version and exit.
@@ -60,7 +60,7 @@ $ python3
 Python 3.8.5 (default, Jul 28 2020, 12:59:40) 
 [GCC 9.3.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
->>> from price_source import get_price, BTC_USD, RIF_BTC
+>>> from moc_prices_source import get_price, BTC_USD, RIF_BTC
 >>>
 ```
 
@@ -78,10 +78,23 @@ Get de RIF BTC coin pair
 7.8e-06
 ```
 
+Get errors detail (example)
+
+```
+>>> d = {}
+>>> values = get_price(detail = d)
+>>> for e in d['prices']:
+...     if not e["ok"]:
+...         print('{}: {}'.format(e["name"], e["error"]))
+... 
+btc_usd_kraken: HTTPSConnectionPool(host='api.bad_uri.com', port=443): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x7f2c48700b50>: Failed to establish a new connection: [Errno -2] Name or service not known'))
+>>> 
+```
+
 Show the default weighing
 
 ```
->>> from price_source.weighing import weighing
+>>> from moc_prices_source.weighing import weighing
 >>> print(weighing)
 Engine                  Weigh
 ------------------  ---------
