@@ -86,9 +86,9 @@ Get errors detail (example)
 >>> for e in d['prices']:
 ...     if not e["ok"]:
 ...         print('{}: {}'.format(e["name"], e["error"]))
-... 
+...
 btc_usd_kraken: HTTPSConnectionPool(host='api.bad_uri.com', port=443): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x7f2c48700b50>: Failed to establish a new connection: [Errno -2] Name or service not known'))
->>> 
+>>>
 ```
 
 Show the default weighing
