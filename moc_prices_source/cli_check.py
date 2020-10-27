@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 import json, sys
 from os.path  import dirname, abspath
-from cli      import command, option, tabulate, trim
 from weighing import weighing
 
-sys.path.append(dirname(dirname(abspath(__file__))))
+bkpath   = sys.path[:]
+base_dir = dirname(abspath(__file__))
+sys.path.append(base_dir)
+
+from cli import command, option, tabulate, trim
+
+sys.path = bkpath
+sys.path.append(dirname(base_dir))
 
 from moc_prices_source import __version__ as version
 from moc_prices_source import get_price, ALL
+
+sys.path = bkpath
 
 
 
