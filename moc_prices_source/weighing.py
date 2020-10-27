@@ -77,7 +77,7 @@ class Weighing(object):
     @property
     def refresh_time(self):
         return self._refresh_time
-    
+
     def __str__(self):
         return tabulate(list(self.as_dict.items()),
             headers=['Engine', 'Weigh'])

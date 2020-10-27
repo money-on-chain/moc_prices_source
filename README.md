@@ -15,34 +15,35 @@ pip3 install .
 ## Check that all is working ok
 
 ```
-$ ./moc_prices_source_check 
+user@host:~$ moc_prices_source_check 
 
 Coin pair    Exchnage        Response    Weigh     %  Time
 -----------  ----------  ------------  -------  ----  ------
-BTC/USD      Bitfinex    13073            0.15  15.4  0.57s
-BTC/USD      Bitstamp    13082.6          0.23  22.6  0.96s
-BTC/USD      Coinbase    13080.1          0.4   40.3  0.32s
-BTC/USD      Gemini      13084.7          0.06   6.4  1.14s
-BTC/USD      Kraken      13083.8          0.15  15.2  0.57s
-RIF/BTC      BitHumb         8.26e-06     0.25  25    1.96s
-RIF/BTC      Bitfinex        6.36e-06     0.25  25    0.57s
-RIF/BTC      Coinbene        7.09e-06     0.25  25    0.56s
-RIF/BTC      Kucoin          7.86e-06     0.25  25    1.57s
+BTC/USD      Bitfinex    13349            0.15  15.4  0.41s
+BTC/USD      Bitstamp    13361.8          0.23  22.6  0.25s
+BTC/USD      Coinbase    13369.3          0.4   40.3  0.31s
+BTC/USD      Gemini      13361.3          0.06   6.4  0.88s
+BTC/USD      Kraken      13365            0.15  15.2  0.39s
+RIF/BTC      BitHumb         7.8e-06      0.25  25    1.91s
+RIF/BTC      Bitfinex        6.36e-06     0.25  25    0.44s
+RIF/BTC      Coinbene        5.83e-06     0.25  25    0.84s
+RIF/BTC      Kucoin          7.58e-06     0.25  25    1.01s
 
-Coin pair           Mediam            Mean    Weighted median    Sources
+Coin pair           Mediam            Mean    Weighted median  Sources
 -----------  -------------  --------------  -----------------  ---------
-BTC/USD      13082.6        13080.8              13080.1               5
-RIF/BTC          7.475e-06      7.3925e-06           7.09e-06          4
+BTC/USD      13361.8        13361.3             13365          5
+RIF/BTC          6.97e-06       6.8925e-06          6.36e-06   4
+RIF/USD          0.0931315      0.0920926           0.0850014  N/A
 
-Response time 1.96s
+Response time 1.92s
 
-$ 
+user@host:~$
 ```
 
 More options
 
 ```
-$ moc_prices_source_check --help
+user@host:~$ moc_prices_source_check --help
 Usage: moc_prices_source_check [OPTIONS]
 
 Options:
@@ -50,7 +51,7 @@ Options:
   -j, --json      Show data in JSON format and exit.
   -w, --weighing  Show the default weighing and exit.
   -h, --help      Show this message and exit.
-$ 
+user@host:~$ 
 ```
 
 ## Usage
@@ -58,11 +59,11 @@ $
 Do some imports first
 
 ```
-$ python3
+user@host:~$ python3
 Python 3.8.5 (default, Jul 28 2020, 12:59:40) 
 [GCC 9.3.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
->>> from moc_prices_source import get_price, BTC_USD, RIF_BTC
+>>> from moc_prices_source import get_price, BTC_USD, RIF_BTC, ALL
 >>>
 ```
 
@@ -130,9 +131,11 @@ Show all details of the coin pair obtained
 ```
 >>> import json
 >>> d = {}
->>> values = get_price(detail = d, serializable = True)
+>>> values = get_price(ALL, detail = d, serializable = True)
+>>>
 >>> values
-{'RIF/BTC': Decimal('0.00000716'), 'BTC/USD': Decimal('13074.22')}
+{'RIF/BTC': Decimal('0.00000636'), 'BTC/USD': Decimal('13380.07'), 'RIF/USD': Decimal('0.0850972452')}
+>>>
 >>> print(json.dumps(d, indent=4, sort_keys=True))
 {
     "prices": [
@@ -144,9 +147,9 @@ Show all details of the coin pair obtained
             "ok": true,
             "percentual_weighing": 0.25,
             "price": 6.36e-06,
-            "time": 0.429792,
+            "time": 0.520118,
             "timeout": 10,
-            "timestamp": "2020-10-26 20:51:09",
+            "timestamp": "2020-10-27 11:44:36",
             "uri": "https://api-pub.bitfinex.com/v2/ticker/tRIFBTC",
             "volume": 199741.08473236,
             "weighing": 0.25
@@ -158,12 +161,12 @@ Show all details of the coin pair obtained
             "name": "btc_usd_bitstamp",
             "ok": true,
             "percentual_weighing": 0.22618963201583328,
-            "price": 13080.65,
-            "time": 0.251088,
+            "price": 13385.48,
+            "time": 0.331992,
             "timeout": 10,
-            "timestamp": "2020-10-26 23:51:07",
+            "timestamp": "2020-10-27 14:44:34",
             "uri": "https://www.bitstamp.net/api/v2/ticker/btcusd/",
-            "volume": 5713.48411002,
+            "volume": 8629.96055351,
             "weighing": 0.226189632
         },
         {
@@ -173,12 +176,12 @@ Show all details of the coin pair obtained
             "name": "rif_btc_coinbene",
             "ok": true,
             "percentual_weighing": 0.25,
-            "price": 7.16e-06,
-            "time": 1.239262,
+            "price": 5.87e-06,
+            "time": 0.923952,
             "timeout": 10,
-            "timestamp": "2020-10-26 20:51:10",
+            "timestamp": "2020-10-27 11:44:36",
             "uri": "http://api.coinbene.com/v1/market/ticker?symbol=RIFBTC",
-            "volume": 503652.44,
+            "volume": 502351.35,
             "weighing": 0.25
         },
         {
@@ -188,12 +191,12 @@ Show all details of the coin pair obtained
             "name": "btc_usd_bitfinex",
             "ok": true,
             "percentual_weighing": 0.15377828681076447,
-            "price": 13072.0,
-            "time": 0.265143,
+            "price": 13377.0,
+            "time": 0.509504,
             "timeout": 10,
-            "timestamp": "2020-10-26 20:51:09",
+            "timestamp": "2020-10-27 11:44:36",
             "uri": "https://api-pub.bitfinex.com/v2/ticker/tBTCUSD",
-            "volume": 3672.97820899,
+            "volume": 5274.6920961,
             "weighing": 0.1537782868
         },
         {
@@ -203,10 +206,10 @@ Show all details of the coin pair obtained
             "name": "btc_usd_gemini",
             "ok": true,
             "percentual_weighing": 0.06432022093450242,
-            "price": 13084.25,
-            "time": 0.912977,
+            "price": 13380.27,
+            "time": 1.120871,
             "timeout": 10,
-            "timestamp": "2020-10-26 20:51:10",
+            "timestamp": "2020-10-27 11:44:36",
             "uri": "https://api.gemini.com/v1/pubticker/BTCUSD",
             "volume": 0.0,
             "weighing": 0.06432022093
@@ -218,10 +221,10 @@ Show all details of the coin pair obtained
             "name": "btc_usd_coinbase",
             "ok": true,
             "percentual_weighing": 0.4033657328282356,
-            "price": 13074.22,
-            "time": 0.290297,
+            "price": 13380.07,
+            "time": 0.29592,
             "timeout": 10,
-            "timestamp": "2020-10-26 20:51:09",
+            "timestamp": "2020-10-27 11:44:35",
             "uri": "https://api.coinbase.com/v2/prices/spot?currency=USD",
             "volume": 0.0,
             "weighing": 0.4033657328
@@ -233,12 +236,12 @@ Show all details of the coin pair obtained
             "name": "btc_usd_kraken",
             "ok": true,
             "percentual_weighing": 0.15234612741066422,
-            "price": 13082.6,
-            "time": 0.353133,
+            "price": 13386.6,
+            "time": 0.335535,
             "timeout": 10,
-            "timestamp": "2020-10-26 20:51:09",
+            "timestamp": "2020-10-27 11:44:35",
             "uri": "https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD",
-            "volume": 4652.36723363,
+            "volume": 5985.07438025,
             "weighing": 0.1523461274
         },
         {
@@ -248,12 +251,12 @@ Show all details of the coin pair obtained
             "name": "rif_btc_kucoin",
             "ok": true,
             "percentual_weighing": 0.25,
-            "price": 7.91e-06,
-            "time": 1.1693310000000001,
+            "price": 7.32e-06,
+            "time": 0.927223,
             "timeout": 10,
-            "timestamp": "2020-10-26 20:51:10",
+            "timestamp": "2020-10-27 11:44:36",
             "uri": "https://openapi-v2.kucoin.com/api/v1/market/orderbook/level1?symbol=RIF-BTC",
-            "volume": 1.5133,
+            "volume": 511.2108,
             "weighing": 0.25
         },
         {
@@ -263,26 +266,26 @@ Show all details of the coin pair obtained
             "name": "rif_btc_bithumbpro",
             "ok": true,
             "percentual_weighing": 0.25,
-            "price": 8.26e-06,
-            "time": 1.7340659999999999,
+            "price": 7.78e-06,
+            "time": 1.741697,
             "timeout": 10,
-            "timestamp": "2020-10-26 20:51:11",
+            "timestamp": "2020-10-27 11:44:37",
             "uri": "https://global-openapi.bithumb.pro/openapi/v1/spot/ticker?symbol=RIF-BTC",
-            "volume": 46691.13,
+            "volume": 39874.55,
             "weighing": 0.25
         }
     ],
-    "time": 1.854053,
+    "time": 1.773495,
     "values": {
         "BTC/USD": {
-            "mean_price": 13078.744,
-            "median_price": 13080.65,
+            "mean_price": 13381.884,
+            "median_price": 13380.27,
             "prices": [
-                13080.65,
-                13072.0,
-                13084.25,
-                13074.22,
-                13082.6
+                13385.48,
+                13377.0,
+                13380.27,
+                13380.07,
+                13386.6
             ],
             "weighings": [
                 0.22618963201583328,
@@ -291,16 +294,16 @@ Show all details of the coin pair obtained
                 0.4033657328282356,
                 0.15234612741066422
             ],
-            "weighted_median_price": 13074.22
+            "weighted_median_price": 13380.07
         },
         "RIF/BTC": {
-            "mean_price": 7.4225e-06,
-            "median_price": 7.535e-06,
+            "mean_price": 6.8325e-06,
+            "median_price": 6.84e-06,
             "prices": [
                 6.36e-06,
-                7.16e-06,
-                7.91e-06,
-                8.26e-06
+                5.87e-06,
+                7.32e-06,
+                7.78e-06
             ],
             "weighings": [
                 0.25,
@@ -308,7 +311,16 @@ Show all details of the coin pair obtained
                 0.25,
                 0.25
             ],
-            "weighted_median_price": 7.16e-06
+            "weighted_median_price": 6.36e-06
+        },
+        "RIF/USD": {
+            "mean_price": 0.09143172243,
+            "median_price": 0.0915210468,
+            "requirements": [
+                "RIF/BTC",
+                "BTC/USD"
+            ],
+            "weighted_median_price": 0.0850972452
         }
     }
 }

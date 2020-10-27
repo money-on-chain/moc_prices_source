@@ -13,7 +13,7 @@ files         = [f for f in files if f not in exclude]
 modules_names = [ n[:-3] for n in files if n[-3:] =='.py' and n[:1]!='_']
 
 del listdir, path, isfile, dirname, mypath, files, exclude
- 
+
 for name in modules_names:
     locals()[name] = __import__(name, globals(), locals()).Engine()
     all_engines[name] = locals()[name]
