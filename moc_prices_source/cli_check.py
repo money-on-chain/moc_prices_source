@@ -31,7 +31,7 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
         return
 
     data = {}
-    
+
     get_price(ALL, detail=data, serializable=show_json)
 
     if show_json:

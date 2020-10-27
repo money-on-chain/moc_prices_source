@@ -1,4 +1,4 @@
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 import sys, json, datetime
 from os.path import dirname, abspath
@@ -104,7 +104,7 @@ def get_price(
         d['median_price'] = median(d['prices'])
         d['mean_price'] = mean(d['prices'])
         d['weighted_median_price'] = weighted_median(d['prices'], d['weighings'])
-    
+
     if requested:
         for r in [r for r in requested if (
             (r in computed_pairs) and (not r in coinpair_prices)) ]:
@@ -138,7 +138,7 @@ def get_price(
             out = out[requested[0]]
         else:
             out = None
-    
+
     if not(requested) and  len(out)==1:
         out = list(out.values())[0]
 
