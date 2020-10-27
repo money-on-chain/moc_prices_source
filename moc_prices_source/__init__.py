@@ -1,4 +1,4 @@
-__version__ = '0.1.3b'
+__version__ = '0.1.4'
 
 import sys, json, datetime
 from os.path import dirname, abspath
