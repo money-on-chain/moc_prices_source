@@ -4,11 +4,15 @@ import sys, json, datetime
 from os.path import dirname, abspath
 from decimal import Decimal
 
-sys.path.append(dirname(abspath(__file__)))
+bkpath   = sys.path[:]
+base_dir = dirname(abspath(__file__))
+sys.path.append(base_dir)
 
 from engines      import get_coinpair_list, get_engines_names, get_prices
 from engines.base import BTC_USD, RIF_BTC
 from weighing     import weighing, weighted_median, median, mean
+
+sys.path = bkpath
 
 
 

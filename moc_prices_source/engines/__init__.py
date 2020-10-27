@@ -1,8 +1,9 @@
 import threading, sys
 from os       import listdir, path
-from os.path  import isfile,  dirname, abspath
+from os.path  import isfile, dirname, abspath
 
-sys.path.append(dirname(abspath(__file__)))
+bkpath   = sys.path[:]
+base_dir = dirname(abspath(__file__))
 
 
 all_engines   = {}
@@ -15,7 +16,9 @@ modules_names = [ n[:-3] for n in files if n[-3:] =='.py' and n[:1]!='_']
 del listdir, path, isfile, dirname, mypath, files, exclude
 
 for name in modules_names:
+    sys.path.append(base_dir)
     locals()[name] = __import__(name, globals(), locals()).Engine()
+    sys.path = bkpath
     all_engines[name] = locals()[name]
 
 del name, modules_names
