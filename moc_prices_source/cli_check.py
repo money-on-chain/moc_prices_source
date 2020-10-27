@@ -32,11 +32,14 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
 
     data = {}
     
-    get_price(detail=data)
+    get_price(detail=data, serializable=show_json)
 
     if show_json:
         print(json.dumps(data, indent=4, sort_keys=True))
         return
+
+    def format_time(t):
+        return '{}s'.format(round(t.seconds + t.microseconds/1000000, 2))
 
     time   = data['time']
     prices = data['prices']
@@ -58,7 +61,7 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
         else:
             row.append(None)
         if p["time"]:
-            row.append(round(p["time"], 2))
+            row.append(format_time(p["time"]))
         else:
             row.append(None)
         table.append(row)
@@ -66,7 +69,7 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
         table.sort()
         print()
         print(tabulate(table, headers=[
-            'Coin pair', 'Exchnage', 'Response', 'Weigh', '%', 'Time (s)'
+            'Coin pair', 'Exchnage', 'Response', 'Weigh', '%', 'Time'
         ]))
 
     table=[]
@@ -85,9 +88,6 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
             'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources'
         ]))
 
-    print()
-    print('Response time {}s'.format(round(time, 2)))
-
     errors = []
     for p in prices:
         if not p["ok"]:
@@ -101,6 +101,8 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
             print()
             print('{}: {}'.format(*e))
 
+    print()
+    print('Response time {}'.format(format_time(time)))
     print()
 
 

@@ -2,11 +2,13 @@ __version__ = '0.1.0'
 
 import sys, json, datetime
 from os.path import dirname, abspath
+from decimal import Decimal
+
 sys.path.append(dirname(abspath(__file__)))
 
-from engines  import get_coinpair_list, get_engines_names, get_prices
+from engines      import get_coinpair_list, get_engines_names, get_prices
 from engines.base import BTC_USD, RIF_BTC
-from weighing import weighing, weighted_median, median, mean
+from weighing     import weighing, weighted_median, median, mean
 
 
 
@@ -15,12 +17,15 @@ def get_price(
     engines_names = None,
     detail        = {},
     weighing      = weighing,
-    serializable  = True):
+    serializable  = False):
 
     start_time = datetime.datetime.now()
 
     if 'as_dict' in dir(weighing):
         weighing = weighing.as_dict
+    else:
+        for key, value in weighing.items():
+            weighing[key] = Decimal(str(value))
 
     if engines_names==None:
         engines_names = list(weighing.keys())
@@ -30,7 +35,7 @@ def get_price(
         engines_names = engines_names)
 
     for value in prices:
-        value['weighing'] = weighing.get(value['name'], 0.0)
+        value['weighing'] = weighing.get(value['name'], Decimal('0.0'))
 
     detail['prices'] = prices
 
@@ -41,7 +46,7 @@ def get_price(
             if not value['coinpair'] in coinpair_prices:
                 coinpair_prices[value['coinpair']] = {
                     'data': [],
-                    'sum_weighing': 0.0}
+                    'sum_weighing': Decimal('0.0')}
             coinpair_prices[value['coinpair']]['data'].append(value)
             coinpair_prices[value['coinpair']]['sum_weighing'] += value['weighing']
 
@@ -73,21 +78,6 @@ def get_price(
 
     detail['values'] = coinpair_prices
 
-    detail['time'] = datetime.datetime.now() - start_time
-
-    if serializable:
-        detail['time'] = detail['time'].seconds + detail['time'].microseconds/1000000
-        for p in prices:
-            if p['time']:
-                p['time'] = p['time'].seconds + p['time'
-                    ].microseconds/1000000
-            p['timestamp'] = str(p['timestamp'])
-            if p['error']:
-                p['error'] = str(p['error'])
-
-    if not coinpair_prices:
-        return None
-
     out = {}
 
     for key, value in coinpair_prices.items():
@@ -96,6 +86,27 @@ def get_price(
     if len(out)==1:
         out = list(out.values())[0]
 
+    detail['time'] = datetime.datetime.now() - start_time
+
+    if serializable:
+        detail['time'] = detail['time'].seconds + detail['time'].microseconds/1000000
+        for p in prices:
+            if p['time']:
+                p['time'] = p['time'].seconds + p['time'].microseconds/1000000
+            p['timestamp'] = str(p['timestamp'])
+            if p['error']:
+                p['error'] = str(p['error'])
+            for k in ['price', 'weighing', 'percentual_weighing', 'volume']:
+                p[k] = float(p[k])
+        for d in coinpair_prices.values():
+            for k in ['weighings', 'prices']:
+                d[k] = [ float(x) for x in d[k] ]
+            for k in ['median_price', 'mean_price', 'weighted_median_price']:
+                d[k] = float(d[k])
+
+    if not out:
+        return None
+
     return out
 
 
@@ -103,5 +114,8 @@ def get_price(
 if __name__ == '__main__':
     print("File: {}, Ok!".format(repr(__file__)))
     detail = {}
-    price = get_price(detail=detail)
+    output = get_price(detail=detail, serializable=True)
+    print()
     print(json.dumps(detail, indent=4, sort_keys=True))
+    print()
+    print('output = {}'.format(repr(output)))

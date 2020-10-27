@@ -1,6 +1,7 @@
 import requests
 import datetime
 from os.path import basename
+from decimal import Decimal
 
 RIF_BTC = "RIF/BTC"
 BTC_USD = "BTC/USD"
@@ -172,7 +173,7 @@ class Base(object):
 
         try:
             info = self._map(response)
-            self._price = float(info['price'])
+            self._price = Decimal(str(info['price']))
         except Exception:
             self._error = "Engine error (bad mapping)"
             return False
@@ -188,7 +189,7 @@ class Base(object):
 
         if 'volume' in info:
             try:
-                self._volume = float(info['volume'])
+                self._volume = Decimal(str(info['volume']))
             except Exception:
                 self._error = "Engine error (bad mapping)"
                 return False

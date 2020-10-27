@@ -1,10 +1,11 @@
-import datetime, numpy
+import datetime
 from os.path      import dirname, abspath
 from json         import load, dumps
 from json.decoder import JSONDecodeError
 from sys          import stderr
 from statistics   import median, mean
 from tabulate     import tabulate
+from decimal      import Decimal
 
 
 
@@ -48,7 +49,7 @@ class Weighing(object):
                 ok = True
                 try:
                     for key, value in data.items():
-                        data[key] = float(value)
+                        data[key] = Decimal(str(value))
                 except:
                     ok = False
 
@@ -67,7 +68,7 @@ class Weighing(object):
         return list(self.as_dict.keys())
 
     def __call__(self, name):
-        return  self.as_dict.get(name, 0.0)
+        return  self.as_dict.get(name, Decimal('0.0'))
 
     @property
     def last_load(self):
@@ -88,8 +89,12 @@ weighing = Weighing()
 
 
 def weighted_median(values, weights):
-    ''' compute the weighted median of values list. The
-weighted median is computed as follows:
+    idx = weighted_median_idx(values, weights)
+    return values[idx]
+
+
+def weighted_median_idx(values, weights):
+    ''' compute the weighted median of values list. The weighted median is computed as follows:
     1- sort both lists (values and weights) based on values.
     2- select the 0.5 point from the weights and return the corresponding values as results
     e.g. values = [1, 3, 0] and weights=[0.1, 0.3, 0.6] assuming weights are probabilities.
@@ -98,35 +103,29 @@ weighted median is computed as follows:
 
     # convert the weights into probabilities
     sum_weights = sum(weights)
-    weights = numpy.array([(w*1.0)/sum_weights for w in weights])
+    weights = [w / sum_weights for w in weights]
     # sort values and weights based on values
-    values = numpy.array(values)
-    sorted_indices = numpy.argsort(values)
-    values_sorted  = values[sorted_indices]
-    weights_sorted = weights[sorted_indices]
-    # select the median point
-    it = numpy.nditer(weights_sorted, flags=['f_index'])
-    accumulative_probability = 0
-    median_index = -1
-    while not it.finished:
-        accumulative_probability += it[0]
-        if accumulative_probability > 0.5:
-            median_index = it.index
-            return values_sorted[median_index]
-        elif accumulative_probability == 0.5:
-            median_index = it.index
-            it.iternext()
-            next_median_index = it.index
-            return numpy.mean(values_sorted[[median_index, next_median_index]])
-        it.iternext()
+    sorted_tuples = sorted(zip(values, weights, range(len(values))))
 
-    return values_sorted[median_index]
+    # select the median point
+    cumulative_probability = 0
+    for i in range(len(sorted_tuples)):
+        cumulative_probability += sorted_tuples[i][1]
+        if cumulative_probability > 0.5:
+            return sorted_tuples[i][2]
+        elif cumulative_probability == 0.5:
+            # if i + 1 >= len(sorted_tuples):
+            return sorted_tuples[i][2]
+            # return (sorted_tuples[i][2] + sorted_tuples[i + 1][2]) / 2
+    return sorted_tuples[-1][2]
 
 
 
 if __name__ == '__main__':
     print("File: {}, Ok!".format(repr(__file__)))
     print("Config file: {}".format(repr(filename)))
+    print()
+    print('weighing.as_dict = {}'.format(repr(weighing.as_dict)))
     print()
     print(weighing)
     print()
