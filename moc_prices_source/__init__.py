@@ -12,6 +12,19 @@ from weighing     import weighing, weighted_median, median, mean
 
 
 
+RIF_USD = 'RIF/USD'
+
+ALL = [BTC_USD, RIF_BTC, RIF_USD]
+
+computed_pairs = {
+    RIF_USD: {
+        'requirements': [RIF_BTC, BTC_USD],
+        'formula': lambda rif_btc, btc_usd: rif_btc * btc_usd
+    }
+}
+
+
+
 def get_price(
     coinpairs     = None,
     engines_names = None,
@@ -20,6 +33,22 @@ def get_price(
     serializable  = False):
 
     start_time = datetime.datetime.now()
+
+    requested = coinpairs
+
+    if coinpairs:
+
+        if not isinstance(coinpairs, list):
+            coinpairs = [coinpairs]
+
+        requested = coinpairs
+
+        new_coinpairs = []
+        for c in coinpairs:
+            if c in computed_pairs:
+                for r in computed_pairs[c]['requirements']:
+                    new_coinpairs.append(r)
+        coinpairs = list(set(new_coinpairs))
 
     if 'as_dict' in dir(weighing):
         weighing = weighing.as_dict
@@ -75,15 +104,42 @@ def get_price(
         d['median_price'] = median(d['prices'])
         d['mean_price'] = mean(d['prices'])
         d['weighted_median_price'] = weighted_median(d['prices'], d['weighings'])
+    
+    if requested:
+        for r in [r for r in requested if (
+            (r in computed_pairs) and (not r in coinpair_prices)) ]:
+            requirements = computed_pairs[r]['requirements']
+            if set(requirements).issubset(set(coinpair_prices.keys())):
+                coinpair_prices[r] = {}
+                coinpair_prices[r]['requirements'] = requirements
+                formula = computed_pairs[r]['formula']
+                for k in ['median_price', 'mean_price', 'weighted_median_price']:
+                    args = [ coinpair_prices[q][k] for q in requirements ]
+                    try:
+                        coinpair_prices[r][k] = formula(*args)
+                    except:
+                        coinpair_prices[r][k] = None
 
     detail['values'] = coinpair_prices
 
     out = {}
 
     for key, value in coinpair_prices.items():
-        out[key] = value['weighted_median_price']
+        if requested:
+            if key in requested:
+                if value['weighted_median_price']:
+                    out[key] = value['weighted_median_price']
+        else:
+            if value['weighted_median_price']:
+                out[key] = value['weighted_median_price']
 
-    if len(out)==1:
+    if requested and len(requested)==1:
+        if requested[0] in out:
+            out = out[requested[0]]
+        else:
+            out = None
+    
+    if not(requested) and  len(out)==1:
         out = list(out.values())[0]
 
     detail['time'] = datetime.datetime.now() - start_time
@@ -100,9 +156,11 @@ def get_price(
                 p[k] = float(p[k])
         for d in coinpair_prices.values():
             for k in ['weighings', 'prices']:
-                d[k] = [ float(x) for x in d[k] ]
+                if k in d:
+                    d[k] = [ float(x) for x in d[k] ]
             for k in ['median_price', 'mean_price', 'weighted_median_price']:
-                d[k] = float(d[k])
+                if d[k]:
+                    d[k] = float(d[k])
 
     if not out:
         return None
@@ -114,7 +172,7 @@ def get_price(
 if __name__ == '__main__':
     print("File: {}, Ok!".format(repr(__file__)))
     detail = {}
-    output = get_price(detail=detail, serializable=True)
+    output = get_price(ALL, detail=detail, serializable=True)
     print()
     print(json.dumps(detail, indent=4, sort_keys=True))
     print()

@@ -7,7 +7,7 @@ from weighing import weighing
 sys.path.append(dirname(dirname(abspath(__file__))))
 
 from moc_prices_source import __version__ as version
-from moc_prices_source import get_price
+from moc_prices_source import get_price, ALL
 
 
 
@@ -32,7 +32,7 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
 
     data = {}
     
-    get_price(detail=data, serializable=show_json)
+    get_price(ALL, detail=data, serializable=show_json)
 
     if show_json:
         print(json.dumps(data, indent=4, sort_keys=True))
@@ -59,11 +59,11 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
             row.append(round(p[
                 "percentual_weighing"]*100, 1))
         else:
-            row.append(None)
+            row.append('N/A')
         if p["time"]:
             row.append(format_time(p["time"]))
         else:
-            row.append(None)
+            row.append('N/A')
         table.append(row)
     if table:
         table.sort()
@@ -79,7 +79,10 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
         row.append(d['median_price'])
         row.append(d['mean_price'])
         row.append(d['weighted_median_price'])
-        row.append(len(d['prices']))
+        if 'prices' in d:
+            row.append(len(d['prices']))
+        else:
+            row.append('N/A')
         table.append(row)
     if table:
         table.sort()
