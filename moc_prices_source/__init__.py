@@ -8,9 +8,9 @@ bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
 sys.path.append(base_dir)
 
-from engines      import get_coinpair_list, get_engines_names, get_prices
-from engines.base import BTC_USD, RIF_BTC
-from weighing     import weighing, weighted_median, median, mean
+from engines             import get_coinpair_list, get_engines_names, get_prices
+from engines.engine_base import BTC_USD, RIF_BTC
+from weighing            import weighing, weighted_median, median, mean
 
 sys.path = bkpath
 

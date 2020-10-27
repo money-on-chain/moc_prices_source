@@ -7,19 +7,21 @@ base_dir = dirname(abspath(__file__))
 
 
 all_engines   = {}
-exclude       = ['base.py']
-mypath        = dirname(__file__)
-files         = [f for f in listdir(mypath) if isfile(path.join(mypath, f))]
+exclude       = ['engine_base.py']
+files         = [f for f in listdir(base_dir) if isfile(path.join(base_dir, f))]
 files         = [f for f in files if f not in exclude]
 modules_names = [ n[:-3] for n in files if n[-3:] =='.py' and n[:1]!='_']
 
-del listdir, path, isfile, dirname, mypath, files, exclude
+del listdir, path, isfile, dirname, files, exclude
+
+sys.path.append(base_dir)
+sys.path = sorted(list(set(sys.path[:])), key = lambda x: [
+    'moc_prices_source/engines' in x, x], reverse=True)
 
 for name in modules_names:
-    sys.path.append(base_dir)
     locals()[name] = __import__(name, globals(), locals()).Engine()
-    sys.path = bkpath
     all_engines[name] = locals()[name]
+sys.path = bkpath
 
 del name, modules_names
 
