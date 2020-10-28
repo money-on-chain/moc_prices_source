@@ -8,7 +8,7 @@ sys.path.append(dirname(base_dir))
 
 from moc_prices_source.cli      import command, option, tabulate, trim
 from moc_prices_source.weighing import weighing
-from moc_prices_source          import __version__ as version
+from moc_prices_source          import version
 from moc_prices_source          import get_price, ALL
 
 sys.path = bkpath
