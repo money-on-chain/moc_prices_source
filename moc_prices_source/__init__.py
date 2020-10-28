@@ -1,5 +1,7 @@
 __version__ = '0.1.5b'
 
+version = __version__
+
 import sys, json, datetime
 from os.path import dirname, abspath
 from decimal import Decimal
