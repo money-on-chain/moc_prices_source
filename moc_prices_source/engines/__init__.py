@@ -21,6 +21,7 @@ sys.path = sorted(list(set(sys.path[:])), key = lambda x: [
 for name in modules_names:
     locals()[name] = __import__(name, globals(), locals()).Engine()
     all_engines[name] = locals()[name]
+    
 sys.path = bkpath
 
 del name, modules_names
