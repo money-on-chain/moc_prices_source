@@ -1,4 +1,6 @@
-__version__ = '0.1.4'
+__version__ = '0.1.6'
+
+version = __version__
 
 import sys, json, datetime
 from os.path import dirname, abspath
@@ -6,11 +8,11 @@ from decimal import Decimal
 
 bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
-sys.path.append(base_dir)
+sys.path.append(dirname(base_dir))
 
-from engines             import get_coinpair_list, get_engines_names, get_prices
-from engines.engine_base import BTC_USD, RIF_BTC
-from weighing            import weighing, weighted_median, median, mean
+from moc_prices_source.engines             import get_coinpair_list, get_engines_names, get_prices
+from moc_prices_source.engines.engine_base import BTC_USD, RIF_BTC
+from moc_prices_source.weighing            import weighing, weighted_median, median, mean
 
 sys.path = bkpath
 
@@ -157,11 +159,12 @@ def get_price(
             if p['error']:
                 p['error'] = str(p['error'])
             for k in ['price', 'weighing', 'percentual_weighing', 'volume']:
-                p[k] = float(p[k])
+                if p[k]:
+                    p[k] = float(p[k])
         for d in coinpair_prices.values():
             for k in ['weighings', 'prices']:
                 if k in d:
-                    d[k] = [ float(x) for x in d[k] ]
+                    d[k] = [ float(x) for x in d[k] if d[k] ]
             for k in ['median_price', 'mean_price', 'weighted_median_price']:
                 if d[k]:
                     d[k] = float(d[k])
