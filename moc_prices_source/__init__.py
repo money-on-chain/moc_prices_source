@@ -1,13 +1,14 @@
-__version__ = '0.1.6'
-
-version = __version__
-
 import sys, json, datetime
 from os.path import dirname, abspath
 from decimal import Decimal
 
-bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
+
+with open(base_dir + "/version.txt", "r") as file_:
+    version = file_.read().split()[0]
+__version__ = version
+
+bkpath   = sys.path[:]
 sys.path.append(dirname(base_dir))
 
 from moc_prices_source.engines             import get_coinpair_list, get_engines_names, get_prices
@@ -178,6 +179,7 @@ def get_price(
 
 if __name__ == '__main__':
     print("File: {}, Ok!".format(repr(__file__)))
+    print('Version: {}'.format(version))
     detail = {}
     output = get_price(ALL, detail=detail, serializable=True)
     print()

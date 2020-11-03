@@ -2,15 +2,37 @@
 
 Prices source for MoC projects
 
+
 ## Requirements
 
 * Python 3.6+ support
 
+
 ## Installation
 
+Download from [Github](https://github.com/money-on-chain/moc_prices_source)
+
+Standing inside the folder, run:
+
 ```
-pip3 install .
+$ pip3 install -r requirements.txt 
 ```
+
+For install the dependencies and then run:
+
+```
+$ pip3 install .
+```
+
+Finally run:
+
+```
+$ moc_prices_source_check --version
+```
+
+To verify that it has been installed correctly
+
+
 
 ## Check that all is working ok
 
@@ -53,6 +75,7 @@ Options:
   -h, --help      Show this message and exit.
 user@host:~$ 
 ```
+
 
 ## Usage
 
