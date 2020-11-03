@@ -9,7 +9,7 @@ with open(base_dir + "/README.md", "r") as file_:
 with open(base_dir + "/requirements.txt", "r") as file_:
     requirements = file_.read().split()
 
-with open(base_dir + "/easy_chain/version.txt", "r") as file_:
+with open(base_dir + "/moc_prices_source/version.txt", "r") as file_:
     version = file_.read().split()[0]
 
 setup(
