@@ -1,11 +1,16 @@
-from setuptools        import setup, find_packages
-from moc_prices_source import version
+from setuptools import setup, find_packages
+from os.path    import dirname, abspath
 
-with open("README.md", "r") as file_:
+base_dir = dirname(abspath(__file__))
+
+with open(base_dir + "/README.md", "r") as file_:
     long_description = file_.read()
 
-with open("requirements.txt", "r") as file_:
+with open(base_dir + "/requirements.txt", "r") as file_:
     requirements = file_.read().split()
+
+with open(base_dir + "/easy_chain/version.txt", "r") as file_:
+    version = file_.read().split()[0]
 
 setup(
     name='moc_prices_source',
@@ -23,7 +28,8 @@ setup(
         'Programming Language :: Python :: 3.6'
     ],
     package_data={
-        "moc_prices_source": ["data/*.json"]
+        "moc_prices_source": ["version.txt",
+                              "data/*.json"]
     },
     python_requires='>=3.6',
     install_requires=requirements,
