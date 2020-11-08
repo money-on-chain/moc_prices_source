@@ -58,6 +58,15 @@ Coins = [ c for c in locals().values() if isinstance(c, Coin) ]
 
 
 
+def get_coin(value):
+    value = str(value).strip().lower()
+    try:
+        return dict([ (str(c.name).strip().lower(), c) for c in Coins])[value]
+    except KeyError:
+        return dict([ (str(c).strip().lower(), c) for c in Coins])[value]
+        
+
+
 class CoinPair(object):
 
     def __init__(self, from_: Coin, to_: Coin):
@@ -100,7 +109,14 @@ RIF_BTC = CoinPair(RIF, BTC)
 RIF_USD = CoinPair(RIF, USD)
 
 
+
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]
+
+
+
+def get_coin_pair(value):
+    value = str(value).strip().lower()
+    return dict([ (str(c).strip().lower(), c) for c in CoinPairs ])[value]
 
 
 
