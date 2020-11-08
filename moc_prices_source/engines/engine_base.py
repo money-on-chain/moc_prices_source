@@ -2,9 +2,10 @@ import requests
 import datetime
 from os.path import basename
 from decimal import Decimal
+from   coins import *
 
-RIF_BTC = "RIF/BTC"
-BTC_USD = "BTC/USD"
+#RIF_BTC = "RIF/BTC"
+#BTC_USD = "BTC/USD"
 
 
 

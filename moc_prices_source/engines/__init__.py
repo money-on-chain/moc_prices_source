@@ -7,7 +7,7 @@ base_dir = dirname(abspath(__file__))
 
 
 all_engines   = {}
-exclude       = ['engine_base.py']
+exclude       = ['engine_base.py', 'coins.py']
 files         = [f for f in listdir(base_dir) if isfile(path.join(base_dir, f))]
 files         = [f for f in files if f not in exclude]
 modules_names = [ n[:-3] for n in files if n[-3:] =='.py' and n[:1]!='_']
