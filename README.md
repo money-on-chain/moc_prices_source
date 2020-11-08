@@ -39,25 +39,24 @@ To verify that it has been installed correctly
 ```
 user@host:~$ moc_prices_source_check 
 
-Coin pair    Exchnage        Response    Weigh     %  Time
------------  ----------  ------------  -------  ----  ------
-BTC/USD      Bitfinex    13349            0.15  15.4  0.41s
-BTC/USD      Bitstamp    13361.8          0.23  22.6  0.25s
-BTC/USD      Coinbase    13369.3          0.4   40.3  0.31s
-BTC/USD      Gemini      13361.3          0.06   6.4  0.88s
-BTC/USD      Kraken      13365            0.15  15.2  0.39s
-RIF/BTC      BitHumb         7.8e-06      0.25  25    1.91s
-RIF/BTC      Bitfinex        6.36e-06     0.25  25    0.44s
-RIF/BTC      Coinbene        5.83e-06     0.25  25    0.84s
-RIF/BTC      Kucoin          7.58e-06     0.25  25    1.01s
+From       To       Exchnage        Response  U.      Weigh     %  Time
+---------  -------  ----------  ------------  ----  -------  ----  ------
+Bitcoin    Dollar   Bitfinex    15245         $        0.15  15.4  0.88s
+Bitcoin    Dollar   Bitstamp    15241.9       $        0.23  22.6  0.34s
+Bitcoin    Dollar   Coinbase    15236.5       $        0.4   40.3  0.27s
+Bitcoin    Dollar   Gemini      15246.8       $        0.06   6.4  0.87s
+Bitcoin    Dollar   Kraken      15239.4       $        0.15  15.2  0.4s
+RIF Token  Bitcoin  BitHumb         6.64e-06  ₿        0.33  33.3  3.09s
+RIF Token  Bitcoin  Coinbene        5.78e-06  ₿        0.33  33.3  1.27s
+RIF Token  Bitcoin  Kucoin          6.37e-06  ₿        0.33  33.3  1.16s
 
-Coin pair           Mediam            Mean    Weighted median  Sources
------------  -------------  --------------  -----------------  ---------
-BTC/USD      13361.8        13361.3             13365          5
-RIF/BTC          6.97e-06       6.8925e-06          6.36e-06   4
-RIF/USD          0.0931315      0.0920926           0.0850014  N/A
+Coin pair          Mediam             Mean    Weighted median  Sources
+-----------  ------------  ---------------  -----------------  ---------
+BTC/USD      15241.9       15241.9               15239.4       5
+RIF/BTC          6.37e-06      6.26333e-06           6.37e-06  3
+RIF/USD          0.097091      0.0954653             0.097075  N/A
 
-Response time 1.92s
+Response time 3.1s
 
 user@host:~$
 ```
@@ -131,12 +130,11 @@ btc_usd_bitfinex    0.153778
 btc_usd_kraken      0.152346
 btc_usd_coinbase    0.403366
 btc_usd_gemini      0.0643202
-rif_btc_bitfinex    0.25
-rif_btc_bithumbpro  0.25
-rif_btc_kucoin      0.25
-rif_btc_coinbene    0.25
+rif_btc_bithumbpro  0.333333
+rif_btc_kucoin      0.333333
+rif_btc_coinbene    0.333333
 >>> weighing.as_dict
-{'btc_usd_bitstamp': Decimal('0.226189632'), 'btc_usd_bitfinex': Decimal('0.1537782868'), 'btc_usd_kraken': Decimal('0.1523461274'), 'btc_usd_coinbase': Decimal('0.4033657328'), 'btc_usd_gemini': Decimal('0.06432022093'), 'rif_btc_bitfinex': Decimal('0.25'), 'rif_btc_bithumbpro': Decimal('0.25'), 'rif_btc_kucoin': Decimal('0.25'), 'rif_btc_coinbene': Decimal('0.25')}
+{'btc_usd_bitstamp': Decimal('0.226189632'), 'btc_usd_bitfinex': Decimal('0.1537782868'), 'btc_usd_kraken': Decimal('0.1523461274'), 'btc_usd_coinbase': Decimal('0.4033657328'), 'btc_usd_gemini': Decimal('0.06432022093'), 'rif_btc_bithumbpro': Decimal('0.333333333'), 'rif_btc_kucoin': Decimal('0.333333333'), 'rif_btc_coinbene': Decimal('0.333333333')}
 >>> 
 ```
 
@@ -157,26 +155,11 @@ Show all details of the coin pair obtained
 >>> values = get_price(ALL, detail = d, serializable = True)
 >>>
 >>> values
-{'RIF/BTC': Decimal('0.00000636'), 'BTC/USD': Decimal('13380.07'), 'RIF/USD': Decimal('0.0850972452')}
+{<BTC/USD Coin Pair object>: Decimal('15250.00000'), <RIF/BTC Coin Pair object>: Decimal('0.00000637'), <RIF/USD Coin Pair object>: Decimal('0.0971425000000')}
 >>>
 >>> print(json.dumps(d, indent=4, sort_keys=True))
 {
     "prices": [
-        {
-            "coinpair": "RIF/BTC",
-            "description": "Bitfinex",
-            "error": null,
-            "name": "rif_btc_bitfinex",
-            "ok": true,
-            "percentual_weighing": 0.25,
-            "price": 6.36e-06,
-            "time": 0.520118,
-            "timeout": 10,
-            "timestamp": "2020-10-27 11:44:36",
-            "uri": "https://api-pub.bitfinex.com/v2/ticker/tRIFBTC",
-            "volume": 199741.08473236,
-            "weighing": 0.25
-        },
         {
             "coinpair": "BTC/USD",
             "description": "Bitstamp",
@@ -184,12 +167,12 @@ Show all details of the coin pair obtained
             "name": "btc_usd_bitstamp",
             "ok": true,
             "percentual_weighing": 0.22618963201583328,
-            "price": 13385.48,
-            "time": 0.331992,
+            "price": 15248.38,
+            "time": 0.279066,
             "timeout": 10,
-            "timestamp": "2020-10-27 14:44:34",
+            "timestamp": "2020-11-08 14:23:02",
             "uri": "https://www.bitstamp.net/api/v2/ticker/btcusd/",
-            "volume": 8629.96055351,
+            "volume": 10835.66006591,
             "weighing": 0.226189632
         },
         {
@@ -198,14 +181,14 @@ Show all details of the coin pair obtained
             "error": null,
             "name": "rif_btc_coinbene",
             "ok": true,
-            "percentual_weighing": 0.25,
-            "price": 5.87e-06,
-            "time": 0.923952,
+            "percentual_weighing": 0.3333333333333333,
+            "price": 5.8e-06,
+            "time": 1.571258,
             "timeout": 10,
-            "timestamp": "2020-10-27 11:44:36",
+            "timestamp": "2020-11-08 11:23:04",
             "uri": "http://api.coinbene.com/v1/market/ticker?symbol=RIFBTC",
-            "volume": 502351.35,
-            "weighing": 0.25
+            "volume": 806810.93,
+            "weighing": 0.333333333
         },
         {
             "coinpair": "BTC/USD",
@@ -214,12 +197,12 @@ Show all details of the coin pair obtained
             "name": "btc_usd_bitfinex",
             "ok": true,
             "percentual_weighing": 0.15377828681076447,
-            "price": 13377.0,
-            "time": 0.509504,
+            "price": 15248.22269385,
+            "time": 0.267649,
             "timeout": 10,
-            "timestamp": "2020-10-27 11:44:36",
+            "timestamp": "2020-11-08 11:23:02",
             "uri": "https://api-pub.bitfinex.com/v2/ticker/tBTCUSD",
-            "volume": 5274.6920961,
+            "volume": 14362.55862314,
             "weighing": 0.1537782868
         },
         {
@@ -229,10 +212,10 @@ Show all details of the coin pair obtained
             "name": "btc_usd_gemini",
             "ok": true,
             "percentual_weighing": 0.06432022093450242,
-            "price": 13380.27,
-            "time": 1.120871,
+            "price": 15254.3,
+            "time": 0.952623,
             "timeout": 10,
-            "timestamp": "2020-10-27 11:44:36",
+            "timestamp": "2020-11-08 11:23:03",
             "uri": "https://api.gemini.com/v1/pubticker/BTCUSD",
             "volume": 0.0,
             "weighing": 0.06432022093
@@ -244,10 +227,10 @@ Show all details of the coin pair obtained
             "name": "btc_usd_coinbase",
             "ok": true,
             "percentual_weighing": 0.4033657328282356,
-            "price": 13380.07,
-            "time": 0.29592,
+            "price": 15251.88,
+            "time": 0.246729,
             "timeout": 10,
-            "timestamp": "2020-10-27 11:44:35",
+            "timestamp": "2020-11-08 11:23:02",
             "uri": "https://api.coinbase.com/v2/prices/spot?currency=USD",
             "volume": 0.0,
             "weighing": 0.4033657328
@@ -259,12 +242,12 @@ Show all details of the coin pair obtained
             "name": "btc_usd_kraken",
             "ok": true,
             "percentual_weighing": 0.15234612741066422,
-            "price": 13386.6,
-            "time": 0.335535,
+            "price": 15250.0,
+            "time": 0.265883,
             "timeout": 10,
-            "timestamp": "2020-10-27 11:44:35",
+            "timestamp": "2020-11-08 11:23:02",
             "uri": "https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD",
-            "volume": 5985.07438025,
+            "volume": 8018.38037875,
             "weighing": 0.1523461274
         },
         {
@@ -273,14 +256,14 @@ Show all details of the coin pair obtained
             "error": null,
             "name": "rif_btc_kucoin",
             "ok": true,
-            "percentual_weighing": 0.25,
-            "price": 7.32e-06,
-            "time": 0.927223,
+            "percentual_weighing": 0.3333333333333333,
+            "price": 6.37e-06,
+            "time": 0.932421,
             "timeout": 10,
-            "timestamp": "2020-10-27 11:44:36",
+            "timestamp": "2020-11-08 11:23:03",
             "uri": "https://openapi-v2.kucoin.com/api/v1/market/orderbook/level1?symbol=RIF-BTC",
-            "volume": 511.2108,
-            "weighing": 0.25
+            "volume": 963.5025,
+            "weighing": 0.333333333
         },
         {
             "coinpair": "RIF/BTC",
@@ -288,27 +271,27 @@ Show all details of the coin pair obtained
             "error": null,
             "name": "rif_btc_bithumbpro",
             "ok": true,
-            "percentual_weighing": 0.25,
-            "price": 7.78e-06,
-            "time": 1.741697,
+            "percentual_weighing": 0.3333333333333333,
+            "price": 6.67e-06,
+            "time": 1.836675,
             "timeout": 10,
-            "timestamp": "2020-10-27 11:44:37",
+            "timestamp": "2020-11-08 11:23:04",
             "uri": "https://global-openapi.bithumb.pro/openapi/v1/spot/ticker?symbol=RIF-BTC",
-            "volume": 39874.55,
-            "weighing": 0.25
+            "volume": 27932.67,
+            "weighing": 0.333333333
         }
     ],
-    "time": 1.773495,
+    "time": 1.882155,
     "values": {
         "BTC/USD": {
-            "mean_price": 13381.884,
-            "median_price": 13380.27,
+            "mean_price": 15250.55653877,
+            "median_price": 15250.0,
             "prices": [
-                13385.48,
-                13377.0,
-                13380.27,
-                13380.07,
-                13386.6
+                15248.38,
+                15248.22269385,
+                15254.3,
+                15251.88,
+                15250.0
             ],
             "weighings": [
                 0.22618963201583328,
@@ -317,35 +300,57 @@ Show all details of the coin pair obtained
                 0.4033657328282356,
                 0.15234612741066422
             ],
-            "weighted_median_price": 13380.07
+            "weighted_median_price": 15250.0
         },
         "RIF/BTC": {
-            "mean_price": 6.8325e-06,
-            "median_price": 6.84e-06,
+            "mean_price": 6.28e-06,
+            "median_price": 6.37e-06,
             "prices": [
-                6.36e-06,
-                5.87e-06,
-                7.32e-06,
-                7.78e-06
+                5.8e-06,
+                6.37e-06,
+                6.67e-06
             ],
             "weighings": [
-                0.25,
-                0.25,
-                0.25,
-                0.25
+                0.3333333333333333,
+                0.3333333333333333,
+                0.3333333333333333
             ],
-            "weighted_median_price": 6.36e-06
+            "weighted_median_price": 6.37e-06
         },
         "RIF/USD": {
-            "mean_price": 0.09143172243,
-            "median_price": 0.0915210468,
+            "mean_price": 0.0957734950634756,
+            "median_price": 0.0971425,
             "requirements": [
                 "RIF/BTC",
                 "BTC/USD"
             ],
-            "weighted_median_price": 0.0850972452
+            "weighted_median_price": 0.0971425
         }
     }
 }
 >>> 
+```
+
+`Coin object` and `Coin Pair object` usage:
+
+```
+>>> BTC_USD
+<BTC/USD Coin Pair object>
+>>> str(BTC_USD)
+'BTC/USD'
+>>> BTC_USD.from_
+<Bitcoin Coin object>
+>>> str(BTC_USD.from_)
+'BTC'
+>>> BTC_USD.to_
+<Dollar Coin object>
+>>> str(BTC_USD.to_)
+'USD'
+>>> BTC_USD.from_.symbol
+'BTC'
+>>> BTC_USD.from_.name
+'Bitcoin'
+>>> BTC_USD.from_.small_symbol
+'₿'
+>>>
 ```
