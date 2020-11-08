@@ -14,14 +14,15 @@ sys.path.append(dirname(base_dir))
 from moc_prices_source.engines             import get_coinpair_list, get_engines_names, get_prices
 from moc_prices_source.engines.engine_base import BTC_USD, RIF_BTC
 from moc_prices_source.weighing            import weighing, weighted_median, median, mean
+from moc_prices_source.coins               import *
 
 sys.path = bkpath
 
 
 
-RIF_USD = 'RIF/USD'
+ALL = CoinPairs
 
-ALL = [BTC_USD, RIF_BTC, RIF_USD]
+
 
 computed_pairs = {
     RIF_USD: {
@@ -154,6 +155,7 @@ def get_price(
     if serializable:
         detail['time'] = detail['time'].seconds + detail['time'].microseconds/1000000
         for p in prices:
+            p['coinpair'] = str(p['coinpair'])
             if p['time']:
                 p['time'] = p['time'].seconds + p['time'].microseconds/1000000
             p['timestamp'] = str(p['timestamp'])
@@ -169,6 +171,13 @@ def get_price(
             for k in ['median_price', 'mean_price', 'weighted_median_price']:
                 if d[k]:
                     d[k] = float(d[k])
+        for k in list(coinpair_prices.keys()):
+            v = coinpair_prices[k]
+            del coinpair_prices[k]
+            coinpair_prices[str(k)] = v
+            if 'requirements' in coinpair_prices[str(k)]:
+                coinpair_prices[str(k)]['requirements'] = list(
+                    map(str, coinpair_prices[str(k)]['requirements']))
 
     if not out:
         return None

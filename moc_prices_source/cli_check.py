@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import json, sys
 from os.path  import dirname, abspath
 
@@ -52,12 +51,15 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
     table=[]
     for p in prices:
         row = []
-        row.append(p["coinpair"])
+        row.append(p["coinpair"].from_.name)
+        row.append(p["coinpair"].to_.name)
         row.append(p["description"])
         if p["ok"]:
             row.append(p["price"])
+            row.append(p["coinpair"].to_.small_symbol)
         else:
             row.append(trim(p["error"], 25))
+            row.append(None)
         row.append(round(p["weighing"], 2))
         if p["percentual_weighing"]:
             row.append(round(p[
@@ -70,10 +72,10 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
             row.append('N/A')
         table.append(row)
     if table:
-        table.sort()
+        table.sort(key=str)
         print()
         print(tabulate(table, headers=[
-            'Coin pair', 'Exchnage', 'Response', 'Weigh', '%', 'Time'
+            'From', 'To', 'Exchnage', 'Response', 'U.', 'Weigh', '%', 'Time'
         ]))
 
     table=[]
@@ -89,7 +91,7 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
             row.append('N/A')
         table.append(row)
     if table:
-        table.sort()
+        table.sort(key=str)
         print()
         print(tabulate(table, headers=[
             'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources'
