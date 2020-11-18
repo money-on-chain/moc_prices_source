@@ -109,23 +109,33 @@ def get_values(log):
     data = []
 
     for p in d['prices']:
+        timestamp = p['timestamp'] if p['timestamp'] else datetime.datetime.now().replace(microsecond=0)
+        coinpair =  p['coinpair']
+        name =      p['description']
+        price =     p['price']
+        weighing =  p['percentual_weighing']
         row = {
-            'timestamp': p['timestamp'] if p['timestamp'] else datetime.datetime.now().replace(microsecond=0),
-            'coinpair':  p['coinpair'],
-            'name':      p['description'],
-            'price':     p['price'],
-            'weighing':  p['percentual_weighing']
+            'timestamp': timestamp,
+            'coinpair':  coinpair,
+            'name':      name,
+            'price':     price,
+            'weighing':  weighing
         }
+        log.verbose(f'Exchange {name} {coinpair} value: {price}')
         data.append(row)
 
     for coinpair, v in d['values'].items():
+        median_price =          v['median_price']
+        mean_price =            v['mean_price']
+        weighted_median_price = v['weighted_median_price']
         row = {
             'timestamp':             datetime.datetime.now().replace(microsecond=0),
             'coinpair':              coinpair,
-            'median_price':          v['median_price'],
-            'mean_price':            v['mean_price'],
-            'weighted_median_price': v['weighted_median_price']
+            'median_price':          median_price,
+            'mean_price':            mean_price,
+            'weighted_median_price': weighted_median_price
         }
+        log.info(f'{coinpair} weighted:{weighted_median_price}, median;{median_price}, mean:{mean_price}')
         data.append(row)
 
     out = []
