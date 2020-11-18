@@ -33,5 +33,6 @@ setup(
     },
     python_requires='>=3.6',
     install_requires=requirements,
-    scripts=['moc_prices_source_check']
+    scripts=['moc_prices_source_check',
+             'moc_prices_source_to_db']
 )
