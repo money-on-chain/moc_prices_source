@@ -1,4 +1,3 @@
-import datetime
 from engine_base import Base, BTC_USD
 
 
@@ -10,12 +9,9 @@ class Engine(Base):
     _coinpair    = BTC_USD
 
     def _map(self, data):
-        timestamp = self._utcfromtimestamp(data['timestamp'])
-        timestamp = timestamp - datetime.timedelta(hours=3)
         return {
             'price':  data['last'],
-            'volume': data['volume'],
-            'timestamp': timestamp }
+            'volume': data['volume']}
 
 
 if __name__ == '__main__':
