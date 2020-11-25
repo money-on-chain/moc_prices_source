@@ -48,8 +48,6 @@ class Base(object):
 
 
     def __init__(self, session=None):
-        if not session:
-            session = requests.Session()
         self._session = session
         self._clean_output_values()
 
@@ -141,6 +139,8 @@ class Base(object):
         start_time = datetime.datetime.now()
 
         session = self._session
+        if not session:
+            session = requests.Session()
         self._clean_output_values()
 
         try:
