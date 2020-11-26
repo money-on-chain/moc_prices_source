@@ -138,13 +138,12 @@ class Base(object):
 
         start_time = datetime.datetime.now()
 
-        session = self._session
-        if not session:
-            session = requests.Session()
+        get = requests.get if self._session==None else self._session.get
+
         self._clean_output_values()
 
         try:
-            response = session.get(self.uri, timeout=self.timeout)
+            response = get(self.uri, timeout=self.timeout)
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             self._error = e
