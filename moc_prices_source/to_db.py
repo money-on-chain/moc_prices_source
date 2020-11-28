@@ -164,7 +164,9 @@ def get_values(log):
     help='Verbose mode.')
 @option('-f', '--frequency', 'frequency', type=int, default=5,
     help='Loop delay in seconds.')
-def cli_values_to_db(frequency, verbose=0, ):
+@option('-i', '--interval', 'interval', type=int, default=0,
+    help='How long the program runs (in minutes, 0 = infinity)')
+def cli_values_to_db(frequency, verbose=0, interval=0):
     """ MoC prices source to DB """
 
     app_name = 'moc_prices_source'
@@ -181,8 +183,16 @@ def cli_values_to_db(frequency, verbose=0, ):
 
     output = OutputDB(app_name, verbose=log.verbose, critical=log.critical)
 
+    start_time = datetime.datetime.now()
+
+    def condition():
+        if not interval:
+            return True
+        until_now = datetime.datetime.now() - start_time
+        return until_now <= datetime.timedelta(minutes=interval)
+
     try:
-        while True:
+        while condition():
             output(get_values(log))
             sleep(frequency)
     except KeyboardInterrupt:
@@ -190,6 +200,9 @@ def cli_values_to_db(frequency, verbose=0, ):
         print()
         print('Aborted!')
         print()
+
+    if not condition():
+        log.info(f'Ends (interval {interval}m)')        
 
 
 
