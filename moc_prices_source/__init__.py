@@ -56,6 +56,8 @@ def get_price(
             if c in computed_pairs:
                 for r in computed_pairs[c]['requirements']:
                     new_coinpairs.append(r)
+            elif c in ALL:
+                new_coinpairs.append(c)
         coinpairs = list(set(new_coinpairs))
 
     if 'as_dict' in dir(weighing):
