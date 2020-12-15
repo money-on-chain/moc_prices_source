@@ -5,7 +5,7 @@ class Engine(Base):
 
     _name        = Base._name_from_file(__file__)
     _description = "RSK_2"
-    _uri         = "http://134.209.68.142:3000"
+    _uri         = "http://64.225.31.252:3000"
     _coinpair    = RIF_BTC
 
     def _map(self, data):
