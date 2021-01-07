@@ -1,12 +1,12 @@
-from engine_base import Base, BTC_USD
+from engine_base import Base, RIF_BTC
 
 
 class Engine(Base):
 
     _name        = Base._name_from_file(__file__)
     _description = "Binance"
-    _uri         = "https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT"
-    _coinpair    = BTC_USD
+    _uri         = "https://api.binance.com/api/v3/ticker/24hr?symbol=RIFBTC"
+    _coinpair    = RIF_BTC
 
     def _map(self, data):
         return {
