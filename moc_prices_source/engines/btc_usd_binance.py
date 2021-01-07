@@ -5,7 +5,7 @@ class Engine(Base):
 
     _name        = Base._name_from_file(__file__)
     _description = "Binance"
-    _uri         = "https://api.binance.com/api/v1/ticker/24hr?symbol=BTCUSDT"
+    _uri         = "https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT"
     _coinpair    = BTC_USD
 
     def _map(self, data):
