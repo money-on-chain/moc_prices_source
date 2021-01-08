@@ -12,6 +12,7 @@ class Base(object):
     _uri         = "http://api.pricefetcher.com/BTCUSD"
     _coinpair    = BTC_USD
     _timeout     = 10
+    _max_age     = 30
 
 
     @property
@@ -45,6 +46,7 @@ class Base(object):
         self._timestamp = None
         self._error     = None
         self._time      = None
+        self._age       = None
 
 
     def __init__(self, session=None):
@@ -60,6 +62,16 @@ class Base(object):
     @property
     def volume(self):
         return self._volume
+
+
+    @property
+    def age(self):
+        return self._age
+
+
+    @property
+    def max_age(self):
+        return self._max_age
 
 
     @property
@@ -128,7 +140,8 @@ class Base(object):
             'timestamp',
             'uri',
             'volume',
-            'time']:
+            'time',
+            'age']:
             out[attr] = getattr(self, attr, None)
         out['ok'] = bool(self)
         return out
@@ -159,6 +172,17 @@ class Base(object):
         if response.status_code != 200:
             self._error = "Response error (code {})".format(
                 response.status_code)
+            return False
+
+        try:
+            self._age = int(response.headers['age'])
+        except ValueError:
+            self._age = None
+        except KeyError:
+            self._age = None
+
+        if self._age!=None and self._age > self._max_age:
+            self._error = str(f"Response age error (age > {self._max_age})")
             return False
 
         try:
