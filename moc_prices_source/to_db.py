@@ -1,6 +1,7 @@
 import sys, datetime
-from os.path import dirname, abspath
-from time    import sleep
+from os.path  import dirname, abspath
+from time     import sleep
+from tabulate import tabulate
 
 bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
@@ -13,6 +14,7 @@ from moc_prices_source.database   import database, database_error_message
 from moc_prices_source.my_logging import make_log, INFO, DEBUG, VERBOSE
 
 sys.path = bkpath
+app_name = 'moc_prices_source'
 
 
 
@@ -114,12 +116,16 @@ def get_values(log):
         name =      p['description']
         price =     p['price']
         weighing =  p['percentual_weighing']
+        age =       p['age']
+        error =     p['error']
         row = {
             'timestamp': timestamp,
             'coinpair':  coinpair,
             'name':      name,
             'price':     price,
-            'weighing':  weighing
+            'weighing':  weighing,
+            'age': age,
+            'error': error
         }
         log.verbose(f'Exchange {name} {coinpair} value: {price}')
         data.append(row)
@@ -169,8 +175,6 @@ def get_values(log):
 def cli_values_to_db(frequency, verbose=0, interval=0):
     """ MoC prices source to DB """
 
-    app_name = 'moc_prices_source'
-
     # Logger
     if verbose==0:
         level = INFO
@@ -208,3 +212,8 @@ def cli_values_to_db(frequency, verbose=0, interval=0):
 
 if __name__ == '__main__':
     print("File: {}, Ok!".format(repr(__file__)))
+    log = make_log(app_name, level = INFO)
+    values = get_values(log)
+    print()
+    print(tabulate(values, headers=['timestamp', 'key', 'value']))
+    print()
