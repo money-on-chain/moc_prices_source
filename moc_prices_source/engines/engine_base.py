@@ -1,4 +1,4 @@
-import requests, datetime
+import requests, datetime, json
 from os.path import basename
 from decimal import Decimal
 from coins   import *
@@ -145,6 +145,22 @@ class Base(object):
             out[attr] = getattr(self, attr, None)
         out['ok'] = bool(self)
         return out
+
+
+    @property
+    def as_json(self):
+        data = self.as_dict
+        for k in data.keys():
+            if k in data:
+                v = data[k]
+                if isinstance(v, Decimal):
+                    data[k] = float(v)
+                if isinstance(v, datetime.datetime):
+                    data[k] = datetime.datetime.timestamp(v)
+                elif v!=None and not(isinstance(v, (int, bool, float))):
+                    print(type(v))
+                    data[k] = str(v)
+        return json.dumps(data, indent=4, sort_keys=True)
 
 
     def __call__(self):
