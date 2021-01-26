@@ -1,18 +1,22 @@
 import requests, datetime, json
-from os.path import basename
-from decimal import Decimal
-from coins   import *
+from sys          import stderr
+from os.path      import basename, dirname, abspath, expanduser
+from decimal      import Decimal
+from json.decoder import JSONDecodeError
+from redis        import Redis, ConnectionError
+from coins        import *
 
 
 
 class Base(object):
 
-    _name        = "base"
-    _description = "Base Engine"
-    _uri         = "http://api.pricefetcher.com/BTCUSD"
-    _coinpair    = BTC_USD
-    _timeout     = 10
-    _max_age     = 30
+    _name             = "base"
+    _description      = "Base Engine"
+    _uri              = "http://api.pricefetcher.com/BTCUSD"
+    _coinpair         = BTC_USD
+    _timeout          = 10
+    _max_age          = 30
+    _redis_expiration = datetime.timedelta(minutes=60)
 
 
     @property
@@ -50,6 +54,53 @@ class Base(object):
 
 
     def __init__(self, session=None):
+
+        app_dir  = dirname(dirname(abspath(__file__)))
+        app_name = basename(app_dir)
+        redis_conf_files = [expanduser("~") + '/.' + app_name + '/redis.json',
+                            expanduser("~") + '/.' + app_name + '/redis_default.json',
+                            app_dir + '/data/redis.json',
+                            app_dir + '/data/redis_default.json']
+
+        redis_conf = {}
+        for file_ in redis_conf_files:
+            try:
+                with open(file_, 'r') as f:
+                    redis_conf = json.load(f)
+            except JSONDecodeError as e:
+                print(f'Error in "{file_}", {str(e)}', file=stderr)
+                exit(1)
+            except Exception as e:
+                redis_conf = {}
+            if redis_conf:
+                break
+        
+        self._redis_enable = redis_conf.get('enable', False)
+
+        if self._redis_enable:
+
+            self._redis_path = app_name + '/' + self._name
+
+            redis_connection = {}
+
+            for key, type_ in [('host',             str),
+                               ('port',             int),
+                               ('db',               int),
+                               ('unix_socket_path', str)]:
+                if key in redis_conf:
+                    try:
+                        redis_connection[key] = type_(redis_conf[key])
+                    except Exception as e:
+                        print(f'Error in "{file_}", {str(e)}', file=stderr)
+                        exit(1)
+
+            try:
+                self._redis = Redis(**redis_connection)
+                self._redis.ping()
+            except Exception as e:
+                print(f'Error in "{file_}", {str(e)}', file=stderr)
+                exit(1)
+
         self._session = session
         self._clean_output_values()
 
@@ -158,7 +209,6 @@ class Base(object):
                 if isinstance(v, datetime.datetime):
                     data[k] = datetime.datetime.timestamp(v)
                 elif v!=None and not(isinstance(v, (int, bool, float))):
-                    print(type(v))
                     data[k] = str(v)
         return json.dumps(data, indent=4, sort_keys=True)
 
@@ -233,6 +283,14 @@ class Base(object):
             self._volume = 0.0
 
         self._time = datetime.datetime.now() - start_time
+
+        if self._redis_enable:
+
+            path = self._redis_path
+            data = self.as_json
+            time = self._redis_expiration
+
+            self._redis.setex(path, time, data)
 
         return True
 
