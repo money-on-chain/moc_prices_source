@@ -6,8 +6,8 @@ class Engine(Base):
     _name        = Base._name_from_file(__file__)
     _description = "Coinbene"
     _uri         = "https://openapi-exchange.coinbene.com/api/exchange/v2/market/ticker/one?symbol=RIF%2FBTC"
-
     _coinpair    = RIF_BTC
+    _max_time_without_price_change = 0 # zero means infinity
 
     def _map(self, data):
         return {

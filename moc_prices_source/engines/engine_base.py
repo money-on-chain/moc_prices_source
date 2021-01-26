@@ -1,18 +1,23 @@
-import requests, datetime
-from os.path import basename
-from decimal import Decimal
-from coins   import *
+import requests, datetime, json
+from sys          import stderr
+from os.path      import basename, dirname, abspath, expanduser
+from decimal      import Decimal
+from json.decoder import JSONDecodeError
+from redis        import Redis, ConnectionError
+from coins        import *
 
 
 
 class Base(object):
 
-    _name        = "base"
-    _description = "Base Engine"
-    _uri         = "http://api.pricefetcher.com/BTCUSD"
-    _coinpair    = BTC_USD
-    _timeout     = 10
-    _max_age     = 30
+    _name                          = "base"
+    _description                   = "Base Engine"
+    _uri                           = "http://api.pricefetcher.com/BTCUSD"
+    _coinpair                      = BTC_USD
+    _timeout                       = 10
+    _max_age                       = 30
+    _max_time_without_price_change = 180 # zero means infinity
+    _redis_expiration              = 3600
 
 
     @property
@@ -41,15 +46,63 @@ class Base(object):
 
 
     def _clean_output_values(self):
-        self._price     = None
-        self._volume    = None
-        self._timestamp = None
-        self._error     = None
-        self._time      = None
-        self._age       = None
+        self._price                 = None
+        self._volume                = None
+        self._timestamp             = None
+        self._last_change_timestamp = None
+        self._error                 = None
+        self._time                  = None
+        self._age                   = None
 
 
     def __init__(self, session=None):
+
+        app_dir  = dirname(dirname(abspath(__file__)))
+        app_name = basename(app_dir)
+        redis_conf_files = [expanduser("~") + '/.' + app_name + '/redis.json',
+                            expanduser("~") + '/.' + app_name + '/redis_default.json',
+                            app_dir + '/data/redis.json',
+                            app_dir + '/data/redis_default.json']
+
+        redis_conf = {}
+        for file_ in redis_conf_files:
+            try:
+                with open(file_, 'r') as f:
+                    redis_conf = json.load(f)
+            except JSONDecodeError as e:
+                print(f'Error in "{file_}", {str(e)}', file=stderr)
+                exit(1)
+            except Exception as e:
+                redis_conf = {}
+            if redis_conf:
+                break
+        
+        self._redis_enable = redis_conf.get('enable', False)
+
+        if self._redis_enable:
+
+            self._redis_path = app_name + '/' + self._name
+
+            redis_connection = {}
+
+            for key, type_ in [('host',             str),
+                               ('port',             int),
+                               ('db',               int),
+                               ('unix_socket_path', str)]:
+                if key in redis_conf:
+                    try:
+                        redis_connection[key] = type_(redis_conf[key])
+                    except Exception as e:
+                        print(f'Error in "{file_}", {str(e)}', file=stderr)
+                        exit(1)
+
+            try:
+                self._redis = Redis(**redis_connection)
+                self._redis.ping()
+            except Exception as e:
+                print(f'Error in "{file_}", {str(e)}', file=stderr)
+                exit(1)
+
         self._session = session
         self._clean_output_values()
 
@@ -78,6 +131,9 @@ class Base(object):
     def timestamp(self):
         return self._timestamp
 
+    @property
+    def last_change_timestamp(self):
+        return self._last_change_timestamp
 
     @property
     def error(self):
@@ -138,6 +194,7 @@ class Base(object):
             'price',
             'timeout',
             'timestamp',
+            'last_change_timestamp',
             'uri',
             'volume',
             'time',
@@ -145,6 +202,21 @@ class Base(object):
             out[attr] = getattr(self, attr, None)
         out['ok'] = bool(self)
         return out
+
+
+    @property
+    def as_json(self):
+        data = self.as_dict
+        for k in data.keys():
+            if k in data:
+                v = data[k]
+                if isinstance(v, Decimal):
+                    data[k] = float(v)
+                if isinstance(v, datetime.datetime):
+                    data[k] = datetime.datetime.timestamp(v)
+                elif v!=None and not(isinstance(v, (int, bool, float))):
+                    data[k] = str(v)
+        return json.dumps(data, indent=4, sort_keys=True)
 
 
     def __call__(self):
@@ -206,6 +278,7 @@ class Base(object):
                 return False
         else:
             self._timestamp = self._now()
+        self._last_change_timestamp = self._timestamp
 
         if 'volume' in info:
             try:
@@ -217,6 +290,45 @@ class Base(object):
             self._volume = 0.0
 
         self._time = datetime.datetime.now() - start_time
+
+        if self._redis_enable:
+
+            path = self._redis_path
+
+            if self._max_time_without_price_change:
+
+                try:
+                    pre_data = json.loads(self._redis.get(path))
+                except Exception:
+                    pre_data = {}
+                if not isinstance(pre_data, dict):
+                    pre_data = {}
+
+                try:
+                    pre_last_change_timestamp = datetime.datetime.fromtimestamp(pre_data['last_change_timestamp'])
+                except Exception:
+                    pre_last_change_timestamp = None
+
+                try:
+                    pre_price = Decimal(pre_data['price'])
+                except Exception:
+                    pre_price = None
+
+                if pre_price!=None and pre_last_change_timestamp!=None:
+                    if pre_price==self._price:
+                        self._last_change_timestamp = pre_last_change_timestamp
+            
+                max_time_without_price_change = datetime.timedelta(seconds=self._max_time_without_price_change)
+                time_without_price_change     = datetime.datetime.now()-self._last_change_timestamp
+
+                if time_without_price_change > max_time_without_price_change:
+                    self._error = str(f"Too much time without price change (t > {max_time_without_price_change})")
+                    return False
+
+            data = self.as_json
+            time = datetime.timedelta(seconds=self._redis_expiration)
+
+            self._redis.setex(path, time, data)
 
         return True
 
