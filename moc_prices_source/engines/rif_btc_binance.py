@@ -7,6 +7,7 @@ class Engine(Base):
     _description = "Binance"
     _uri         = "https://api.binance.com/api/v3/ticker/24hr?symbol=RIFBTC"
     _coinpair    = RIF_BTC
+    _max_time_without_price_change = 0 # zero means infinity
 
     def _map(self, data):
         return {

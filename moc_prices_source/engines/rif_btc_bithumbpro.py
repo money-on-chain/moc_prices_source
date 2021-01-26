@@ -7,6 +7,7 @@ class Engine(Base):
     _description = "BitHumb"
     _uri         = "https://global-openapi.bithumb.pro/openapi/v1/spot/ticker?symbol=RIF-BTC"
     _coinpair    = RIF_BTC
+    _max_time_without_price_change = 0 # zero means infinity
 
     def _map(self, data):
         return {

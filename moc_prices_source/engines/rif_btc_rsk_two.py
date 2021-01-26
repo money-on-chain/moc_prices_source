@@ -7,6 +7,7 @@ class Engine(Base):
     _description = "RSK_2"
     _uri         = "http://64.225.31.252:3000"
     _coinpair    = RIF_BTC
+    _max_time_without_price_change = 0 # zero means infinity
 
     def _map(self, data):
         return {

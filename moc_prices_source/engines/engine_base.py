@@ -10,13 +10,14 @@ from coins        import *
 
 class Base(object):
 
-    _name             = "base"
-    _description      = "Base Engine"
-    _uri              = "http://api.pricefetcher.com/BTCUSD"
-    _coinpair         = BTC_USD
-    _timeout          = 10
-    _max_age          = 30
-    _redis_expiration = datetime.timedelta(minutes=60)
+    _name                          = "base"
+    _description                   = "Base Engine"
+    _uri                           = "http://api.pricefetcher.com/BTCUSD"
+    _coinpair                      = BTC_USD
+    _timeout                       = 10
+    _max_age                       = 30
+    _max_time_without_price_change = 180 # zero means infinity
+    _redis_expiration              = 3600
 
 
     @property
@@ -45,12 +46,13 @@ class Base(object):
 
 
     def _clean_output_values(self):
-        self._price     = None
-        self._volume    = None
-        self._timestamp = None
-        self._error     = None
-        self._time      = None
-        self._age       = None
+        self._price                 = None
+        self._volume                = None
+        self._timestamp             = None
+        self._last_change_timestamp = None
+        self._error                 = None
+        self._time                  = None
+        self._age                   = None
 
 
     def __init__(self, session=None):
@@ -129,6 +131,9 @@ class Base(object):
     def timestamp(self):
         return self._timestamp
 
+    @property
+    def last_change_timestamp(self):
+        return self._last_change_timestamp
 
     @property
     def error(self):
@@ -189,6 +194,7 @@ class Base(object):
             'price',
             'timeout',
             'timestamp',
+            'last_change_timestamp',
             'uri',
             'volume',
             'time',
@@ -272,6 +278,7 @@ class Base(object):
                 return False
         else:
             self._timestamp = self._now()
+        self._last_change_timestamp = self._timestamp
 
         if 'volume' in info:
             try:
@@ -287,8 +294,39 @@ class Base(object):
         if self._redis_enable:
 
             path = self._redis_path
+
+            if self._max_time_without_price_change:
+
+                try:
+                    pre_data = json.loads(self._redis.get(path))
+                except Exception:
+                    pre_data = {}
+                if not isinstance(pre_data, dict):
+                    pre_data = {}
+
+                try:
+                    pre_last_change_timestamp = datetime.datetime.fromtimestamp(pre_data['last_change_timestamp'])
+                except Exception:
+                    pre_last_change_timestamp = None
+
+                try:
+                    pre_price = Decimal(pre_data['price'])
+                except Exception:
+                    pre_price = None
+
+                if pre_price!=None and pre_last_change_timestamp!=None:
+                    if pre_price==self._price:
+                        self._last_change_timestamp = pre_last_change_timestamp
+            
+                max_time_without_price_change = datetime.timedelta(seconds=self._max_time_without_price_change)
+                time_without_price_change     = datetime.datetime.now()-self._last_change_timestamp
+
+                if time_without_price_change > max_time_without_price_change:
+                    self._error = str(f"Too much time without price change (t > {max_time_without_price_change})")
+                    return False
+
             data = self.as_json
-            time = self._redis_expiration
+            time = datetime.timedelta(seconds=self._redis_expiration)
 
             self._redis.setex(path, time, data)
 
