@@ -117,7 +117,7 @@ def get_values(log):
         price =     p['price']
         weighing =  p['percentual_weighing']
         age =       p['age']
-        error =     p['error']
+        error =     None if p['error']==None else str(p['error'])
         row = {
             'timestamp': timestamp,
             'coinpair':  coinpair,
