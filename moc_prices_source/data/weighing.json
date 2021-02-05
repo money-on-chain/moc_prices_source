@@ -4,12 +4,12 @@
     "btc_usd_kraken":     0.18,
     "btc_usd_coinbase":   0.25,
     "btc_usd_gemini":     0.17,
-    "rif_btc_coinbene":   0.1428571429,
-    "rif_btc_bithumbpro": 0.1428571429,
-    "rif_btc_kucoin":     0.1428571429,
-    "rif_btc_rsk_one":    0.1428571429,
-    "rif_btc_rsk_two":    0.1428571429,
-    "rif_btc_rsk_three":  0.1428571429,
-    "rif_btc_binance":    0.1428571429,
-    "rif_btc_mxc":        0
+    "rif_btc_coinbene":   0,
+    "rif_btc_bithumbpro": 0,
+    "rif_btc_kucoin":     0.4,
+    "rif_btc_rsk_one":    0,
+    "rif_btc_rsk_two":    0,
+    "rif_btc_rsk_three":  0,
+    "rif_btc_binance":    0.4,
+    "rif_btc_mxc":        0.2
 }
