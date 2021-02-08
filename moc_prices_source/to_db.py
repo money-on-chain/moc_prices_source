@@ -115,15 +115,15 @@ def get_values(log):
         coinpair =  p['coinpair']
         name =      p['description']
         price =     p['price']
-        weighing =  p['percentual_weighing']
-        age =       p['age']
+        weighing =  float(p['percentual_weighing'])
+        age =       None if p['age']==None else int(p['age'])
         error =     None if p['error']==None else str(p['error'])
         row = {
-            'timestamp': timestamp,
-            'coinpair':  coinpair,
-            'name':      name,
-            'price':     price,
-            'weighing':  weighing,
+            'timestamp':            timestamp,
+            'coinpair':             coinpair,
+            'name':                 name,
+            'price':                price,
+            'percentual_weighing':  weighing,
             'age': age,
             'error': error
         }
