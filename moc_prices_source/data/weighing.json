@@ -4,8 +4,8 @@
     "btc_usd_kraken":     0.18,
     "btc_usd_coinbase":   0.25,
     "btc_usd_gemini":     0.17,
-    "rif_btc_coinbene":   0.0,
-    "rif_btc_bithumbpro": 0.0,
+    "rif_btc_coinbene":   0,
+    "rif_btc_bithumbpro": 0,
     "rif_btc_kucoin":     0.4,
     "rif_btc_binance":    0.4,
     "rif_btc_mxc":        0.2
