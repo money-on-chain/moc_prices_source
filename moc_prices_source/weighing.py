@@ -1,4 +1,4 @@
-import datetime
+import datetime, requests
 from os.path      import dirname, abspath
 from json         import load, dumps
 from json.decoder import JSONDecodeError
@@ -10,21 +10,48 @@ from decimal      import Decimal
 
 
 filename = dirname(abspath(__file__)) + '/data/weighing.json'
+url      = None # 'https://api.moneyonchain.com/static/archive/moc_prices_source/weighing.json'
 
-def get_json_file(filename):
 
-    def error(e):
-        s = "Config file error\n{}\n{}"
-        print(s.format(filename, e), file=stderr)
+def get_json_file():
+
+    def config_error(e, source):
+        s = "Config file error\nLocation: {}\n{}"
+        print(s.format(source, e), file=stderr)
         exit(1)
+
+    def validate_json_data(data):       
+        if not isinstance(data, dict):
+            return False
+        for key, value in data.items():
+            if isinstance(value, int):
+                data[key]=float(value)
+        for key, value in data.items():
+            if not isinstance(key, str):
+                return False
+            if not isinstance(value, float):
+                return False
+        return True
 
     try:
         with open(filename) as json_file:
             data = load(json_file)
     except JSONDecodeError as e:
-        error(e)
+        config_error(e, filename)
     except FileNotFoundError as e:
-        error('File not found!')
+        config_error('File not found!', filename)
+
+    if not validate_json_data(data):
+        str_err_map = "Bad mapping, has to be a dictionary with string keys and float values"
+        config_error(str_err_map, filename)
+    
+    if url:
+        try:
+            new_data = requests.get(url).json()
+        except:
+            new_data = None
+        if new_data and validate_json_data(new_data):
+            data = new_data  
 
     return data
 
@@ -43,7 +70,7 @@ class Weighing(object):
         if ((self._last_load == None) or (
             (datetime.datetime.now() - self._last_load) > self._refresh_time)):
 
-            data = get_json_file(filename)
+            data = get_json_file()
 
             if isinstance(data, dict):
                 ok = True
