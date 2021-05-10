@@ -166,10 +166,11 @@ def get_price(
             if p['time']:
                 p['time'] = p['time'].seconds + p['time'].microseconds/1000000
             p['timestamp'] = str(p['timestamp'])
+            p['last_change_timestamp'] = str(p['last_change_timestamp'])
             if p['error']:
                 p['error'] = str(p['error'])
             for k in ['price', 'weighing', 'percentual_weighing', 'volume']:
-                if p[k]:
+                if p[k]!=None:
                     p[k] = float(p[k])
         for d in coinpair_prices.values():
             for k in ['weighings', 'prices']:
