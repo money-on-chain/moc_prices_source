@@ -51,6 +51,7 @@ class Coin(object):
 BTC = Coin('Bitcoin',   'btc', '₿')
 USD = Coin('Dollar',    'usd', '$')
 RIF = Coin('RIF Token', 'rif')
+ETH = Coin('Ether',     'eth')
 
 
 
@@ -107,7 +108,8 @@ class CoinPair(object):
 BTC_USD = CoinPair(BTC, USD)
 RIF_BTC = CoinPair(RIF, BTC)
 RIF_USD = CoinPair(RIF, USD)
-
+ETH_BTC = CoinPair(ETH, BTC)
+ETH_USD = CoinPair(ETH, USD)
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]

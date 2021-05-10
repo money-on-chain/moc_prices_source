@@ -8,5 +8,10 @@
     "rif_btc_bithumbpro": 0,
     "rif_btc_kucoin":     0.4,
     "rif_btc_binance":    0.4,
-    "rif_btc_mxc":        0.2
+    "rif_btc_mxc":        0.2,
+    "eth_btc_bitstamp":   0.2,
+    "eth_btc_bitfinex":   0.2,
+    "eth_btc_kraken":     0.2,
+    "eth_btc_binance":    0.2,
+    "eth_btc_gemini":     0.2
 }
