@@ -33,6 +33,10 @@ computed_pairs = {
     ETH_USD: {
         'requirements': [ETH_BTC, BTC_USD],
         'formula': lambda eth_btc, btc_usd: eth_btc * btc_usd
+    },
+    USDT_USD: {
+        'requirements': [BTC_USD, BTC_USDT],
+        'formula': lambda btc_usd, btc_usdt: btc_usd / btc_usdt
     }
 }
 

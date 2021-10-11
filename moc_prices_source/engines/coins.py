@@ -48,11 +48,11 @@ class Coin(object):
         return hash(str(self))
 
 
-BTC = Coin('Bitcoin',   'btc', '₿')
-USD = Coin('Dollar',    'usd', '$')
-RIF = Coin('RIF Token', 'rif')
-ETH = Coin('Ether',     'eth')
-
+BTC  = Coin('Bitcoin',   'btc',  '₿')
+USD  = Coin('Dollar',    'usd',  '$')
+RIF  = Coin('RIF Token', 'rif')
+ETH  = Coin('Ether',     'eth',  '⟠')
+USDT = Coin('Tether',    'usdt', '₮')
 
 
 Coins = [ c for c in locals().values() if isinstance(c, Coin) ]
@@ -105,11 +105,13 @@ class CoinPair(object):
         return hash(str(self))
 
 
-BTC_USD = CoinPair(BTC, USD)
-RIF_BTC = CoinPair(RIF, BTC)
-RIF_USD = CoinPair(RIF, USD)
-ETH_BTC = CoinPair(ETH, BTC)
-ETH_USD = CoinPair(ETH, USD)
+BTC_USD  = CoinPair(BTC,  USD)
+RIF_BTC  = CoinPair(RIF,  BTC)
+RIF_USD  = CoinPair(RIF,  USD)
+ETH_BTC  = CoinPair(ETH,  BTC)
+ETH_USD  = CoinPair(ETH,  USD)
+BTC_USDT = CoinPair(BTC,  USDT)
+USDT_USD = CoinPair(USDT, USD)
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]
