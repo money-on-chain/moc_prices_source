@@ -1,5 +1,8 @@
 import json, sys
-from os.path  import dirname, abspath
+from os.path import dirname, abspath
+from inspect import getsource
+from types   import LambdaType
+
 
 bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
@@ -8,7 +11,7 @@ sys.path.append(dirname(base_dir))
 from moc_prices_source.cli      import command, option, tabulate, trim
 from moc_prices_source.weighing import weighing
 from moc_prices_source          import version
-from moc_prices_source          import get_price, ALL
+from moc_prices_source          import get_price, ALL, computed_pairs
 
 sys.path = bkpath
 
@@ -21,7 +24,9 @@ sys.path = bkpath
         help='Show data in JSON format and exit.')
 @option('-w', '--weighing', 'show_weighing', is_flag=True,
         help='Show the default weighing and exit.')
-def cli_check(show_version=False, show_json=False, show_weighing=False):
+@option('-c', '--computed', 'show_computed_pairs', is_flag=True,
+        help='Show the computed pairs formula and exit.')
+def cli_check(show_version=False, show_json=False, show_weighing=False, show_computed_pairs=False):
 
     if show_version:
         print(version)
@@ -32,6 +37,21 @@ def cli_check(show_version=False, show_json=False, show_weighing=False):
         print(weighing)
         print()
         return
+
+    if show_computed_pairs:
+        print()
+        print("Computed pairs formula")
+        print("-------- ----- -------")
+        print("")
+        for pair, data in computed_pairs.items():
+            formula = data['formula']
+            if isinstance(formula, LambdaType):
+                formula = ':'.join(getsource(formula).split('lambda')[-1].strip().split(':')[1:]).strip()
+            else:
+                formula = repr(formula)
+            print(f"{pair} = {formula}")
+        print("")
+        return 
 
     data = {}
 
