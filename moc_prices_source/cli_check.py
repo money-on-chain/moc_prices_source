@@ -101,6 +101,10 @@ def cli_check(show_version=False, show_json=False, show_weighing=False, show_com
     table=[]
     for coinpair, d in values.items():
         row = []
+        if 'prices' in d:
+            row.append('🠻')
+        else:
+            row.append('ƒ')
         row.append(coinpair)
         row.append(d['median_price'])
         row.append(d['mean_price'])
@@ -111,10 +115,10 @@ def cli_check(show_version=False, show_json=False, show_weighing=False, show_com
             row.append('N/A')
         table.append(row)
     if table:
-        table.sort(key=str)
+        table.sort(key=lambda x: str(x[1]))
         print()
         print(tabulate(table, headers=[
-            'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources'
+            '', 'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources'
         ]))
 
     errors = []
