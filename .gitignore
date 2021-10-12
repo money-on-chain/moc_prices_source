@@ -1,3 +1,5 @@
 __pycache__
 *.pyc
 .vscode
+build/
+moc_prices_source.egg-info/
