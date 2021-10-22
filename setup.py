@@ -13,7 +13,7 @@ with open(base_dir + "/moc_prices_source/version.txt", "r") as file_:
     version = file_.read().split()[0]
 
 setup(
-    name='moc_prices_source',
+    name='moneyonchain_prices_source',
     version=version,
     packages=find_packages(),
     author='Juan S. Bokser',
