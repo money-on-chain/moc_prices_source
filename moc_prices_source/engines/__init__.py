@@ -1,4 +1,4 @@
-import threading, sys
+import concurrent.futures, sys
 from os       import listdir, path
 from os.path  import isfile, dirname, abspath
 
@@ -64,14 +64,8 @@ def get_prices(coinpairs=None, engines_names=None, engines_list=[]):
     if not engines_list:
         return []
 
-    threads = []
-    for engine in engines_list:
-        thread = threading.Thread(target=engine)
-        threads.append(thread)
-        thread.start()
-
-    for thread in threads:
-        thread.join()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(engines_list)) as executor:
+        concurrent.futures.wait([ executor.submit(engine) for engine in engines_list ] )
 
     return [ engine.as_dict for engine in engines_list ]
 
