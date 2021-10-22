@@ -11,7 +11,7 @@ __version__ = version
 bkpath   = sys.path[:]
 sys.path.append(dirname(base_dir))
 
-from moc_prices_source.engines             import get_coinpair_list, get_engines_names, get_prices
+from moc_prices_source.engines             import get_coinpair_list, get_engines_names, get_prices, session_storage
 from moc_prices_source.engines.engine_base import BTC_USD, RIF_BTC, ETH_BTC
 from moc_prices_source.weighing            import weighing, weighted_median, median, mean
 from moc_prices_source.coins               import *

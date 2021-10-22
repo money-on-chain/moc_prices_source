@@ -6,11 +6,12 @@ bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
 
 
-all_engines   = {}
-exclude       = ['engine_base.py', 'coins.py']
-files         = [f for f in listdir(base_dir) if isfile(path.join(base_dir, f))]
-files         = [f for f in files if f not in exclude]
-modules_names = [ n[:-3] for n in files if n[-3:] =='.py' and n[:1]!='_']
+all_engines     = {}
+session_storage = {}
+exclude         = ['engine_base.py', 'coins.py']
+files           = [f for f in listdir(base_dir) if isfile(path.join(base_dir, f))]
+files           = [f for f in files if f not in exclude]
+modules_names   = [ n[:-3] for n in files if n[-3:] =='.py' and n[:1]!='_']
 
 del listdir, path, isfile, dirname, files, exclude
 
@@ -19,7 +20,7 @@ sys.path = sorted(list(set(sys.path[:])), key = lambda x: [
     'moc_prices_source/engines' in x, x], reverse=True)
 
 for name in modules_names:
-    locals()[name] = __import__(name, globals(), locals()).Engine()
+    locals()[name] = __import__(name, globals(), locals()).Engine(session_storage=session_storage)
     all_engines[name] = locals()[name]
     
 sys.path = bkpath
