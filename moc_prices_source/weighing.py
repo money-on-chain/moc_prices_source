@@ -1,4 +1,4 @@
-import datetime, requests
+import datetime, requests, sys
 from os.path      import dirname, abspath
 from json         import load, dumps
 from json.decoder import JSONDecodeError
@@ -7,10 +7,63 @@ from statistics   import median, mean
 from tabulate     import tabulate
 from decimal      import Decimal
 
+bkpath   = sys.path[:]
+base_dir = dirname(abspath(__file__))
+sys.path.append(dirname(base_dir))
+
+from moc_prices_source.conf import get
+
+sys.path = bkpath
+
+on_remote_differences_options = ['halt', 'error', 'remote', 'local']
+
+url = None
+refresh_time_in_minutes = 60
+on_remote_differences = on_remote_differences_options[0]
+envs = {}
+
+def call_back(options):
+
+    url = None if not 'url' in options else options['url'] 
+    if not(isinstance(url, str) or url==None):
+        raise ValueError('url must be str or null')
+
+    refresh_time_in_minutes = 60 if not 'refresh_time_in_minutes' in options else options['refresh_time_in_minutes']
+    if not(isinstance(refresh_time_in_minutes, int)):
+        raise ValueError('refresh_time_in_minutes must be integer')
+    if refresh_time_in_minutes<1:
+        raise ValueError('refresh_time_in_minutes must be < 1')
+
+    on_remote_differences = on_remote_differences_options[0] if not 'on_remote_differences' in options else options['on_remote_differences']
+    if not(isinstance(on_remote_differences, str)):
+        raise ValueError('on_remote_differences must be str')
+    on_remote_differences = on_remote_differences.lower().strip()
+    if on_remote_differences not in on_remote_differences_options:
+        raise ValueError('on_remote_differences must be ' + ', '.join(map(repr, on_remote_differences_options[:-1])) + ' or ' + repr(on_remote_differences_options[-1]))
+
+    return {
+        'url': url,
+        'refresh_time_in_minutes': refresh_time_in_minutes,
+        'on_remote_differences': on_remote_differences
+    }
+
+kargs = dict(
+    out          = locals(),
+    call_back    = call_back,
+    files        = ['remote_weighing.json', 'remote_weighing_default.json'],
+    env_pre      = 'MOC_PRICES_SOURCE',
+    dir_         = '/data/',
+    copy_to_home = False,
+    places       = dirname(abspath(__file__)))
+
+get(**kargs)
 
 
 filename = dirname(abspath(__file__)) + '/data/weighing.json'
-url      = None # 'https://api.moneyonchain.com/static/archive/moc_prices_source/weighing.json'
+
+
+class WeighingException(Exception):
+    pass
 
 
 def get_json_file():
@@ -45,13 +98,19 @@ def get_json_file():
         str_err_map = "Bad mapping, has to be a dictionary with string keys and float values"
         config_error(str_err_map, filename)
     
-    if url:
+    if url and not(on_remote_differences=='local') :
         try:
-            new_data = requests.get(url).json()
+            url_data = validate_json_data(requests.get(url).json())
         except:
-            new_data = None
-        if new_data and validate_json_data(new_data):
-            data = new_data  
+            url_data = None
+        if url_data and url_data!=data:
+            if on_remote_differences=='error':
+                raise WeighingException
+            if on_remote_differences=='halt':
+                print("Error: differences between local and remote weighing", file=stderr)
+                exit(1)
+            if on_remote_differences=='remote':
+                data = url_data
 
     return data
 
@@ -59,7 +118,7 @@ def get_json_file():
 
 class Weighing(object):
 
-    def __init__(self, refresh_time=datetime.timedelta(minutes=60)):
+    def __init__(self, refresh_time=datetime.timedelta(minutes=refresh_time_in_minutes)):
         self._data = {}
         self._last_load = None
         self._refresh_time = refresh_time
