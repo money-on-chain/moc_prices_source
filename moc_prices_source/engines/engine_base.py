@@ -55,7 +55,7 @@ class Base(object):
         self._age                   = None
 
 
-    def __init__(self, session=None):
+    def __init__(self, session=None, session_storage=None):
 
         app_dir  = dirname(dirname(abspath(__file__)))
         app_name = basename(app_dir)
@@ -79,9 +79,9 @@ class Base(object):
         
         self._redis_enable = redis_conf.get('enable', False)
 
-        if self._redis_enable:
+        self._engine_session_id = app_name + '/' + self._name
 
-            self._redis_path = app_name + '/' + self._name
+        if self._redis_enable:
 
             redis_connection = {}
 
@@ -102,6 +102,8 @@ class Base(object):
             except Exception as e:
                 print(f'Error in "{file_}", {str(e)}', file=stderr)
                 exit(1)
+
+        self._session_storage = session_storage
 
         self._session = session
         self._clean_output_values()
@@ -291,16 +293,22 @@ class Base(object):
 
         self._time = datetime.datetime.now() - start_time
 
-        if self._redis_enable:
+        if self._redis_enable or isinstance(self._session_storage, dict):
 
-            path = self._redis_path
+            session_id = self._engine_session_id
 
             if self._max_time_without_price_change:
 
-                try:
-                    pre_data = json.loads(self._redis.get(path))
-                except Exception:
-                    pre_data = {}
+                if self._redis_enable:
+                    try:
+                        pre_data = json.loads(self._redis.get(session_id))
+                    except Exception:
+                        pre_data = {}
+                elif isinstance(self._session_storage, dict):
+                    try:
+                        pre_data = self._session_storage[session_id]
+                    except Exception:
+                        pre_data = {}
                 if not isinstance(pre_data, dict):
                     pre_data = {}
 
@@ -325,10 +333,11 @@ class Base(object):
                     self._error = str(f"Too much time without price change (t > {max_time_without_price_change})")
                     return False
 
-            data = self.as_json
-            time = datetime.timedelta(seconds=self._redis_expiration)
-
-            self._redis.setex(path, time, data)
+            if self._redis_enable:
+                time = datetime.timedelta(seconds=self._redis_expiration)
+                self._redis.setex(session_id, time, self.as_json)
+            elif isinstance(self._session_storage, dict):
+                self._session_storage[session_id] = self.as_dict
 
         return True
 
