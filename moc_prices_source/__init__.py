@@ -11,34 +11,16 @@ __version__ = version
 bkpath   = sys.path[:]
 sys.path.append(dirname(base_dir))
 
-from moc_prices_source.engines             import get_coinpair_list, get_engines_names, get_prices, session_storage
-from moc_prices_source.engines.engine_base import BTC_USD, RIF_BTC, ETH_BTC
-from moc_prices_source.weighing            import weighing, weighted_median, median, mean
-from moc_prices_source.coins               import *
+from moc_prices_source.engines        import get_coinpair_list, get_engines_names, get_prices, session_storage
+from moc_prices_source.computed_pairs import computed_pairs
+from moc_prices_source.weighing       import weighing, weighted_median, median, mean
+from moc_prices_source.coins          import *
 
 sys.path = bkpath
 
 
 
 ALL = CoinPairs
-
-
-
-
-computed_pairs = {
-    RIF_USD: {
-        'requirements': [RIF_BTC, BTC_USD],
-        'formula': lambda rif_btc, btc_usd: rif_btc * btc_usd
-    },
-    ETH_USD: {
-        'requirements': [ETH_BTC, BTC_USD],
-        'formula': lambda eth_btc, btc_usd: eth_btc * btc_usd
-    },
-    USDT_USD: {
-        'requirements': [BTC_USD, BTC_USDT],
-        'formula': lambda btc_usd, btc_usdt: btc_usd / btc_usdt
-    }
-}
 
 
 
