@@ -269,14 +269,14 @@ class Base(object):
             info = self._map(response)
             self._price = Decimal(str(info['price']))
         except Exception:
-            self._error = "Engine error (bad mapping)"
+            self._error = "Engine error (bad mapping) trying to get 'price'"
             return False
 
         if 'timestamp' in info:
             if isinstance(info['timestamp'], datetime.datetime):
                 self._timestamp = info['timestamp']
             else:
-                self._error = "Engine error (bad mapping)"
+                self._error = "Engine error (bad mapping) trying to get 'timestamp'"
                 return False
         else:
             self._timestamp = self._now()
@@ -286,7 +286,7 @@ class Base(object):
             try:
                 self._volume = Decimal(str(info['volume']))
             except Exception:
-                self._error = "Engine error (bad mapping)"
+                self._error = "Engine error (bad mapping)  trying to get 'volume'"
                 return False
         else:
             self._volume = 0.0
