@@ -72,9 +72,14 @@ def get_coin(value):
 
 class CoinPair(object):
 
-    def __init__(self, from_: Coin, to_: Coin):
-        self._from = from_
-        self._to   = to_
+    def __init__(self, from_: Coin, to_: Coin, variant=None):
+        self._from    = from_
+        self._to      = to_
+        self._variant = str(variant) if variant else None
+
+    @property
+    def variant(self):
+        return self._variant
 
     @property
     def from_(self):
@@ -87,11 +92,14 @@ class CoinPair(object):
     @property
     def as_dict(self):
         return {
-            'from': self.from_,
-            'to':   self.to_,
+            'from':    self.from_,
+            'to':      self.to_,
+            'variant': self.variant
         }
 
     def __str__(self):
+        if self.variant:
+            return '{}/{}({})'.format(self.from_.symbol, self.to_.symbol, self.variant)
         return '{}/{}'.format(self.from_.symbol, self.to_.symbol)
 
     def __repr__(self):
@@ -107,16 +115,17 @@ class CoinPair(object):
         return hash(str(self))
 
 
-BTC_USD  = CoinPair(BTC,  USD)
-RIF_BTC  = CoinPair(RIF,  BTC)
-RIF_USD  = CoinPair(RIF,  USD)
-ETH_BTC  = CoinPair(ETH,  BTC)
-ETH_USD  = CoinPair(ETH,  USD)
-BTC_USDT = CoinPair(BTC,  USDT)
-USDT_USD = CoinPair(USDT, USD)
-BNB_USDT = CoinPair(BNB,  USDT)
-BNB_USD  = CoinPair(BNB,  USD)
-ARS_USD  = CoinPair(ARS,  USD)
+BTC_USD     = CoinPair(BTC,  USD)
+RIF_BTC     = CoinPair(RIF,  BTC)
+RIF_USD     = CoinPair(RIF,  USD)
+ETH_BTC     = CoinPair(ETH,  BTC)
+ETH_USD     = CoinPair(ETH,  USD)
+BTC_USDT    = CoinPair(BTC,  USDT)
+USDT_USD    = CoinPair(USDT, USD)
+BNB_USDT    = CoinPair(BNB,  USDT)
+BNB_USD     = CoinPair(BNB,  USD)
+ARS_USD     = CoinPair(ARS,  USD)
+ARS_USD_CCL = CoinPair(ARS,  USD, "CCL")
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]
@@ -141,4 +150,7 @@ if __name__ == '__main__':
     print()
     print('Coin pairs:')
     for c in CoinPairs:
-        print(f'    {c} (from {c.from_.name} to {c.to_.name})')
+        if c.variant:
+            print(f'    {c} (from {c.from_.name} to {c.to_.name}, {c.variant})')
+        else:    
+            print(f'    {c} (from {c.from_.name} to {c.to_.name})')
