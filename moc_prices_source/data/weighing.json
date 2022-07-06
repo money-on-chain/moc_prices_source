@@ -19,8 +19,9 @@
     "btc_usdt_kraken":      0.25,
     "btc_usdt_coinbase":    0.25,
     "bnb_usdt_binance":     1,
-    "ars_usd_ccl_criptoya": 0.5,
-    "ars_usd_ccl_dolarsi":  0.5,
+    "ars_usd_ccl_ambito":   0.33,
+    "ars_usd_ccl_criptoya": 0.33,
+    "ars_usd_ccl_dolarsi":  0.33,
     "ars_usd_ambito":       0.33,
     "ars_usd_criptoya":     0.33,
     "ars_usd_dolarsi":      0.33
