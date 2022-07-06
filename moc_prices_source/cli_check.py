@@ -63,6 +63,7 @@ def cli_check(show_version=False, show_json=False, show_weighing=False, show_com
         row = []
         row.append(p["coinpair"].from_.name)
         row.append(p["coinpair"].to_.name)
+        row.append(p["coinpair"].variant)
         row.append(p["description"])
         if p["ok"]:
             row.append(p["price"])
@@ -85,7 +86,7 @@ def cli_check(show_version=False, show_json=False, show_weighing=False, show_com
         table.sort(key=str)
         print()
         print(tabulate(table, headers=[
-            'From', 'To', 'Exchnage', 'Response', 'U.', 'Weigh', '%', 'Time'
+            'From', 'To', 'V.', 'Exchnage', 'Response', 'U.', 'Weigh', '%', 'Time'
         ]))
 
     table=[]
