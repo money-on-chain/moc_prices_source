@@ -114,7 +114,7 @@ def cli_check(show_version=False, show_json=False, show_weighing=False, show_com
 
     errors = []
     for p in prices:
-        if not p["ok"]:
+        if not p["ok"] and p['weighing']:
             errors.append((p["name"], p["error"]))
 
     if errors:
