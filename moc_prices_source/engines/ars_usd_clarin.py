@@ -8,7 +8,9 @@ class Engine(Base):
     _description = "Clarin.com"
     _uri         = "https://www.clarin.com/economia/divisas-acciones-bonos/monedas.json"
     _coinpair    = ARS_USD
-    #_max_age     = 30
+
+    _max_age                       = 3600 # 1hs.
+    _max_time_without_price_change = 0    # zero means infinity
 
     def _map(self, data):
         value = None

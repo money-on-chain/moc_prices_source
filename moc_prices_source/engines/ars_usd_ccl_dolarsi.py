@@ -9,6 +9,9 @@ class Engine(Base):
     _uri         = "https://www.dolarsi.com/api/api.php?type=valoresprincipales"
     _coinpair    = ARS_USD_CCL
 
+    _max_age                       = 3600 # 1hs.
+    _max_time_without_price_change = 0    # zero means infinity
+
     def _map(self, data):
         value = None
         for i in data:

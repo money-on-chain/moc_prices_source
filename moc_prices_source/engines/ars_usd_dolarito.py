@@ -8,7 +8,9 @@ class Engine(Base):
     _description = "Dolarito.ar"
     _uri         = "https://www.dolarito.ar/api/frontend/quotations"
     _coinpair    = ARS_USD
-    #_max_age     = 30
+    
+    _max_age                       = 3600 # 1hs.
+    _max_time_without_price_change = 0    # zero means infinity
 
     def _map(self, data):
         info = data['informal']
