@@ -25,17 +25,17 @@
 
     "bnb_usdt_binance":     1,
 
-    "ars_usd_ccl_ambito":   0.2,
-    "ars_usd_ccl_criptoya": 0.2,
-    "ars_usd_ccl_dolarsi":  0.2,
-    "ars_usd_ccl_lanacion": 0.2,
-    "ars_usd_ccl_dolarito": 0.2,
+    "ars_usd_ccl_ambito":   0.33,
+    "ars_usd_ccl_criptoya": 0.33,
+    "ars_usd_ccl_dolarsi":  0,
+    "ars_usd_ccl_lanacion": 0.33,
+    "ars_usd_ccl_dolarito": 0,
 
-    "ars_usd_ambito":       0.16,
-    "ars_usd_criptoya":     0.16,
-    "ars_usd_dolarsi":      0.16,
-    "ars_usd_lanacion":     0.16,
-    "ars_usd_clarin":       0.16,
-    "ars_usd_dolarito":     0.16
+    "ars_usd_ambito":       0.25,
+    "ars_usd_criptoya":     0.25,
+    "ars_usd_dolarsi":      0,
+    "ars_usd_lanacion":     0.25,
+    "ars_usd_clarin":       0.25,
+    "ars_usd_dolarito":     0
 
 }
