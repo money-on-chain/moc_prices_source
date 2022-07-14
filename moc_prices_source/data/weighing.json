@@ -38,6 +38,8 @@
     "ars_usd_lanacion":     0.25,
     "ars_usd_clarin":       0.25,
     "ars_usd_dolarito":     0,
-    "ars_usd_dolarhoy":     0
+    "ars_usd_dolarhoy":     0,
+
+    "mxn_usd_eldolar_info": 1
 
 }
