@@ -55,6 +55,7 @@ ETH  = Coin('Ether',          'eth',  '⟠')
 USDT = Coin('Tether',         'usdt', '₮')
 BNB  = Coin('Binance Coin',   'bnb',  'Ƀ')
 ARS  = Coin('Peso Argentino', 'ars',  '$')
+MXN  = Coin('Peso Mexicano',  'mxn',  '$')
 
 
 Coins = [ c for c in locals().values() if isinstance(c, Coin) ]
@@ -126,6 +127,7 @@ BNB_USDT    = CoinPair(BNB,  USDT)
 BNB_USD     = CoinPair(BNB,  USD)
 ARS_USD     = CoinPair(ARS,  USD)
 ARS_USD_CCL = CoinPair(ARS,  USD, "CCL")
+MXN_USD     = CoinPair(MXN,  USD)
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]
