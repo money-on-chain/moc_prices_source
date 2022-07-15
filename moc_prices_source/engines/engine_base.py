@@ -13,7 +13,9 @@ class Base(object):
 
     _name                          = "base"
     _description                   = "Base Engine"
+    _method                        = 'get'
     _uri                           = "http://api.pricefetcher.com/BTCUSD"
+    _payload                       = {}
     _coinpair                      = BTC_USD
     _timeout                       = 10
     _max_age                       = 30
@@ -235,12 +237,22 @@ class Base(object):
 
         start_time = datetime.datetime.now()
 
-        get = requests.get if self._session==None else self._session.get
+        rq = requests if self._session==None else self._session
+
+        method = self._method.strip().lower()
+        if method=='post':
+            getter = rq.post
+        else:
+            getter = rq.get
+
+        kargs = {'url':self.uri, 'timeout': self.timeout}
+        if self._payload:
+            kargs['data'] = self._payload
 
         self._clean_output_values()
 
         try:
-            response = get(self.uri, timeout=self.timeout)
+            response = getter(**kargs)
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             self._error = e
