@@ -31,7 +31,7 @@
     "ars_usd_ccl_lanacion": 0.33,
     "ars_usd_ccl_dolarito": 0,
     "ars_usd_ccl_dolarhoy": 0,
-    "ars_usd_ccl_infobae": 0,
+    "ars_usd_ccl_infobae":  0,
 
     "ars_usd_ambito":       0.25,
     "ars_usd_criptoya":     0.25,
@@ -40,7 +40,7 @@
     "ars_usd_clarin":       0.25,
     "ars_usd_dolarito":     0,
     "ars_usd_dolarhoy":     0,
-    "ars_usd_infobae":     0,
+    "ars_usd_infobae":      0,
 
     "mxn_usd_eldolar_info": 0.33,
     "mxn_usd_intercam":     0.33,
