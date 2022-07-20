@@ -13,7 +13,10 @@ class Engine(Base):
     _max_time_without_price_change = 0    # zero means infinity
 
     def _map(self, data):
-        value = Decimal(str(data[-1]['value']))
+        try:
+            value = Decimal(str(data[-1]['value']))
+        except:
+            value = None        
         return {
             'price':  value
         }
