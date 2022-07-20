@@ -5,6 +5,7 @@ from decimal      import Decimal
 from json.decoder import JSONDecodeError
 from redis        import Redis, ConnectionError
 from coins        import *
+from bs4          import BeautifulSoup
 
 
 
@@ -12,7 +13,9 @@ class Base(object):
 
     _name                          = "base"
     _description                   = "Base Engine"
+    _method                        = 'get'
     _uri                           = "http://api.pricefetcher.com/BTCUSD"
+    _payload                       = {}
     _coinpair                      = BTC_USD
     _timeout                       = 10
     _max_age                       = 30
@@ -172,6 +175,15 @@ class Base(object):
             'timestamp': self._utcfromtimestamp(data['timestamp']) }
 
 
+    def _json(self, response):
+        out = None
+        try:
+            out = response.json()
+        except Exception:
+            self._error = "Response format error (not JSON)"
+        return out
+
+
     def __bool__(self):
         return not(bool(self._error))
 
@@ -225,12 +237,22 @@ class Base(object):
 
         start_time = datetime.datetime.now()
 
-        get = requests.get if self._session==None else self._session.get
+        rq = requests if self._session==None else self._session
+
+        method = self._method.strip().lower()
+        if method=='post':
+            getter = rq.post
+        else:
+            getter = rq.get
+
+        kargs = {'url':self.uri, 'timeout': self.timeout}
+        if self._payload:
+            kargs['data'] = self._payload
 
         self._clean_output_values()
 
         try:
-            response = get(self.uri, timeout=self.timeout)
+            response = getter(**kargs)
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             self._error = e
@@ -259,24 +281,22 @@ class Base(object):
             self._error = str(f"Response age error (age > {self._max_age})")
             return False
 
-        try:
-            response = response.json()
-        except Exception:
-            self._error = "Response format error (not JSON)"
+        response = self._json(response)
+        if not response:
             return False
 
         try:
             info = self._map(response)
             self._price = Decimal(str(info['price']))
         except Exception:
-            self._error = "Engine error (bad mapping)"
+            self._error = "Engine error (bad mapping) trying to get 'price'"
             return False
 
         if 'timestamp' in info:
             if isinstance(info['timestamp'], datetime.datetime):
                 self._timestamp = info['timestamp']
             else:
-                self._error = "Engine error (bad mapping)"
+                self._error = "Engine error (bad mapping) trying to get 'timestamp'"
                 return False
         else:
             self._timestamp = self._now()
@@ -286,7 +306,7 @@ class Base(object):
             try:
                 self._volume = Decimal(str(info['volume']))
             except Exception:
-                self._error = "Engine error (bad mapping)"
+                self._error = "Engine error (bad mapping)  trying to get 'volume'"
                 return False
         else:
             self._volume = 0.0
@@ -340,6 +360,30 @@ class Base(object):
                 self._session_storage[session_id] = self.as_dict
 
         return True
+
+
+class EngineWebScraping(Base):
+
+    def _scraping(self, html):
+        value = None
+        if not value:
+            self._error = "Response format error"
+            return None
+        return {
+            'price':  value
+        }
+
+    def _json(self, response):
+        html = BeautifulSoup(response.text, 'lxml')
+        data = self._scraping(html)
+        if self._error: 
+            self._error += " (Web scraping)"
+        return data
+
+    def _map(self, data):
+        return data
+
+
 
 if __name__ == '__main__':
     print("File: {}, Ok!".format(repr(__file__)))
