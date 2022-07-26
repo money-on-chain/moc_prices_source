@@ -46,13 +46,14 @@
     "ars_usd_cronista":  0,
     "ars_usd_infodolar": 0,
 
-    "mxn_usd_eldolar_info":      1.25,
-    "mxn_usd_intercam":          1.25,
-    "mxn_usd_citibanamex":       1.25,
-    "mxn_usd_wise":              1.25,
-    "mxn_usd_xrates":            1.25,
-    "mxn_usd_themoneyconverter": 1.25,
-    "mxn_usd_currencymeuk":      1.25,
-    "mxn_usd_infodolar":         1.25
+    "mxn_usd_eldolar_info":      1.11,
+    "mxn_usd_intercam":          1.11,
+    "mxn_usd_citibanamex":       1.11,
+    "mxn_usd_wise":              1.11,
+    "mxn_usd_xrates":            1.11,
+    "mxn_usd_themoneyconverter": 1.11,
+    "mxn_usd_currencymeuk":      1.11,
+    "mxn_usd_infodolar":         1.11,  
+    "mxn_usd_eleconomista":      1.11
 
 }
