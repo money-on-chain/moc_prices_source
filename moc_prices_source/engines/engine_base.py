@@ -191,7 +191,7 @@ class Base(object):
     def __str__(self):
         name  = '{} {}'.format(self.description, self.coinpair
             ) if self.description else self.name
-        if self.price == None:
+        if self.price is None:
             return name
         value = self.price if self else self.error
         return '{} = {}'.format(name, value)
@@ -237,7 +237,7 @@ class Base(object):
 
         start_time = datetime.datetime.now()
 
-        rq = requests if self._session==None else self._session
+        rq = requests if self._session is None else self._session
 
         method = self._method.strip().lower()
         if method=='post':
