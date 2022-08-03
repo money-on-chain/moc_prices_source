@@ -21,6 +21,7 @@ class Base(object):
     _max_age                       = 30
     _max_time_without_price_change = 180 # zero means infinity
     _redis_expiration              = 3600
+    _ssl_verify                    = True
 
 
     @property
@@ -245,7 +246,7 @@ class Base(object):
         else:
             getter = rq.get
 
-        kargs = {'url':self.uri, 'timeout': self.timeout}
+        kargs = {'url':self.uri, 'timeout': self.timeout, 'verify': self._ssl_verify}
         if self._payload:
             kargs['data'] = self._payload
 
