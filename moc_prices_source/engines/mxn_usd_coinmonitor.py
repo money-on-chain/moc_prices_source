@@ -10,6 +10,7 @@ class Engine(Base):
     
     _max_age                       = 3600 # 1hs.
     _max_time_without_price_change = 0    # zero means infinity
+    _ssl_verify                    = False
 
     def _map(self, data):
         return {
