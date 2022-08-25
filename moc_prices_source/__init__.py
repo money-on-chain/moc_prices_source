@@ -57,7 +57,7 @@ def get_price(
         for key, value in weighing.items():
             weighing[key] = Decimal(str(value))
 
-    if engines_names==None:
+    if engines_names is None:
         engines_names = list(weighing.keys())
 
     prices = get_prices(

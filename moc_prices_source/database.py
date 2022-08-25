@@ -55,7 +55,7 @@ class Database(object):
 
     @staticmethod
     def _validate_time(time_):
-        if time_==None:
+        if time_ is None:
             time_ = datetime.datetime.utcnow()
         return time_
 

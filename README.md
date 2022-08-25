@@ -3,12 +3,39 @@
 Prices source for MoC projects
 
 
+
+## Refrences
+
+* [Source code in Github](https://github.com/money-on-chain/moc_prices_source)
+* [Package from Python package index (PyPI)](https://pypi.org/project/moneyonchain-prices-source/)
+
+
+
 ## Requirements
 
 * Python 3.6+ support
 
 
+
 ## Installation
+
+### From the Python package index (PyPI) 
+
+Run:
+
+```
+$ pip3 install moneyonchain-prices-source 
+```
+
+And then run:
+
+```
+$ moc_prices_source_check --version
+```
+
+To verify that it has been installed correctly
+
+### From source
 
 Download from [Github](https://github.com/money-on-chain/moc_prices_source)
 
