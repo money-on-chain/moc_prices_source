@@ -46,7 +46,10 @@ def get_engines_names():
 
 
 
-def get_prices(coinpairs=None, engines_names=None, engines_list=[]):
+def get_prices(coinpairs=None, engines_names=None, engines_list=None):
+
+    if engines_list is None: 
+        engines_list = []
 
     assert isinstance(engines_list, (list, str))
     if not engines_list:

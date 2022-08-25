@@ -126,7 +126,7 @@ class Weighing(object):
 
     def _load(self):
 
-        if ((self._last_load == None) or (
+        if ((self._last_load is None) or (
             (datetime.datetime.now() - self._last_load) > self._refresh_time)):
 
             data = get_json_file()
