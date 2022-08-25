@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
     package_name = 'moneyonchain-prices-source'
     module_name = 'moc_prices_source'
-    required_version = '0.6.0b'
+    required_version = '0.6.0'
 
     # Check the package
     package_ok = check_package(package_name, module_name, required_version)
@@ -116,6 +116,6 @@ jbokser@beta:~/moc_prices_source/docs/files$
 If things go wrong:
 ```shell
 jbokser@beta:~/moc_prices_source/docs/files$ ./poc_autoupdate_package.py 
-Invalid moneyonchain-prices-source version, must be 0.6.0b.
+Invalid moneyonchain-prices-source version, must be 0.6.0.
 jbokser@beta:~/moc_prices_source/docs/files$ 
 ```

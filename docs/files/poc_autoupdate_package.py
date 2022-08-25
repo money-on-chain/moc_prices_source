@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     package_name = 'moneyonchain-prices-source'
     module_name = 'moc_prices_source'
-    required_version = '0.6.0b'
+    required_version = '0.6.0'
 
     # Check the package
     package_ok = check_package(package_name, module_name, required_version)
