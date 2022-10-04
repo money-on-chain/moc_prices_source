@@ -16,6 +16,7 @@ class Base(object):
     _method                        = 'get'
     _uri                           = "http://api.pricefetcher.com/BTCUSD"
     _payload                       = {}
+    _headers                       = {}
     _coinpair                      = BTC_USD
     _timeout                       = 10
     _max_age                       = 30
@@ -249,6 +250,8 @@ class Base(object):
         kargs = {'url':self.uri, 'timeout': self.timeout, 'verify': self._ssl_verify}
         if self._payload:
             kargs['data'] = self._payload
+        if self._headers:
+            kargs['headers'] = self._headers
 
         self._clean_output_values()
 
