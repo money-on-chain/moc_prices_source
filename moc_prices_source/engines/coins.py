@@ -117,6 +117,7 @@ class CoinPair(object):
 
 
 BTC_USD     = CoinPair(BTC,  USD)
+BTC_ARS     = CoinPair(BTC,  ARS)
 RIF_BTC     = CoinPair(RIF,  BTC)
 RIF_USD     = CoinPair(RIF,  USD)
 ETH_BTC     = CoinPair(ETH,  BTC)
