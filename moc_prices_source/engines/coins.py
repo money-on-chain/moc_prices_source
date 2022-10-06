@@ -128,6 +128,7 @@ BNB_USDT    = CoinPair(BNB,  USDT)
 BNB_USD     = CoinPair(BNB,  USD)
 ARS_USD     = CoinPair(ARS,  USD)
 ARS_USD_CCL = CoinPair(ARS,  USD, "CCL")
+ARS_USD_CCB = CoinPair(ARS,  USD, "CCB")
 MXN_USD     = CoinPair(MXN,  USD)
 
 
