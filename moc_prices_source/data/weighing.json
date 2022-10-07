@@ -1,6 +1,7 @@
 {
-    "btc_ars_rofex": 0.5,
-    "btc_ars_bitso": 0.5,
+    "btc_ars_rofex":     0.33,
+    "btc_ars_bitso":     0.33,
+    "btc_ars_cryptomkt": 0.33,
 
     "btc_usd_coinbase": 0.25,
     "btc_usd_bitstamp": 0.22,
