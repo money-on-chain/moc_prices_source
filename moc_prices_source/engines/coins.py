@@ -117,6 +117,7 @@ class CoinPair(object):
 
 
 BTC_USD     = CoinPair(BTC,  USD)
+BTC_ARS     = CoinPair(BTC,  ARS)
 RIF_BTC     = CoinPair(RIF,  BTC)
 RIF_USD     = CoinPair(RIF,  USD)
 ETH_BTC     = CoinPair(ETH,  BTC)
@@ -125,9 +126,10 @@ BTC_USDT    = CoinPair(BTC,  USDT)
 USDT_USD    = CoinPair(USDT, USD)
 BNB_USDT    = CoinPair(BNB,  USDT)
 BNB_USD     = CoinPair(BNB,  USD)
-ARS_USD     = CoinPair(ARS,  USD)
-ARS_USD_CCL = CoinPair(ARS,  USD, "CCL")
-MXN_USD     = CoinPair(MXN,  USD)
+USD_ARS     = CoinPair(USD,  ARS)
+USD_ARS_CCL = CoinPair(USD,  ARS, "CCL")
+USD_ARS_CCB = CoinPair(USD,  ARS, "CCB")
+USD_MXN     = CoinPair(USD,  MXN)
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]
