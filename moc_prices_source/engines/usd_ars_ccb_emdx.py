@@ -1,4 +1,4 @@
-from engine_base import Base, USD_ARS
+from engine_base import Base, USD_ARS_CCB
 from decimal     import Decimal
 
 
@@ -8,7 +8,7 @@ class Engine(Base):
     _description = "emdx.io"
     _uri         = "https://api.emdx.io/api/v1/markets/full?chainId=43114"
     _headers     = {"origin": "https://app.emdx.io"} # without this it gives: 500 Server Error   
-    _coinpair    = USD_ARS
+    _coinpair    = USD_ARS_CCB
 
     _max_age                       = 3600 # 1hs.
     _max_time_without_price_change = 0    # zero means infinity

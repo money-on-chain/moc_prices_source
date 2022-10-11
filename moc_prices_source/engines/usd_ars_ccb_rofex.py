@@ -1,4 +1,4 @@
-from engine_base import Base, USD_ARS
+from engine_base import Base, USD_ARS_CCB
 
 
 class Engine(Base):
@@ -6,7 +6,7 @@ class Engine(Base):
     _name        = Base._name_from_file(__file__)
     _description = "MatbaRofex.com.ar"
     _uri         = "https://api.matbarofex.com.ar/v1/rest/indices/I.CCB"
-    _coinpair    = USD_ARS
+    _coinpair    = USD_ARS_CCB
     
     _max_age                       = 3600 # 1hs.
     _max_time_without_price_change = 0    # zero means infinity

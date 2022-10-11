@@ -58,8 +58,9 @@
     "usd_ars_cronista":    0.09,
     "usd_ars_infodolar":   0.09,
     "usd_ars_coinmonitor": 0.09,
-    "usd_ars_emdx":        0,
-    "usd_ars_rofex":       0,
+
+    "usd_ars_ccb_rofex": 1,
+    "usd_ars_ccb_emdx":  0,
 
     "usd_mxn_eldolar_info":      0.11,
     "usd_mxn_intercam":          0.11,
