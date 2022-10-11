@@ -62,13 +62,15 @@
     "usd_ars_ccb_rofex": 1,
     "usd_ars_ccb_emdx":  0,
 
-    "usd_mxn_eldolar_info":      0.11,
-    "usd_mxn_intercam":          0.11,
-    "usd_mxn_citibanamex":       0.11,
-    "usd_mxn_wise":              0.11,
-    "usd_mxn_xrates":            0.11,
-    "usd_mxn_themoneyconverter": 0.11,
-    "usd_mxn_currencymeuk":      0.11,
-    "usd_mxn_infodolar":         0.11, 
-    "usd_mxn_eleconomista":      0.11
+    "usd_mxn_eldolar_info":      0.1,
+    "usd_mxn_intercam":          0.1,
+    "usd_mxn_citibanamex":       0.1,
+    "usd_mxn_wise":              0.1,
+    "usd_mxn_xrates":            0.1,
+    "usd_mxn_themoneyconverter": 0.1,
+    "usd_mxn_currencymeuk":      0.1,
+    "usd_mxn_infodolar":         0.1, 
+    "usd_mxn_eleconomista":      0.1,
+    "usd_mxn_bitso":             0.1
+
 }
