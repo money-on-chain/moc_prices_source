@@ -14,7 +14,7 @@ class Engine(EngineWebScraping):
 
     def _scraping(self, html):
         value = None
-        for s in html.find_all ('div', id="cc-ratebox"):
+        for s in html.find_all ('span'):
             d = s.string.strip().split()
             if len(d)==3 and d[0]=="MXN/USD" and d[1]=="=":
                 try:
