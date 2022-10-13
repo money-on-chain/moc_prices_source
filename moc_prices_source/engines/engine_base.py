@@ -298,6 +298,8 @@ class Base(object):
         response = self._request(rq)
  
         if not response:
+            if not self._error:
+                self._error = "Empty response from server"
             return False
 
         try:
