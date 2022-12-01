@@ -66,7 +66,7 @@ def cli_check(show_version=False, show_json=False, show_weighing=False, show_com
         row.append(p["coinpair"].variant)
         row.append(p["description"])
         if p["ok"]:
-            row.append(p["price"])
+            row.append(f"{p['price']:.8f}")
             row.append(p["coinpair"].to_.small_symbol)
         else:
             row.append(trim(p["error"], 25))
