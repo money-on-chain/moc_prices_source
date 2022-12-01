@@ -16,6 +16,7 @@ class Base(object):
     _method                        = 'get'
     _uri                           = "http://api.pricefetcher.com/BTCUSD"
     _payload                       = {}
+    _headers                       = {}
     _coinpair                      = BTC_USD
     _timeout                       = 10
     _max_age                       = 30
@@ -80,7 +81,7 @@ class Base(object):
                 redis_conf = {}
             if redis_conf:
                 break
-        
+
         self._redis_enable = redis_conf.get('enable', False)
 
         self._engine_session_id = app_name + '/' + self._name
@@ -234,11 +235,7 @@ class Base(object):
         return json.dumps(data, indent=4, sort_keys=True)
 
 
-    def __call__(self):
-
-        start_time = datetime.datetime.now()
-
-        rq = requests if self._session is None else self._session
+    def _request(self, rq):
 
         method = self._method.strip().lower()
         if method=='post':
@@ -249,6 +246,8 @@ class Base(object):
         kargs = {'url':self.uri, 'timeout': self.timeout, 'verify': self._ssl_verify}
         if self._payload:
             kargs['data'] = self._payload
+        if self._headers:
+            kargs['headers'] = self._headers
 
         self._clean_output_values()
 
@@ -257,19 +256,19 @@ class Base(object):
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             self._error = e
-            return False
+            return None
         except Exception as e:
             self._error = e
-            return False
+            return None
 
         if not response:
             self._error = "No response from server"
-            return False
+            return None
 
         if response.status_code != 200:
             self._error = "Response error (code {})".format(
                 response.status_code)
-            return False
+            return None
 
         try:
             self._age = int(response.headers['age'])
@@ -280,10 +279,27 @@ class Base(object):
 
         if self._age!=None and self._age > self._max_age:
             self._error = str(f"Response age error (age > {self._max_age})")
-            return False
+            return None
 
         response = self._json(response)
+
         if not response:
+            return None
+
+        return response
+
+
+    def __call__(self):
+
+        start_time = datetime.datetime.now()
+
+        rq = requests if self._session is None else self._session
+
+        response = self._request(rq)
+ 
+        if not response:
+            if not self._error:
+                self._error = "Empty response from server"
             return False
 
         try:
@@ -346,7 +362,7 @@ class Base(object):
                 if pre_price!=None and pre_last_change_timestamp!=None:
                     if pre_price==self._price:
                         self._last_change_timestamp = pre_last_change_timestamp
-            
+
                 max_time_without_price_change = datetime.timedelta(seconds=self._max_time_without_price_change)
                 time_without_price_change     = datetime.datetime.now()-self._last_change_timestamp
 

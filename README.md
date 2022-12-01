@@ -7,7 +7,7 @@ Prices source for MoC projects
 ## Refrences
 
 * [Source code in Github](https://github.com/money-on-chain/moc_prices_source)
-* [Package from Python package index (PyPI)](https://pypi.org/project/moneyonchain-prices-source/)
+* [Package from Python package index (PyPI)](https://pypi.org/project/moneyonchain-prices-source)
 
 
 
