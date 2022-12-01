@@ -104,7 +104,10 @@ def get_price(
         del d['sum_weighing']
         d['median_price'] = median(d['prices'])
         d['mean_price'] = mean(d['prices'])
-        d['weighted_median_price'] = weighted_median(d['prices'], d['weighings'])
+        if any (d['weighings']):
+            d['weighted_median_price'] = weighted_median(d['prices'], d['weighings'])
+        else:
+            d['weighted_median_price'] = None
 
     if requested:
         for r in [r for r in requested if (
