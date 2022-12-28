@@ -1,14 +1,13 @@
 import json, sys
 from os.path import dirname, abspath
-from inspect import getsource
-from types   import LambdaType
+from fnmatch import fnmatch as match
 
 
 bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
 sys.path.append(dirname(base_dir))
 
-from moc_prices_source.cli            import command, option, tabulate, trim
+from moc_prices_source.cli            import command, option, tabulate, trim, cli
 from moc_prices_source.weighing       import weighing
 from moc_prices_source                import version
 from moc_prices_source                import get_price, ALL
@@ -27,7 +26,19 @@ sys.path = bkpath
         help='Show the default weighing and exit.')
 @option('-c', '--computed', 'show_computed_pairs', is_flag=True,
         help='Show the computed pairs formula and exit.')
-def cli_check(show_version=False, show_json=False, show_weighing=False, show_computed_pairs=False):
+@cli.argument('coinpairs_filter', required=False)
+def cli_check(show_version=False, show_json=False, show_weighing=False, show_computed_pairs=False, coinpairs_filter=None):
+    """\b
+Description:
+    CLI-type tool that shows the data obtained by
+    the `moc_price_source` library.   
+    Useful for troubleshooting.
+\b
+COINPAIRS_FILTER:
+    Is a display pairs filter that accepts wildcards.
+    Example: "btc*"
+    Default value: "*" (all available pairs)
+"""
 
     if show_version:
         print(version)
@@ -45,7 +56,15 @@ def cli_check(show_version=False, show_json=False, show_weighing=False, show_com
 
     data = {}
 
-    get_price(ALL, detail=data, serializable=show_json)
+    if coinpairs_filter:
+        coinpairs = list(filter(lambda i: match(str(i).lower(), str(coinpairs_filter).lower()), ALL))
+    else:
+        coinpairs = ALL
+    if not coinpairs:
+        print(f"The {repr(coinpairs_filter)} filter did not return any results.", file=sys.stderr)
+        return 1
+
+    get_price(coinpairs, detail=data, serializable=show_json)
 
     if show_json:
         print(json.dumps(data, indent=4, sort_keys=True))
@@ -66,7 +85,7 @@ def cli_check(show_version=False, show_json=False, show_weighing=False, show_com
         row.append(p["coinpair"].variant)
         row.append(p["description"])
         if p["ok"]:
-            row.append(p["price"])
+            row.append(f"{p['price']:.8f}")
             row.append(p["coinpair"].to_.small_symbol)
         else:
             row.append(trim(p["error"], 25))
@@ -132,4 +151,4 @@ def cli_check(show_version=False, show_json=False, show_weighing=False, show_com
 
 
 if __name__ == '__main__':
-    cli_check()
+    exit(cli_check())
