@@ -289,9 +289,10 @@ class Base(object):
         return response
 
 
-    def __call__(self):
+    def __call__(self, start_time=None):
 
-        start_time = datetime.datetime.now()
+        if start_time is None:
+            start_time = datetime.datetime.now()
 
         rq = requests if self._session is None else self._session
 
@@ -400,6 +401,19 @@ class EngineWebScraping(Base):
     def _map(self, data):
         return data
 
+
+class BaseWithFailover(Base):
+
+    _uri_failover = None
+
+    def __call__(self):
+        start_time = datetime.datetime.now()
+        ok = Base.__call__(self, start_time)
+        if self._uri_failover and not ok:
+            uri_failover, uri = self._uri_failover, self._uri
+            self._uri_failover, self._uri =  uri, uri_failover
+            ok = Base.__call__(self, start_time)
+        return ok
 
 
 if __name__ == '__main__':
