@@ -19,6 +19,9 @@
     "rif_btc_binance":    1,
     "rif_btc_bithumbpro": 0,
     "rif_btc_sovryn":     0,
+    "rif_btc_mexc":       0,
+    "rif_btc_coingecko":  0,
+
 
     "eth_btc_bitstamp": 0.25,
     "eth_btc_bitfinex": 0.25,
