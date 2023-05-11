@@ -71,6 +71,8 @@
     "usd_mxn_currencymeuk":      0.1,
     "usd_mxn_infodolar":         0.1, 
     "usd_mxn_eleconomista":      0.1,
-    "usd_mxn_bitso":             0.1
+    "usd_mxn_bitso":             0.1,
+
+    "moc_btc_sovryn": 1
 
 }
