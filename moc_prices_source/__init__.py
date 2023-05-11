@@ -25,11 +25,12 @@ ALL = CoinPairs
 
 
 def get_price(
-    coinpairs     = None,
-    engines_names = None,
-    detail        = {},
-    weighing      = weighing,
-    serializable  = False):
+    coinpairs            = None,
+    engines_names        = None,
+    detail               = {},
+    weighing             = weighing,
+    serializable         = False,
+    ignore_zero_weighing = False):
 
     start_time = datetime.datetime.now()
 
@@ -56,6 +57,11 @@ def get_price(
     else:
         for key, value in weighing.items():
             weighing[key] = Decimal(str(value))
+    
+    if ignore_zero_weighing:
+        for key in list(weighing.keys()):
+            if not weighing[key]:
+                del weighing[key]
 
     if engines_names is None:
         engines_names = list(weighing.keys())
