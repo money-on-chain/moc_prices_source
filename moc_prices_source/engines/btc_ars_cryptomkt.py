@@ -1,5 +1,5 @@
 from engine_base import Base, BTC_ARS
-
+from decimal import Decimal
 
 class Engine(Base):
 
@@ -13,7 +13,7 @@ class Engine(Base):
 
     def _map(self, data):
         return {
-            'price': data['last'],
+            'price': (Decimal(data['ask']) + Decimal(data['bid'])) / Decimal('2'),
             'volume': data['volume']
         }
 

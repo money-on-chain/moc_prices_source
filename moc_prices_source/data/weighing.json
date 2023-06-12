@@ -17,10 +17,12 @@
     "btc_usd_gemini":   0.17,
 
     "rif_btc_binance":    1,
-    "rif_btc_coinbene":   0,
     "rif_btc_bithumbpro": 0,
-    "rif_btc_kucoin":     0,
-    "rif_btc_mxc":        0,
+    "rif_btc_sovryn":     0,
+    "rif_btc_mexc":       0,
+    "rif_btc_coingecko":  0,
+
+    "rif_usdt_binance": 1,
 
     "eth_btc_bitstamp": 0.25,
     "eth_btc_bitfinex": 0.25,
@@ -71,6 +73,8 @@
     "usd_mxn_currencymeuk":      0.1,
     "usd_mxn_infodolar":         0.1, 
     "usd_mxn_eleconomista":      0.1,
-    "usd_mxn_bitso":             0.1
+    "usd_mxn_bitso":             0.1,
+
+    "moc_btc_sovryn": 1
 
 }
