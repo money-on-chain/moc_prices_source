@@ -93,7 +93,7 @@ def cli_check(show_version=False, show_json=False, show_weighing=False, show_com
     for coinpair, d in values.items():
         row = []
         if 'prices' in d:
-            row.append('🠻')
+            row.append('↓')
         else:
             row.append('ƒ')
         row.append(coinpair)
