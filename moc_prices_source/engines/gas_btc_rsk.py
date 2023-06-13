@@ -8,6 +8,7 @@ class Engine(BaseOnChain):
     _description   = "RSK onchain"
     _coinpair      = GAS_BTC
     _uri           = get_env('RSK_NODE', 'https://public-node.rsk.co')
+    _max           = 2*(10**10) #20Gwei
 
 
     def _get_price(self):
@@ -17,11 +18,14 @@ class Engine(BaseOnChain):
         except Exception as e:
             self._error = str(e)
             return None
-        if value:
-            return Decimal(value) / (10**18)
-        else:
+        if not value:
             self._error = f"No gas price value given from {self._uri}"
             return None
+        elif value >= self._max:
+            self._error = f"Gas price value >= {self._max}"
+            return None
+        else:
+            return Decimal(value) / (10**18)
 
 
 
