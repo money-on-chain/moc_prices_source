@@ -75,6 +75,8 @@
     "usd_mxn_eleconomista":      0.1,
     "usd_mxn_bitso":             0.1,
 
-    "moc_btc_sovryn": 1
+    "moc_btc_sovryn": 1,
+
+    "gas_btc_rsk": 1
 
 }
