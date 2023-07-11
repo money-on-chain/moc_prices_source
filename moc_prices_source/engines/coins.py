@@ -121,7 +121,9 @@ class CoinPair(object):
 BTC_USD         = CoinPair(BTC,  USD)
 BTC_ARS         = CoinPair(BTC,  ARS)
 RIF_BTC         = CoinPair(RIF,  BTC)
-RIF_USD         = CoinPair(RIF,  USD)
+RIF_USD         = CoinPair(RIF,  USD) # Leave this as legacy
+RIF_USD_B       = CoinPair(RIF,  USD, "B") # Passing through Tether
+RIF_USD_T       = CoinPair(RIF,  USD, "T") # Passing through Bitcoin
 RIF_USDT        = CoinPair(RIF,  USDT)
 MOC_BTC         = CoinPair(MOC,  BTC)
 MOC_USD         = CoinPair(MOC,  USD)
