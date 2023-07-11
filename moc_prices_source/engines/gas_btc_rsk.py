@@ -14,10 +14,28 @@ class Engine(BaseOnChain):
     def _get_price(self):
 
         try:
-            value = self.make_web3_obj_with_uri().eth.gas_price
+            eth = self.make_web3_obj_with_uri().eth
         except Exception as e:
             self._error = str(e)
             return None
+
+        # Fix: backcompatibility with various we3 versions
+        value = None
+        attributes = ['gas_price', 'gasPrice']
+        not_get = True
+        for g in attributes:
+            if hasattr(eth, g):
+                try:
+                    value = getattr(eth, g)
+                except Exception as e:
+                    self._error = str(e)
+                    return None
+                not_get = False
+                break
+        if not_get:
+            self._error = f"'Eth' object has none of these attributes: {', '.join(map(repr, attributes))}"
+            return None
+
         if not value:
             self._error = f"No gas price value given from {self._uri}"
             return None
