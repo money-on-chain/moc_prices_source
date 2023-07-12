@@ -131,6 +131,7 @@ ETH_BTC         = CoinPair(ETH,  BTC)
 ETH_USD         = CoinPair(ETH,  USD)
 BTC_USDT        = CoinPair(BTC,  USDT)
 USDT_USD        = CoinPair(USDT, USD)
+USDT_USD_B      = CoinPair(USDT, USD, "B") # Passing through Bitcoin
 BNB_USDT        = CoinPair(BNB,  USDT)
 BNB_USD         = CoinPair(BNB,  USD)
 USD_ARS         = CoinPair(USD,  ARS)
