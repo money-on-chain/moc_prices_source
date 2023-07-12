@@ -8,7 +8,7 @@ base_dir = dirname(abspath(__file__))
 bkpath   = sys.path[:]
 sys.path.append(dirname(base_dir))
 
-from moc_prices_source.engines.coins import RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB_MOC, BTC_ARS
+from moc_prices_source.engines.coins import RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB_MOC, BTC_ARS, RIF_USD_TB
 
 sys.path = bkpath
 
@@ -23,9 +23,13 @@ computed_pairs = {
         'requirements': [RIF_BTC, BTC_USD],
         'formula': lambda rif_btc, btc_usd: rif_btc * btc_usd
     },
-    RIF_USD_T: { # Passing through Tether
+    RIF_USD_TB: { # Passing through Tether & Bitcoin
         'requirements': [RIF_USDT, BTC_USD, BTC_USDT],
         'formula': lambda rif_usdt, btc_usd, btc_usdt: rif_usdt * btc_usd / btc_usdt
+    },
+    RIF_USD_T: { # Passing through Tether
+        'requirements': [RIF_USDT, USDT_USD],
+        'formula': lambda rif_usdt, usdt_usd: rif_usdt * usdt_usd
     },
     RIF_USD: { # Leave this as legacy
         'requirements': [RIF_BTC, BTC_USD],
