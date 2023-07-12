@@ -8,7 +8,7 @@ base_dir = dirname(abspath(__file__))
 bkpath   = sys.path[:]
 sys.path.append(dirname(base_dir))
 
-from moc_prices_source.engines.coins import RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, RIF_USD_T, ETH_USD, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB_MOC, BTC_ARS
+from moc_prices_source.engines.coins import RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB_MOC, BTC_ARS
 
 sys.path = bkpath
 
@@ -35,7 +35,7 @@ computed_pairs = {
         'requirements': [ETH_BTC, BTC_USD],
         'formula': lambda eth_btc, btc_usd: eth_btc * btc_usd
     },
-    USDT_USD: {
+    USDT_USD_B: { # Passing through Bitcoin
         'requirements': [BTC_USD, BTC_USDT],
         'formula': lambda btc_usd, btc_usdt: btc_usd / btc_usdt
     },

@@ -77,6 +77,9 @@
 
     "moc_btc_sovryn": 1,
 
-    "gas_btc_rsk": 1
+    "gas_btc_rsk": 1,
 
+    "usdt_usd_bitstamp": 0.15,
+    "usdt_usd_coinbase": 0.45,
+    "usdt_usd_kraken":   0.40
 }
