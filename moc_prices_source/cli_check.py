@@ -85,11 +85,16 @@ COINPAIRS_FILTER:
         row.append(p["coinpair"].variant)
         row.append(p["description"])
         if p["ok"]:
-            row.append(f"{p['price']:.8f}")
-            row.append(p["coinpair"].to_.small_symbol)
+            unit = 'p'
+            v = p['price'] * (1000**4)
+            if v > 1000:
+                for unit in ['p', 'µ', 'm', ' ', 'K', 'M', 'G']:
+                    v = v/1000
+                    if v<1000:
+                        break
+            row.append(f"{p['coinpair'].to_.small_symbol} {v:9.5f}{unit}")
         else:
-            row.append(trim(p["error"], 25))
-            row.append(None)
+            row.append(trim(p["error"], 20))
         row.append(round(p["weighing"], 2))
         if p["percentual_weighing"]:
             row.append(round(p[
@@ -105,14 +110,14 @@ COINPAIRS_FILTER:
         table.sort(key=str)
         print()
         print(tabulate(table, headers=[
-            'From', 'To', 'V.', 'Exchnage', 'Response', 'U.', 'Weigh', '%', 'Time'
+            'From', 'To', 'V.', 'Exchnage', 'Response', 'Weigh', '%', 'Time'
         ]))
 
     table=[]
     for coinpair, d in values.items():
         row = []
         if 'prices' in d:
-            row.append('🠻')
+            row.append('↓')
         else:
             row.append('ƒ')
         row.append(coinpair)
