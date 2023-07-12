@@ -1,4 +1,4 @@
-# Options for the `RUF/USD` price source
+# Options for the `RIF/USD` price source
 
 Currently there are **3** options and they respond to the following formulas:
 

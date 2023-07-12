@@ -17,7 +17,7 @@ EXAMPLE=$(example)
 
 report () {
     cat <<EOL
-# Options for the \`RUF/USD\` price source
+# Options for the \`RIF/USD\` price source
 
 Currently there are **$COUNT** options and they respond to the following formulas:
 
