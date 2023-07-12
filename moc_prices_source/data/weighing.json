@@ -5,11 +5,11 @@
     "btc_usd_coinbase":   0.25,
     "btc_usd_gemini":     0.17,
 
-    "rif_btc_coinbene":   0,
-    "rif_btc_bithumbpro": 0,
-    "rif_btc_kucoin":     0,
     "rif_btc_binance":    1,
-    "rif_btc_mxc":        0,
+    "rif_btc_bithumbpro": 0,
+    "rif_btc_sovryn":     0,
+    "rif_btc_mexc":       0,
+    "rif_btc_coingecko":  0,
 
     "rif_usdt_binance": 1,
 

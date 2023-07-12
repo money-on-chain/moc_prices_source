@@ -7,7 +7,7 @@ from redis        import Redis, ConnectionError
 from coins        import *
 from bs4          import BeautifulSoup
 from web3         import Web3, HTTPProvider
-
+from os           import environ
 
 
 class Base(object):
@@ -445,6 +445,15 @@ class BaseOnChain(Base):
     Web3 = Web3
     HTTPProvider = HTTPProvider
 
+    def to_checksum_address(self, value):
+        try:
+            return self.Web3.to_checksum_address(value)
+        except:
+            return self.Web3.toChecksumAddress(value)
+    
+    def make_web3_obj_with_uri(self):
+        return self.Web3(self.HTTPProvider(self._uri))
+
     def _get_price(self):
 
         try:
@@ -482,6 +491,12 @@ class BaseOnChain(Base):
 
         return True
 
+def get_env(name, default):
+    try:
+        return str(environ[name])
+    except KeyError :
+        return default
+    
 
 
 if __name__ == '__main__':
