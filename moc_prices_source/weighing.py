@@ -133,6 +133,11 @@ def weighted_median(values, weights):
     a, b = values[idx], values[idx + 1]
     base = weights[idx] + weights[idx + 1]
     p, q = weights[idx]/base, weights[idx + 1]/base
+
+    if isinstance(a, Decimal) and not isinstance(p, Decimal):
+        p = Decimal(p)
+    if isinstance(b, Decimal) and not isinstance(q, Decimal):
+        q = Decimal(q)      
     
     return (a * p) + (b * q)
 
