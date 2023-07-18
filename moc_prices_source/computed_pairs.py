@@ -6,9 +6,10 @@ from types   import LambdaType
 base_dir = dirname(abspath(__file__))
 
 bkpath   = sys.path[:]
-sys.path.append(dirname(base_dir))
+sys.path.insert(0, dirname(base_dir), )
 
 from moc_prices_source.engines.coins import RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB_MOC, BTC_ARS, RIF_USD_TB
+from moc_prices_source.weighing import weighted_median
 
 sys.path = bkpath
 
