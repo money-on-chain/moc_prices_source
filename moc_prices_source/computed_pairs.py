@@ -32,7 +32,7 @@ computed_pairs = {
         'requirements': [RIF_USDT, BTC_USD, BTC_USDT, RIF_BTC],
         'formula': lambda rif_usdt, btc_usd, btc_usdt, rif_btc: weighted_median(
                 [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
-                [0.5, 0.5])
+                [0.75, 0.25])
     },    
     RIF_USD_T: { # Passing through Tether
         'requirements': [RIF_USDT, USDT_USD],
