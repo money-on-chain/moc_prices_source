@@ -7,7 +7,7 @@ RIF/USD(B) = rif_btc * btc_usd
 RIF/USD(TB) = rif_usdt * btc_usd / btc_usdt
 RIF/USD(WMTB) = weighted_median(
                 [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
-                [0.5, 0.5])
+                [0.75, 0.25])
 RIF/USD(T) = rif_usdt * usdt_usd
 ```
 
