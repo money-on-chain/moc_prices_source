@@ -6,9 +6,10 @@ from types   import LambdaType
 base_dir = dirname(abspath(__file__))
 
 bkpath   = sys.path[:]
-sys.path.append(dirname(base_dir))
+sys.path.insert(0, dirname(base_dir), )
 
-from moc_prices_source.engines.coins import RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB_MOC, BTC_ARS, RIF_USD_TB
+from moc_prices_source.engines.coins import RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB_MOC, BTC_ARS, RIF_USD_TB, RIF_USD_WMTB
+from moc_prices_source.weighing import weighted_median
 
 sys.path = bkpath
 
@@ -27,6 +28,12 @@ computed_pairs = {
         'requirements': [RIF_USDT, BTC_USD, BTC_USDT],
         'formula': lambda rif_usdt, btc_usd, btc_usdt: rif_usdt * btc_usd / btc_usdt
     },
+    RIF_USD_WMTB: { # Passing through Tether & Bitcoin usinng weighted_median
+        'requirements': [RIF_USDT, BTC_USD, BTC_USDT, RIF_BTC],
+        'formula': lambda rif_usdt, btc_usd, btc_usdt, rif_btc: weighted_median(
+                [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
+                [0.5, 0.5])
+    },    
     RIF_USD_T: { # Passing through Tether
         'requirements': [RIF_USDT, USDT_USD],
         'formula': lambda rif_usdt, usdt_usd: rif_usdt * usdt_usd
