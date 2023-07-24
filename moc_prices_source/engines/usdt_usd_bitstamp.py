@@ -1,16 +1,16 @@
-from engine_base import Base, BTC_USD
+from engine_base import Base, USDT_USD
 
 
 class Engine(Base):
 
     _name        = Base._name_from_file(__file__)
-    _description = "Binance"
-    _uri         = "https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT"
-    _coinpair    = BTC_USD
+    _description = "Bitstamp"
+    _uri         = "https://www.bitstamp.net/api/v2/ticker/usdtusd/"
+    _coinpair    = USDT_USD
 
     def _map(self, data):
         return {
-            'price':  data['lastPrice'],
+            'price':  data['last'],
             'volume': data['volume']}
 
 
@@ -19,3 +19,5 @@ if __name__ == '__main__':
     engine = Engine()
     engine()
     print(engine)
+    if engine.error:
+        print(engine.error)

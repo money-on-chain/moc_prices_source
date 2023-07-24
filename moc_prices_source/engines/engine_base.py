@@ -6,7 +6,8 @@ from json.decoder import JSONDecodeError
 from redis        import Redis, ConnectionError
 from coins        import *
 from bs4          import BeautifulSoup
-
+from web3         import Web3, HTTPProvider
+from os           import environ
 
 
 class Base(object):
@@ -414,6 +415,88 @@ class BaseWithFailover(Base):
             self._uri_failover, self._uri =  uri, uri_failover
             ok = Base.__call__(self, start_time)
         return ok
+
+
+class BaseOnChain(Base):
+
+    erc20_simplified_abi = """
+[
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_owner",
+                "type": "address"
+            }
+        ],
+        "name": "balanceOf",
+        "outputs": [
+            {
+                "name": "balance",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
+"""
+    Web3 = Web3
+    HTTPProvider = HTTPProvider
+
+    def to_checksum_address(self, value):
+        try:
+            return self.Web3.to_checksum_address(value)
+        except:
+            return self.Web3.toChecksumAddress(value)
+    
+    def make_web3_obj_with_uri(self):
+        return self.Web3(self.HTTPProvider(self._uri))
+
+    def _get_price(self):
+
+        try:
+
+            return 0
+
+        except Exception as e:
+            self._error = str(e)
+            return None
+
+
+    def __call__(self, start_time=None):
+
+        if start_time is None:
+            start_time = datetime.datetime.now()
+        
+        price = self._get_price()
+ 
+        if not price:
+            if not self._error:
+                self._error = "Engine error trying to get 'price'"
+            return False
+
+        try:
+            self._price = Decimal(str(price))
+        except Exception:
+            self._error = "Engine error trying to get 'price'"
+            return False
+
+        self._timestamp = self._now()
+        self._last_change_timestamp = self._timestamp
+
+        self._volume = 0.0
+        self._time = datetime.datetime.now() - start_time
+
+        return True
+
+def get_env(name, default):
+    try:
+        return str(environ[name])
+    except KeyError :
+        return default
+    
 
 
 if __name__ == '__main__':

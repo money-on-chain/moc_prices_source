@@ -51,11 +51,13 @@ class Coin(object):
 BTC  = Coin('Bitcoin',        'btc',  '₿')
 USD  = Coin('Dollar',         'usd',  '$')
 RIF  = Coin('RIF Token',      'rif')
+MOC  = Coin('MOC Token',      'moc')
 ETH  = Coin('Ether',          'eth',  '⟠')
 USDT = Coin('Tether',         'usdt', '₮')
 BNB  = Coin('Binance Coin',   'bnb',  'Ƀ')
 ARS  = Coin('Peso Argentino', 'ars',  '$')
 MXN  = Coin('Peso Mexicano',  'mxn',  '$')
+GAS  = Coin('Gas',            'gas')
 
 
 Coins = [ c for c in locals().values() if isinstance(c, Coin) ]
@@ -119,11 +121,19 @@ class CoinPair(object):
 BTC_USD         = CoinPair(BTC,  USD)
 BTC_ARS         = CoinPair(BTC,  ARS)
 RIF_BTC         = CoinPair(RIF,  BTC)
-RIF_USD         = CoinPair(RIF,  USD)
+RIF_USD         = CoinPair(RIF,  USD) # Leave this as legacy
+RIF_USD_B       = CoinPair(RIF,  USD, "B") # Passing through Bitcoin
+RIF_USD_T       = CoinPair(RIF,  USD, "T") # Passing through Tether
+RIF_USD_TB      = CoinPair(RIF,  USD, "TB") # Passing through Tether & Bitcoin
+RIF_USD_WMTB    = CoinPair(RIF,  USD, "WMTB") # Passing through Tether & Bitcoin usinng weighted_median
+RIF_USDT        = CoinPair(RIF,  USDT)
+MOC_BTC         = CoinPair(MOC,  BTC)
+MOC_USD         = CoinPair(MOC,  USD)
 ETH_BTC         = CoinPair(ETH,  BTC)
 ETH_USD         = CoinPair(ETH,  USD)
 BTC_USDT        = CoinPair(BTC,  USDT)
 USDT_USD        = CoinPair(USDT, USD)
+USDT_USD_B      = CoinPair(USDT, USD, "B") # Passing through Bitcoin
 BNB_USDT        = CoinPair(BNB,  USDT)
 BNB_USD         = CoinPair(BNB,  USD)
 USD_ARS         = CoinPair(USD,  ARS)
@@ -131,6 +141,7 @@ USD_ARS_CCL     = CoinPair(USD,  ARS, "CCL")
 USD_ARS_CCB     = CoinPair(USD,  ARS, "CCB")
 USD_ARS_CCB_MOC = CoinPair(USD,  ARS, "CCB by MOC")
 USD_MXN         = CoinPair(USD,  MXN)
+GAS_BTC         = CoinPair(GAS,  BTC)
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]

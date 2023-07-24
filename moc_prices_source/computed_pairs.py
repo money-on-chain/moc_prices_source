@@ -6,16 +6,39 @@ from types   import LambdaType
 base_dir = dirname(abspath(__file__))
 
 bkpath   = sys.path[:]
-sys.path.append(dirname(base_dir))
+sys.path.insert(0, dirname(base_dir), )
 
-from moc_prices_source.engines.coins import BTC_USD, RIF_BTC, ETH_BTC, RIF_USD, ETH_USD, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB_MOC, BTC_ARS
+from moc_prices_source.engines.coins import RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB_MOC, BTC_ARS, RIF_USD_TB, RIF_USD_WMTB
+from moc_prices_source.weighing import weighted_median
 
 sys.path = bkpath
 
 
 
 computed_pairs = {
-    RIF_USD: {
+    MOC_USD: {
+        'requirements': [MOC_BTC, BTC_USD],
+        'formula': lambda moc_btc, btc_usd: moc_btc * btc_usd
+    },
+    RIF_USD_B: { # Passing through Bitcoin
+        'requirements': [RIF_BTC, BTC_USD],
+        'formula': lambda rif_btc, btc_usd: rif_btc * btc_usd
+    },
+    RIF_USD_TB: { # Passing through Tether & Bitcoin
+        'requirements': [RIF_USDT, BTC_USD, BTC_USDT],
+        'formula': lambda rif_usdt, btc_usd, btc_usdt: rif_usdt * btc_usd / btc_usdt
+    },
+    RIF_USD_WMTB: { # Passing through Tether & Bitcoin usinng weighted_median
+        'requirements': [RIF_USDT, BTC_USD, BTC_USDT, RIF_BTC],
+        'formula': lambda rif_usdt, btc_usd, btc_usdt, rif_btc: weighted_median(
+                [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
+                [0.75, 0.25])
+    },    
+    RIF_USD_T: { # Passing through Tether
+        'requirements': [RIF_USDT, USDT_USD],
+        'formula': lambda rif_usdt, usdt_usd: rif_usdt * usdt_usd
+    },
+    RIF_USD: { # Leave this as legacy
         'requirements': [RIF_BTC, BTC_USD],
         'formula': lambda rif_btc, btc_usd: rif_btc * btc_usd
     },
@@ -23,13 +46,13 @@ computed_pairs = {
         'requirements': [ETH_BTC, BTC_USD],
         'formula': lambda eth_btc, btc_usd: eth_btc * btc_usd
     },
-    USDT_USD: {
+    USDT_USD_B: { # Passing through Bitcoin
         'requirements': [BTC_USD, BTC_USDT],
         'formula': lambda btc_usd, btc_usdt: btc_usd / btc_usdt
     },
     BNB_USD: {
-        'requirements': [BNB_USDT, USDT_USD],
-        'formula': lambda bnb_usdt, usdt_usd: bnb_usdt * usdt_usd
+        'requirements': [BNB_USDT, BTC_USD, BTC_USDT],
+        'formula': lambda bnb_usdt, btc_usd, btc_usdt: bnb_usdt * btc_usd / btc_usdt
     },
     USD_ARS_CCB_MOC: {
         'requirements': [BTC_ARS, BTC_USD],
