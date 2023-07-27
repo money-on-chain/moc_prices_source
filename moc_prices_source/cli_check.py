@@ -158,6 +158,12 @@ proportionally.""")
 and if for some reason B would not be available, A:0.4, C:0.6 would
 be used.""")
     print()
+    show_p("""The weights used are fixed values.""")
+    show_p("""These weightings are related to the historical volume handled by each
+price source.""")
+    show_p("""Every established period of time we review the historical volume of the
+sources and if necessary we apply the changes to the parameterization""")
+    print()
     for pair, data in summary_data.items():
         if data['type']=='direct':
             title = f"For coinpair {pair.long_name}"

@@ -76,6 +76,12 @@ For example, you have 3 sources with 3 weights A:0.2, B:0.5, C:0.3
 and if for some reason B would not be available, A:0.4, C:0.6 would
 be used.
 
+The weights used are fixed values.
+These weightings are related to the historical volume handled by each
+price source.
+Every established period of time we review the historical volume of the
+sources and if necessary we apply the changes to the parameterization
+
 
 ### For coinpair BTC/USD (from Bitcoin to Dollar)
 
@@ -128,39 +134,39 @@ user@workstation:~$ moc_prices_source_check "RIF/USD*"
 
 From       To       V.    Exchnage        Response        Weigh  %      Time
 ---------  -------  ----  --------------  ------------  -------  -----  ------
-Bitcoin    Dollar         Bitfinex        $  29.40600K     0.18  18.0   0.49s
-Bitcoin    Dollar         Bitstamp        $  29.36500K     0.22  22.0   0.45s
-Bitcoin    Dollar         Coinbase        $  29.36514K     0.25  25.0   0.28s
-Bitcoin    Dollar         Gemini          $  29.36707K     0.17  17.0   0.97s
-Bitcoin    Dollar         Kraken          $  29.34280K     0.18  18.0   0.68s
-Bitcoin    Tether         Binance         ₮  29.36649K     0.8   80.0   1.03s
-Bitcoin    Tether         Bitfinex        ₮  29.36600K     0.05  5.0    0.52s
-Bitcoin    Tether         Coinbase        ₮  29.35978K     0.1   10.0   0.27s
-Bitcoin    Tether         Kraken          ₮  29.36670K     0.05  5.0    0.72s
-RIF Token  Bitcoin        Binance         ₿   2.68000µ     1     100.0  0.47s
-RIF Token  Bitcoin        BitHumb         ₿   6.30000µ     0     N/A    3.26s
-RIF Token  Bitcoin        Coingecko       ₿   2.68000µ     0     N/A    0.41s
-RIF Token  Bitcoin        MEXC            ₿   2.67500µ     0     N/A    0.61s
-RIF Token  Bitcoin        Sovryn onchain  ₿   2.70030µ     0     N/A    1.2s
-RIF Token  Tether         Binance         ₮  78.50000m     1     100.0  0.47s
-Tether     Dollar         Bitstamp        $ 999.89000m     0.15  15.0   0.47s
-Tether     Dollar         Coinbase        $ 999.87500m     0.45  45.0   0.31s
-Tether     Dollar         Kraken          $ 999.64000m     0.4   40.0   0.69s
+Bitcoin    Dollar         Bitfinex        $  29.39700K     0.18  18.0   1.0s
+Bitcoin    Dollar         Bitstamp        $  29.35700K     0.22  22.0   1.01s
+Bitcoin    Dollar         Coinbase        $  29.35588K     0.25  25.0   0.96s
+Bitcoin    Dollar         Gemini          $  29.35139K     0.17  17.0   1.37s
+Bitcoin    Dollar         Kraken          $  29.34200K     0.18  18.0   1.37s
+Bitcoin    Tether         Binance         ₮  29.36504K     0.8   80.0   1.77s
+Bitcoin    Tether         Bitfinex        ₮  29.36200K     0.05  5.0    1.57s
+Bitcoin    Tether         Coinbase        ₮  29.35759K     0.1   10.0   0.95s
+Bitcoin    Tether         Kraken          ₮  29.34340K     0.05  5.0    1.37s
+RIF Token  Bitcoin        Binance         ₿   2.68000µ     1     100.0  1.17s
+RIF Token  Bitcoin        BitHumb         ₿   6.30000µ     0     N/A    2.59s
+RIF Token  Bitcoin        Coingecko       ₿   2.68000µ     0     N/A    0.95s
+RIF Token  Bitcoin        MEXC            ₿   2.68700µ     0     N/A    1.14s
+RIF Token  Bitcoin        Sovryn onchain  ₿   2.70030µ     0     N/A    1.59s
+RIF Token  Tether         Binance         ₮  78.60000m     1     100.0  1.15s
+Tether     Dollar         Bitstamp        $ 999.87000m     0.15  15.0   1.16s
+Tether     Dollar         Coinbase        $ 999.83500m     0.45  45.0   0.97s
+Tether     Dollar         Kraken          $ 999.68000m     0.4   40.0   1.38s
 
     Coin pair             Mediam             Mean    Weighted median  Sources
 --  -------------  -------------  ---------------  -----------------  ---------
-↓   BTC/USD        29365.1        29369.2              29365.1        5
-↓   BTC/USDT       29366.2        29364.7              29366.5        4
-↓   RIF/BTC            2.68e-06       3.40706e-06          2.68e-06   5
-ƒ   RIF/USD            0.0786986      0.100063             0.0786986  N/A
-ƒ   RIF/USD(B)         0.0786986      0.100063             0.0786986  N/A
-ƒ   RIF/USD(T)         0.0784902      0.0784844            0.0784902  N/A
-ƒ   RIF/USD(TB)        0.078497       0.0785119            0.0784964  N/A
-ƒ   RIF/USD(WMTB)      0.0785474      0.0838996            0.0785469  N/A
-↓   RIF/USDT           0.0785         0.0785               0.0785     1
-↓   USDT/USD           0.999875       0.999802             0.999875   3
+↓   BTC/USD        29355.9        29360.7              29355.9        5
+↓   BTC/USDT       29359.8        29357                29363.8        4
+↓   RIF/BTC            2.687e-06      3.40946e-06          2.68e-06   5
+ƒ   RIF/USD            0.0788792      0.100104             0.0786737  N/A
+ƒ   RIF/USD(B)         0.0788792      0.100104             0.0786737  N/A
+ƒ   RIF/USD(T)         0.078587       0.0785839            0.078587   N/A
+ƒ   RIF/USD(TB)        0.0785895      0.0786098            0.0785789  N/A
+ƒ   RIF/USD(WMTB)      0.0786619      0.0839833            0.0786026  N/A
+↓   RIF/USDT           0.0786         0.0786               0.0786     1
+↓   USDT/USD           0.999835       0.999795             0.999835   3
 
-Response time 3.29s
+Response time 2.62s
 
 user@workstation:~$
 ```
