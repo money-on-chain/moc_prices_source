@@ -147,9 +147,16 @@ def summary(coinpairs, md=False):
     print()
 
 
-    title="Weights used for coinpairs obtained from multiple sources"
+    title="Weights used for each obtained coinpairs from multiple sources"
     print()
     show_title(title)
+    print()
+    show_p("""If a price source is not available, this source is discarded
+and the rest of the sources are used but with their weights recalculated
+proportionally.""")
+    show_p("""For example, you have 3 sources with 3 weights A:0.2, B:0.5, C:0.3
+and if for some reason B would not be available, A:0.4, C:0.6 would
+be used.""")
     print()
     for pair, data in summary_data.items():
         if data['type']=='direct':
