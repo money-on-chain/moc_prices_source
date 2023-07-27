@@ -93,6 +93,10 @@ class CoinPair(object):
         return self._to
 
     @property
+    def long_name(self):
+        return f"{self} (from {self.from_.name} to {self.to_.name})"
+    
+    @property
     def as_dict(self):
         return {
             'from':    self.from_,
