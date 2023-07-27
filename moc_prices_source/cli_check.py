@@ -77,10 +77,11 @@ def summary(coinpairs, md=False):
             print(f"    {p}")
 
     def show_table(table, headers=[], tablefmt='psql'):
-        s = tabulate(table, headers=headers, tablefmt=tablefmt, floatfmt=".2f")
         if md:
             if tablefmt=='psql':
                 tablefmt='github'
+        s = tabulate(table, headers=headers, tablefmt=tablefmt, floatfmt=".2f")
+        if md:
             if tablefmt=='plain':
                 print('```')
             print(s)
