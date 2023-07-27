@@ -162,7 +162,7 @@ be used.""")
     show_p("""These weightings are related to the historical volume handled by each
 price source.""")
     show_p("""Every established period of time we review the historical volume of the
-sources and if necessary we apply the changes to the parameterization""")
+sources and if necessary we apply the changes to the parameterization.""")
     print()
     for pair, data in summary_data.items():
         if data['type']=='direct':
