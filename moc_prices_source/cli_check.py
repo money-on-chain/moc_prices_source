@@ -170,7 +170,7 @@ sources and if necessary we apply the changes to the parameterization.""")
             sources = data['sources']
             table = [[d['name'], float(d['weigh']), d['uri']] for d in
                      sources if float(d['weigh'])>0]
-            headers=['Source', 'Weigh', 'URI']
+            headers=['Source', 'Weight', 'URI']
             print()
             show_title(title, 2)
             print()
@@ -209,7 +209,7 @@ Description:
     CLI-type tool that shows the data obtained by
     the `moc_price_source` library.   
     Useful for troubleshooting.
-\b
+\n\b
 COINPAIRS_FILTER:
     Is a display pairs filter that accepts wildcards.
     Example: "btc*"
@@ -300,7 +300,7 @@ COINPAIRS_FILTER:
         table.sort(key=str)
         print()
         print(tabulate(table, headers=[
-            'From', 'To', 'V.', 'Exchnage', 'Response', 'Weigh', '%', 'Time'
+            'From', 'To', 'V.', 'Exchnage', 'Response', 'Weight', '%', 'Time'
         ]))
 
     table=[]
