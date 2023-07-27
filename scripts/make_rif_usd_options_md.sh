@@ -33,12 +33,6 @@ Date: **$DATE**
 
 
 
-[toc]
-
-
-
-------
-
 
 ## Options
 
