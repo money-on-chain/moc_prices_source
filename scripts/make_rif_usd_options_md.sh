@@ -6,6 +6,9 @@ OUTFILE=docs/rif_usd_options.md
 cd "$(dirname "$0")/.."
 
 example () { 
+    echo "user@workstation:~$ moc_prices_source_check --help"
+    ./moc_prices_source_check --help
+    echo ""
     echo "user@workstation:~$ moc_prices_source_check \"RIF/USD(*\""
     ./moc_prices_source_check "RIF/USD(*"
     echo "user@workstation:~$"
@@ -59,7 +62,7 @@ This tool is called \`moc_prices_source_check\` and here you can see an example 
 
 ### Example
 
-\`\`\`
+\`\`\`shell
 $EXAMPLE
 \`\`\`
 
