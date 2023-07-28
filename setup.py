@@ -3,11 +3,23 @@ from os.path    import dirname, abspath
 
 base_dir = dirname(abspath(__file__))
 
+with open(base_dir + "/moc_prices_source/version.txt", "r") as file_:
+    version = file_.read().split()[0]
+
 with open(base_dir + "/README.md", "r") as file_:
     long_description = file_.read()
 
-with open(base_dir + "/moc_prices_source/version.txt", "r") as file_:
-    version = file_.read().split()[0]
+# Fix some links
+ 
+long_description = long_description.replace(
+    "](https://github.com/money-on-chain/moc_prices_source",
+    "](https://github.com/money-on-chain/moc_prices_source/tree/v" + version
+)
+
+long_description = long_description.replace(
+    "](docs/",
+    "](docs/https://github.com/money-on-chain/moc_prices_source/tree/v" + version + "/docs/"
+)
 
 requirements = []
 requires_files = ["/requirements.txt",
