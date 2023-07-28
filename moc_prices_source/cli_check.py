@@ -49,8 +49,8 @@ def summary(coinpairs, md=False):
 
     coinpairs_and_requirements = coinpairs[:]
     for coinpair in coinpairs:
-        c_data = summary_data[coinpair]
-        if coinpair in summary_data and c_data['type']=='computed':
+        c_data = summary_data.get(coinpair, None) 
+        if c_data and c_data['type']=='computed':
             for r in c_data['requirements']:
                 if not r in coinpairs_and_requirements:
                     coinpairs_and_requirements.append(r)
