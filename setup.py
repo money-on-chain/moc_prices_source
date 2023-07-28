@@ -10,15 +10,17 @@ with open(base_dir + "/README.md", "r") as file_:
     long_description = file_.read()
 
 # Fix some links
- 
+
+url = "https://github.com/money-on-chain/moc_prices_source"
+
 long_description = long_description.replace(
-    "](https://github.com/money-on-chain/moc_prices_source",
-    "](https://github.com/money-on-chain/moc_prices_source/tree/v" + version
+    "](" + url + ")",
+    "](" + url + "/tree/v" + version + ")"
 )
 
 long_description = long_description.replace(
     "](docs/",
-    "](docs/https://github.com/money-on-chain/moc_prices_source/tree/v" + version + "/docs/"
+    "](" + url + "/blob/v" + version + "/docs/"
 )
 
 requirements = []
