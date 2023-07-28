@@ -175,8 +175,30 @@ weighing = Weighing()
 
 
 def weighted_median(values, weights):
+    
+    count = len(values)
+    
+    if 1==count:
+        return values[0]
+    
     idx = weighted_median_idx(values, weights)
-    return values[idx]
+
+    if (count % 2) != 0:
+        return values[idx] 
+
+    if count -1 == idx:
+        idx -= 1
+    
+    a, b = values[idx], values[idx + 1]
+    base = weights[idx] + weights[idx + 1]
+    p, q = weights[idx]/base, weights[idx + 1]/base
+
+    if isinstance(a, Decimal) and not isinstance(p, Decimal):
+        p = Decimal(p)
+    if isinstance(b, Decimal) and not isinstance(q, Decimal):
+        q = Decimal(q)      
+    
+    return (a * p) + (b * q)
 
 
 def weighted_median_idx(values, weights):
@@ -197,12 +219,8 @@ def weighted_median_idx(values, weights):
     cumulative_probability = 0
     for i in range(len(sorted_tuples)):
         cumulative_probability += sorted_tuples[i][1]
-        if cumulative_probability > 0.5:
+        if cumulative_probability >= 0.5:
             return sorted_tuples[i][2]
-        elif cumulative_probability == 0.5:
-            # if i + 1 >= len(sorted_tuples):
-            return sorted_tuples[i][2]
-            # return (sorted_tuples[i][2] + sorted_tuples[i + 1][2]) / 2
     return sorted_tuples[-1][2]
 
 

@@ -6,9 +6,14 @@ from types   import LambdaType
 base_dir = dirname(abspath(__file__))
 
 bkpath   = sys.path[:]
-sys.path.append(dirname(base_dir))
+sys.path.insert(0, dirname(base_dir), )
 
-from moc_prices_source.engines.coins import RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB_MOC, BTC_ARS, RIF_USD_TB
+from moc_prices_source.engines.coins import \
+    RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, \
+    RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, \
+    USD_ARS_CCB_MOC, BTC_ARS, RIF_USD_TB, RIF_USD_WMTB
+from moc_prices_source.weighing import weighted_median
+from moc_prices_source.cli import tabulate
 
 sys.path = bkpath
 
@@ -27,6 +32,12 @@ computed_pairs = {
         'requirements': [RIF_USDT, BTC_USD, BTC_USDT],
         'formula': lambda rif_usdt, btc_usd, btc_usdt: rif_usdt * btc_usd / btc_usdt
     },
+    RIF_USD_WMTB: { # Passing through Tether & Bitcoin usinng weighted_median
+        'requirements': [RIF_USDT, BTC_USD, BTC_USDT, RIF_BTC],
+        'formula': lambda rif_usdt, btc_usd, btc_usdt, rif_btc: weighted_median(
+                [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
+                [0.75, 0.25])
+    },    
     RIF_USD_T: { # Passing through Tether
         'requirements': [RIF_USDT, USDT_USD],
         'formula': lambda rif_usdt, usdt_usd: rif_usdt * usdt_usd
@@ -53,6 +64,14 @@ computed_pairs = {
     },
 }
 
+for pair, data in computed_pairs.items():
+    formula = data['formula']
+    if isinstance(formula, LambdaType):
+        formula_desc = ':'.join(getsource(formula).split('lambda')[-1].strip(
+            ).split(':')[1:]).strip()
+    else:
+        formula_desc = repr(formula)
+    data['formula_desc'] = '\n'.join(map(str.strip, formula_desc.split('\n')))
 
 
 def show_computed_pairs_fromula():
@@ -60,13 +79,9 @@ def show_computed_pairs_fromula():
     print("Computed pairs formula")
     print("-------- ----- -------")
     print("")
-    for pair, data in computed_pairs.items():
-        formula = data['formula']
-        if isinstance(formula, LambdaType):
-            formula = ':'.join(getsource(formula).split('lambda')[-1].strip().split(':')[1:]).strip()
-        else:
-            formula = repr(formula)
-        print(f"{pair} = {formula}")
+    table = [[str(pair), '=', data['formula_desc']] for pair,
+             data in computed_pairs.items()]
+    print(tabulate(table, tablefmt='plain'))
     print("")
 
 
