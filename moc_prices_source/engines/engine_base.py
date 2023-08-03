@@ -407,8 +407,9 @@ class BaseWithFailover(Base):
 
     _uri_failover = None
 
-    def __call__(self):
-        start_time = datetime.datetime.now()
+    def __call__(self, start_time=None):
+        if start_time is None:
+            start_time = datetime.datetime.now()
         ok = Base.__call__(self, start_time)
         if self._uri_failover and not ok:
             uri_failover, uri = self._uri_failover, self._uri
