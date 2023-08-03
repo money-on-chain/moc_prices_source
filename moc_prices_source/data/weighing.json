@@ -24,6 +24,10 @@
 
     "rif_usdt_binance": 1,
 
+    "rif_usdt_mp1p_binance": 1,
+
+    "rif_btc_mp1p_binance": 1,
+
     "eth_btc_bitstamp": 0.25,
     "eth_btc_bitfinex": 0.25,
     "eth_btc_kraken":   0.25,

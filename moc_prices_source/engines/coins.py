@@ -125,12 +125,14 @@ class CoinPair(object):
 BTC_USD         = CoinPair(BTC,  USD)
 BTC_ARS         = CoinPair(BTC,  ARS)
 RIF_BTC         = CoinPair(RIF,  BTC)
+RIF_BTC_MP1P    = CoinPair(RIF,  BTC, "mp1%") # To move the price 1 percent
 RIF_USD         = CoinPair(RIF,  USD) # Leave this as legacy
 RIF_USD_B       = CoinPair(RIF,  USD, "B") # Passing through Bitcoin
 RIF_USD_T       = CoinPair(RIF,  USD, "T") # Passing through Tether
 RIF_USD_TB      = CoinPair(RIF,  USD, "TB") # Passing through Tether & Bitcoin
 RIF_USD_WMTB    = CoinPair(RIF,  USD, "WMTB") # Passing through Tether & Bitcoin usinng weighted_median
 RIF_USDT        = CoinPair(RIF,  USDT)
+RIF_USDT_MP1P   = CoinPair(RIF,  USDT, "mp1%") # To move the price 1 percent
 MOC_BTC         = CoinPair(MOC,  BTC)
 MOC_USD         = CoinPair(MOC,  USD)
 ETH_BTC         = CoinPair(ETH,  BTC)
