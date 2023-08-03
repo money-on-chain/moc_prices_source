@@ -1,5 +1,5 @@
 from engine_base import BaseWithFailover, RIF_BTC_MP1P
-from rif_usdt_binance import Engine as RifUsdtEngine
+from rif_btc_binance import Engine as RifBtcEngine
 from decimal import Decimal
 
 base_uri = "https://{}/api/v3/depth?symbol=RIFBTC"
@@ -17,7 +17,7 @@ class Engine(BaseWithFailover):
 
 
     def __call__(self):
-        price_engine = RifUsdtEngine()
+        price_engine = RifBtcEngine()
         ok = price_engine()
         self._error = price_engine.error
         self.base_price = price_engine.price
