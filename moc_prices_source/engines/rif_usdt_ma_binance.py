@@ -1,8 +1,8 @@
-from engine_base import BaseWithFailover, RIF_USDT_MA
+from engine_base import BaseWithFailover, RIF_USDT_MA, get_env
 from decimal import Decimal
 
 base_uri = "https://{}/api/v3/depth?symbol=RIFUSDT"
-max_quantity = Decimal('100000')
+max_quantity = Decimal(get_env('MA_MAX_QUANTITY', '100000'))
 
 class Engine(BaseWithFailover):
 
