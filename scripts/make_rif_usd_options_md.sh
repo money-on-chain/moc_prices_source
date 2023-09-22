@@ -9,17 +9,19 @@ example () {
     echo "user@workstation:~$ moc_prices_source_check --help"
     ./moc_prices_source_check --help
     echo ""
-    echo "user@workstation:~$ moc_prices_source_check \"RIF/USD(*\""
-    ./moc_prices_source_check "RIF/USD(*"
+    echo "user@workstation:~$ moc_prices_source_check \"RIF/USD*\""
+    ./moc_prices_source_check "RIF/USD*"
     echo "user@workstation:~$"
 }
 
 options () {
     ./moc_prices_source_check --computed | awk 'NR>3 && NF>0 && (substr($0,0,8)=="RIF/USD(") {print("* "$1)}'
+    echo "* RIF/USDT(MA)"
+    echo "* RIF/USDT"
 }
 
 summary () {
-    ./moc_prices_source_check "RIF/USD(*" --summary --markdown
+    ./moc_prices_source_check "RIF/USD*" --summary --markdown
 }
 
 SUMMARY=$(summary)
@@ -52,6 +54,10 @@ $OPTIONS
 \`RIF/USD(T)\`: Because it goes through *RIF/**T**ether* and ***T**ether/Dollar* to reach the desired pair.
 
 \`RIF/USD(WMTB)\`: Because uses a **W**eighted **M**edian between \`RIF/USD(B)\` and \`RIF/USD(TB)\` to reach the desired pair.
+
+\`RIF/USDT(MA)\`: Because uses the \`RIF/USDT\` with the "**M**agic **A**verage" algorithm analyzing the orderbook depth.
+
+\`RIF/USDT\`: Because uses directly the \`RIF/USDT\` pair.
 
 $SUMMARY
 
