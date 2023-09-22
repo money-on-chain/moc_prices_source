@@ -39,6 +39,7 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | RIF/USD(TB)   | RIF/USD    | TB        | Computed |
 | RIF/USD(WMTB) | RIF/USD    | WMTB      | Computed |
 | RIF/USDT      | RIF/USDT   |           | Weighted |
+| RIF/USDT(MA)  | RIF/USDT   | MA        | Weighted |
 | USDT/USD      | USDT/USD   |           | Weighted |
 | USDT/USD(B)   | USDT/USD   | B         | Computed |
 
@@ -100,6 +101,11 @@ Only Binance (URI: https://api.binance.com/api/v3/ticker/24hr?symbol=RIFBTC)
 ### For coinpair RIF/USDT (from RIF Token to Tether)
 
 Only Binance (URI: https://api.binance.com/api/v3/ticker/24hr?symbol=RIFUSDT)
+
+
+### For coinpair RIF/USDT(MA) (from RIF Token to Tether)
+
+Only Binance (URI: https://api.binance.com/api/v3/depth?symbol=RIFUSDT)
 
 
 ### For coinpair ETH/BTC (from Ether to Bitcoin)
