@@ -131,6 +131,7 @@ RIF_USD_T       = CoinPair(RIF,  USD, "T") # Passing through Tether
 RIF_USD_TB      = CoinPair(RIF,  USD, "TB") # Passing through Tether & Bitcoin
 RIF_USD_WMTB    = CoinPair(RIF,  USD, "WMTB") # Passing through Tether & Bitcoin usinng weighted_median
 RIF_USDT        = CoinPair(RIF,  USDT)
+RIF_USDT_MA     = CoinPair(RIF,  USDT, "MA") # Using the magic average algorithm with orderbook depth
 MOC_BTC         = CoinPair(MOC,  BTC)
 MOC_USD         = CoinPair(MOC,  USD)
 ETH_BTC         = CoinPair(ETH,  BTC)

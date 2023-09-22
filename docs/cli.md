@@ -41,22 +41,22 @@ user@workstation:~$ moc_prices_source_check BTC/*
 
 From     To      V.    Exchnage    Response        Weight    %  Time
 -------  ------  ----  ----------  ------------  --------  ---  ------
-Bitcoin  Dollar        Bitfinex    $  29.53300K      0.18   18  0.84s
-Bitcoin  Dollar        Bitstamp    $  29.50100K      0.22   22  0.84s
-Bitcoin  Dollar        Coinbase    $  29.50268K      0.25   25  0.82s
-Bitcoin  Dollar        Gemini      $  29.50690K      0.17   17  1.04s
-Bitcoin  Dollar        Kraken      $  29.50080K      0.18   18  1.03s
-Bitcoin  Tether        Binance     ₮  29.50917K      0.8    80  0.83s
-Bitcoin  Tether        Bitfinex    ₮  29.49400K      0.05    5  1.24s
-Bitcoin  Tether        Coinbase    ₮  29.47703K      0.1    10  0.62s
-Bitcoin  Tether        Kraken      ₮  29.51200K      0.05    5  1.04s
+Bitcoin  Dollar        Bitfinex    $  26.63200K      0.18   18  0.98s
+Bitcoin  Dollar        Bitstamp    $  26.59600K      0.22   22  0.98s
+Bitcoin  Dollar        Coinbase    $  26.59208K      0.25   25  0.97s
+Bitcoin  Dollar        Gemini      $  26.59521K      0.17   17  1.15s
+Bitcoin  Dollar        Kraken      $  26.59240K      0.18   18  0.76s
+Bitcoin  Tether        Binance     ₮  26.60007K      0.8    80  0.98s
+Bitcoin  Tether        Bitfinex    ₮  26.60600K      0.05    5  1.08s
+Bitcoin  Tether        Coinbase    ₮  26.59744K      0.1    10  0.96s
+Bitcoin  Tether        Kraken      ₮  26.61380K      0.05    5  0.98s
 
     Coin pair      Mediam     Mean    Weighted median    Sources
 --  -----------  --------  -------  -----------------  ---------
-↓   BTC/USD       29502.7  29508.9            29502.7          5
-↓   BTC/USDT      29501.6  29498.1            29509.3          4
+↓   BTC/USD       26595.2  26601.5            26595.2          5
+↓   BTC/USDT      26603    26604.3            26600.9          4
 
-Response time 1.25s
+Response time 1.17s
 
 user@workstation:~$
 ```
@@ -66,55 +66,57 @@ Get data from all supported coinpairs
 ```shell
 user@workstation:~$ moc_prices_source_check 
 
-From          To       V.    Exchnage        Response        Weight  %      Time
-------------  -------  ----  --------------  ------------  --------  -----  ------
-Binance Coin  Tether         Binance         ₮ 242.30000       1     100.0  0.5s
-Bitcoin       Dollar         Bitfinex        $  29.53300K      0.18  18.0   0.39s
-Bitcoin       Dollar         Bitstamp        $  29.50100K      0.22  22.0   0.51s
-Bitcoin       Dollar         Coinbase        $  29.50404K      0.25  25.0   0.5s
-Bitcoin       Dollar         Gemini          $  29.50690K      0.17  17.0   0.88s
-Bitcoin       Dollar         Kraken          $  29.50080K      0.18  18.0   0.78s
-Bitcoin       Tether         Binance         ₮  29.50918K      0.8   80.0   0.51s
-Bitcoin       Tether         Bitfinex        ₮  29.49400K      0.05  5.0    0.3s
-Bitcoin       Tether         Coinbase        ₮  29.47703K      0.1   10.0   0.21s
-Bitcoin       Tether         Kraken          ₮  29.51200K      0.05  5.0    0.73s
-Ether         Bitcoin        Binance         ₿  63.73000m      0.25  25.0   0.6s
-Ether         Bitcoin        Bitfinex        ₿  63.71300m      0.25  25.0   0.51s
-Ether         Bitcoin        Bitstamp        ₿  63.70931m      0.25  25.0   0.52s
-Ether         Bitcoin        Gemini          ₿  63.78000m      0     N/A    0.87s
-Ether         Bitcoin        Kraken          ₿  63.70000m      0.25  25.0   0.41s
-MOC Token     Bitcoin        Sovryn onchain  ₿   2.98958µ      1     100.0  1.17s
-RIF Token     Bitcoin        Binance         ₿   2.67000µ      1     100.0  0.53s
-RIF Token     Bitcoin        BitHumb         ₿   6.30000µ      0     N/A    1.84s
-RIF Token     Bitcoin        Coingecko       ₿   2.66000µ      0     N/A    0.48s
-RIF Token     Bitcoin        MEXC            ₿   2.66700µ      0     N/A    0.54s
-RIF Token     Bitcoin        Sovryn onchain  ₿   2.69475µ      0     N/A    1.38s
-RIF Token     Tether         Binance         ₮  78.70000m      1     100.0  0.56s
-Tether        Dollar         Bitstamp        $ 999.68000m      0.15  15.0   1.23s
-Tether        Dollar         Coinbase        $ 999.65500m      0.45  45.0   0.43s
-Tether        Dollar         Kraken          $ 999.66000m      0.4   40.0   0.79s
+From          To       V.    Exchnage        Response                Weight  %      Time
+------------  -------  ----  --------------  --------------------  --------  -----  ------
+Binance Coin  Tether         Binance         ₮ 210.40000               1     100.0  0.55s
+Bitcoin       Dollar         Bitfinex        $  26.63200K              0.18  18.0   0.32s
+Bitcoin       Dollar         Bitstamp        $  26.59600K              0.22  22.0   0.56s
+Bitcoin       Dollar         Coinbase        $  26.59208K              0.25  25.0   0.56s
+Bitcoin       Dollar         Gemini          $  26.59521K              0.17  17.0   1.17s
+Bitcoin       Dollar         Kraken          $  26.59240K              0.18  18.0   0.75s
+Bitcoin       Tether         Binance         ₮  26.60006K              0.8   80.0   0.71s
+Bitcoin       Tether         Bitfinex        ₮  26.60600K              0.05  5.0    0.51s
+Bitcoin       Tether         Coinbase        ₮  26.59744K              0.1   10.0   0.54s
+Bitcoin       Tether         Kraken          ₮  26.61380K              0.05  5.0    0.54s
+Ether         Bitcoin        Binance         ₿  59.99000m              0.25  25.0   0.72s
+Ether         Bitcoin        Bitfinex        ₿  60.01700m              0.25  25.0   0.72s
+Ether         Bitcoin        Bitstamp        ₿  60.03022m              0.25  25.0   0.57s
+Ether         Bitcoin        Gemini          ₿  59.98000m              0     N/A    1.13s
+Ether         Bitcoin        Kraken          ₿  60.01000m              0.25  25.0   0.56s
+MOC Token     Bitcoin        Sovryn onchain  ₿   1.58450µ              1     100.0  1.72s
+RIF Token     Bitcoin        Binance         ₿   2.57000µ              1     100.0  0.72s
+RIF Token     Bitcoin        BitHumb         HTTPSConnectio [...]      0     N/A    N/A
+RIF Token     Bitcoin        Coingecko       Response age e [...]      0     N/A    N/A
+RIF Token     Bitcoin        MEXC            ₿   2.57400µ              0     N/A    0.68s
+RIF Token     Bitcoin        Sovryn onchain  ₿   2.57035µ              0     N/A    1.77s
+RIF Token     Tether   MA    Binance         ₮  68.27699m              1     100.0  0.55s
+RIF Token     Tether         Binance         ₮  68.10000m              1     100.0  0.65s
+Tether        Dollar         Bitstamp        $ 999.89000m              0.15  15.0   0.56s
+Tether        Dollar         Coinbase        $ 999.94500m              0.45  45.0   0.58s
+Tether        Dollar         Kraken          $ 999.80000m              0.4   40.0   1.19s
 
     Coin pair               Mediam             Mean    Weighted median  Sources
 --  -------------  ---------------  ---------------  -----------------  ---------
-ƒ   BNB/USD          242.32           242.391            242.256        N/A
-↓   BNB/USDT         242.3            242.3              242.3          1
-↓   BTC/USD        29504            29509.1            29504            5
-↓   BTC/USDT       29501.6          29498.1            29509.3          4
-↓   ETH/BTC            0.063713         0.0637265          0.0637093    5
-ƒ   ETH/USD         1879.79          1880.51            1879.68         N/A
-↓   MOC/BTC            2.98958e-06      2.98958e-06        2.98958e-06  1
-ƒ   MOC/USD            0.0882048        0.08822            0.0882048    N/A
-↓   RIF/BTC            2.67e-06         3.39835e-06        2.67e-06     5
-ƒ   RIF/USD            0.0787758        0.100282           0.0787758    N/A
-ƒ   RIF/USD(B)         0.0787758        0.100282           0.0787758    N/A
-ƒ   RIF/USD(T)         0.0786732        0.0786736          0.0786732    N/A
-ƒ   RIF/USD(TB)        0.0787065        0.0787296          0.0786859    N/A
-ƒ   RIF/USD(WMTB)      0.0787239        0.0841178          0.0787083    N/A
-↓   RIF/USDT           0.0787           0.0787             0.0787       1
-↓   USDT/USD           0.99966          0.999665           0.99966      3
-ƒ   USDT/USD(B)        1.00008          1.00038            0.99982      N/A
+ƒ   BNB/USD          210.338          210.378             210.355       N/A
+↓   BNB/USDT         210.4            210.4               210.4         1
+↓   BTC/USD        26595.2          26601.5             26595.2         5
+↓   BTC/USDT       26603            26604.3             26600.9         4
+↓   ETH/BTC            0.06001          0.0600054           0.06001     5
+ƒ   ETH/USD         1595.98          1596.24             1595.98        N/A
+↓   MOC/BTC            1.5845e-06       1.5845e-06          1.5845e-06  1
+ƒ   MOC/USD            0.04214          0.04215             0.04214     N/A
+↓   RIF/BTC            2.57035e-06      2.57145e-06         2.57e-06    3
+ƒ   RIF/USD            0.068359         0.0684045           0.0683497   N/A
+ƒ   RIF/USD(B)         0.068359         0.0684045           0.0683497   N/A
+ƒ   RIF/USD(T)         0.0680925        0.0680917           0.0680925   N/A
+ƒ   RIF/USD(TB)        0.06808          0.0680929           0.0680855   N/A
+ƒ   RIF/USD(WMTB)      0.0681497        0.0681708           0.0681516   N/A
+↓   RIF/USDT           0.0681           0.0681              0.0681      1
+↓   RIF/USDT(MA)       0.068277         0.068277            0.068277    1
+↓   USDT/USD           0.99989          0.999878            0.99989     3
+ƒ   USDT/USD(B)        0.999706         0.999895            0.999787    N/A
 
-Response time 1.9s
+Response time 1.82s
 
 user@workstation:~$
 ```
