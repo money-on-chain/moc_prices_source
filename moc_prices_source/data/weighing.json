@@ -29,6 +29,8 @@
     "rif_btc_mp1p_binance": 1,
 
     "rif_usdt_ma_binance": 1,
+    "rif_usdt_ma2_binance": 1,
+    "rif_usdt_ma3_binance": 1,
 
     "eth_btc_bitstamp": 0.25,
     "eth_btc_bitfinex": 0.25,
