@@ -11,7 +11,7 @@ sys.path.insert(0, dirname(base_dir), )
 from moc_prices_source.engines.coins import \
     RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, \
     RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, \
-    USD_ARS_CCB_MOC, BTC_ARS, RIF_USD_TB, RIF_USD_WMTB
+    USD_ARS_CCB, BTC_ARS, RIF_USD_TB, RIF_USD_WMTB
 from moc_prices_source.weighing import weighted_median
 from moc_prices_source.cli import tabulate
 
@@ -58,7 +58,7 @@ computed_pairs = {
         'requirements': [BNB_USDT, BTC_USD, BTC_USDT],
         'formula': lambda bnb_usdt, btc_usd, btc_usdt: bnb_usdt * btc_usd / btc_usdt
     },
-    USD_ARS_CCB_MOC: {
+    USD_ARS_CCB: {
         'requirements': [BTC_ARS, BTC_USD],
         'formula': lambda btc_ars, btc_usd: btc_ars / btc_usd
     },

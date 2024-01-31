@@ -148,7 +148,6 @@ BNB_USD         = CoinPair(BNB,  USD)
 USD_ARS         = CoinPair(USD,  ARS)
 USD_ARS_CCL     = CoinPair(USD,  ARS, "CCL")
 USD_ARS_CCB     = CoinPair(USD,  ARS, "CCB")
-USD_ARS_CCB_MOC = CoinPair(USD,  ARS, "CCB by MOC")
 USD_MXN         = CoinPair(USD,  MXN)
 GAS_BTC         = CoinPair(GAS,  BTC)
 

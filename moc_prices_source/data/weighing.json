@@ -67,9 +67,6 @@
     "usd_ars_infodolar":   0.1,
     "usd_ars_coinmonitor": 0.1,
 
-    "usd_ars_ccb_rofex": 1,
-    "usd_ars_ccb_emdx":  0,
-
     "usd_mxn_eldolar_info":      0.1,
     "usd_mxn_intercam":          0.1,
     "usd_mxn_citibanamex":       0.1,
