@@ -2,6 +2,9 @@ from engine_base import EngineWebScraping, USD_ARS
 from decimal     import Decimal
 
 
+to_dec = lambda x: Decimal(str(x).replace('.', '').replace(',', '.'))
+
+
 class Engine(EngineWebScraping):
 
     _name        = EngineWebScraping._name_from_file(__file__)
@@ -19,7 +22,8 @@ class Engine(EngineWebScraping):
         if table:
             values = []
             for s in table.find_all ('td', attrs={'class':'colCompraVenta'} ):
-                d = list(map(lambda x: x.strip(), s.strings))[0].replace('$', '').replace(',', '.').strip()
+                d = to_dec(list(map(lambda x: x.strip(), s.strings))[0
+                    ].replace('$', '').strip())
                 values.append(d)
             if len(values)==2:
                 try:
