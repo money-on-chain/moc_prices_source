@@ -2,6 +2,9 @@ from engine_base import EngineWebScraping, USD_ARS_CCL
 from decimal     import Decimal
 
 
+to_dec = lambda x: Decimal(str(x).replace('.', '').replace(',', '.'))
+
+
 class Engine(EngineWebScraping):
 
     _name        = EngineWebScraping._name_from_file(__file__)
@@ -17,9 +20,9 @@ class Engine(EngineWebScraping):
         value = None
         for s in html.find_all ('table', id="market-scrll-1"):
             d = list(map(lambda x: x.strip(), s.strings))
-            if len(d)==10 and d[0]=='DÓLAR CDO C/LIQ' and d[1]=='Compra' and d[2]=='$' and d[4]=='Venta' and d[5]=='$':
+            if len(d)==10 and d[0]=='DÓLAR CCL GD30 48HS' and d[1]=='Compra' and d[2]=='$' and d[4]=='Venta' and d[5]=='$':
                 try:
-                    value = (Decimal(d[3].replace(',', '.')) + Decimal(d[6].replace(',', '.')))/Decimal(2) 
+                    value = (to_dec(d[3]) + to_dec(d[6]))/Decimal(2) 
                 except:
                     value = None
                 if value:
