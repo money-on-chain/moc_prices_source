@@ -2,6 +2,9 @@ from engine_base import EngineWebScraping, USD_ARS
 from decimal     import Decimal
 
 
+to_dec = lambda x: Decimal(str(x).replace('.', '').replace(',', '.'))
+
+
 class Engine(EngineWebScraping):
 
     _name        = EngineWebScraping._name_from_file(__file__)
@@ -14,11 +17,11 @@ class Engine(EngineWebScraping):
 
     def _scraping(self, html):
         value = None
-        for s in html.find_all ('p', attrs={'class':'exc-tit'}):
-            d = list(map(lambda x: x.strip(), s.parent.strings))
-            if len(d)==2 and d[0]=='Dólar Libre':
+        for s in html.find_all ('div', attrs={'class':'exchange-dolar-item'}):
+            d = list(map(lambda x: x.strip(), s.strings))
+            if len(d)==6 and d[0]=='Dólar Libre':
                 try:
-                    value = Decimal(d[1])
+                    value = value = to_dec(d[2])
                 except:
                     value = None
                 if value:
