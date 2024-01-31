@@ -12,8 +12,9 @@ class Engine(Base):
     _max_time_without_price_change = 0    # zero means infinity
 
     def _map(self, data):
+        prices = [ x['ci']['price'] for x in data['ccl'].values() ] 
         return {
-            'price':  data['ccl']
+            'price':  sum(prices)/len(prices)
         }
 
 
