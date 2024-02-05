@@ -57,6 +57,7 @@ USDT = Coin('Tether',         'usdt', '₮')
 BNB  = Coin('Binance Coin',   'bnb',  'Ƀ')
 ARS  = Coin('Peso Argentino', 'ars',  '$')
 MXN  = Coin('Peso Mexicano',  'mxn',  '$')
+COP  = Coin('Peso Colombiano','cop',  '$')
 GAS  = Coin('Gas',            'gas')
 
 
@@ -124,6 +125,7 @@ class CoinPair(object):
 
 BTC_USD         = CoinPair(BTC,  USD)
 BTC_ARS         = CoinPair(BTC,  ARS)
+BTC_COP         = CoinPair(BTC,  COP)
 RIF_BTC         = CoinPair(RIF,  BTC)
 RIF_BTC_MP1P    = CoinPair(RIF,  BTC, "mp1%") # To move the price 1 percent
 RIF_USD         = CoinPair(RIF,  USD) # Leave this as legacy
@@ -149,6 +151,8 @@ USD_ARS         = CoinPair(USD,  ARS)
 USD_ARS_CCL     = CoinPair(USD,  ARS, "CCL")
 USD_ARS_CCB     = CoinPair(USD,  ARS, "CCB")
 USD_MXN         = CoinPair(USD,  MXN)
+USD_COP         = CoinPair(USD,  COP)
+USD_COP_CCB     = CoinPair(USD,  COP, "CCB")
 GAS_BTC         = CoinPair(GAS,  BTC)
 
 
