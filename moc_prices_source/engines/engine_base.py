@@ -310,6 +310,10 @@ class Base(object):
         except Exception:
             self._error = "Engine error (bad mapping) trying to get 'price'"
             return False
+        
+        if not self._price:
+            self._error = "No price"
+            return False
 
         if 'timestamp' in info:
             if isinstance(info['timestamp'], datetime.datetime):

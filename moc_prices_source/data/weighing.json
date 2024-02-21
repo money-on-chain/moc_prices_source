@@ -7,6 +7,7 @@
     "btc_ars_buenbit":      0.125,
     "btc_ars_decrypto":     0.125,
     "btc_ars_ripio":        0.125,
+    "btc_ars_buda":         0,
     "btc_ars_coinbase":     0,
     "btc_ars_rofex":        0,
     "btc_ars_ripio_exch":   0,
@@ -88,9 +89,10 @@
     "usd_cop_banrep":   0.5,
     "usd_cop_dolarhoy": 0.5,
 
-    "btc_cop_bitso":     0.25,
-    "btc_cop_buenbit":   0.25,
-    "btc_cop_cryptomkt": 0.25,
-    "btc_cop_coinbase":  0.25
+    "btc_cop_bitso":     0.2,
+    "btc_cop_buenbit":   0.2,
+    "btc_cop_cryptomkt": 0.2,
+    "btc_cop_coinbase":  0.2,
+    "btc_cop_buda":      0.2
 
 }
