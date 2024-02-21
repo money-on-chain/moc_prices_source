@@ -1,14 +1,14 @@
 {
-    "btc_ars_rofex":        0.1,
-    "btc_ars_bitso":        0.1,
-    "btc_ars_cryptomkt":    0.1,
-    "btc_ars_satoshitango": 0.1,
-    "btc_ars_argenbtc":     0.1,
-    "btc_ars_belo_app":     0.1,
-    "btc_ars_buenbit":      0.1,
-    "btc_ars_decrypto":     0.1,
-    "btc_ars_ripio_exch":   0.1,
-    "btc_ars_ripio":        0.1,
+    "btc_ars_bitso":        0.125,
+    "btc_ars_cryptomkt":    0.125,
+    "btc_ars_satoshitango": 0.125,
+    "btc_ars_argenbtc":     0.125,
+    "btc_ars_belo_app":     0.125,
+    "btc_ars_buenbit":      0.125,
+    "btc_ars_decrypto":     0.125,
+    "btc_ars_ripio":        0.125,
+    "btc_ars_rofex":        0,
+    "btc_ars_ripio_exch":   0,
 
     "btc_usd_coinbase": 0.25,
     "btc_usd_bitstamp": 0.22,
@@ -16,10 +16,10 @@
     "btc_usd_kraken":   0.18,
     "btc_usd_gemini":   0.17,
 
-    "rif_btc_binance":    1,
-    "rif_btc_sovryn":     0,
-    "rif_btc_mexc":       0,
-    "rif_btc_coingecko":  0,
+    "rif_btc_binance":   1,
+    "rif_btc_sovryn":    0,
+    "rif_btc_mexc":      0,
+    "rif_btc_coingecko": 0,
 
     "rif_usdt_binance": 1,
 
@@ -27,7 +27,7 @@
 
     "rif_btc_mp1p_binance": 1,
 
-    "rif_usdt_ma_binance": 1,
+    "rif_usdt_ma_binance":  1,
     "rif_usdt_ma2_binance": 1,
     "rif_usdt_ma3_binance": 1,
 
