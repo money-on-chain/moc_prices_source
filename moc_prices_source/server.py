@@ -1,20 +1,22 @@
 import sys
 from os.path  import dirname, abspath
 from flask import Flask, request, redirect, jsonify
-from flask_restx import Api, Resource, reqparse
+from flask_restx import Api, Resource, reqparse, abort
 from decimal import Decimal
 from flask_cors import CORS
+from flask_caching import Cache
 
 bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
-sys.path.append(dirname(base_dir))
+sys.path.insert(0, dirname(base_dir))
 
 from moc_prices_source import get_price, ALL, version
+from moc_prices_source.cli import command, option
 
 sys.path = bkpath
 
 
-title='MoC prices source API Rest webservice',
+title='MoC prices source API Rest webservice'
 description="""
 
 <br>
@@ -42,6 +44,29 @@ Simplify integrations with other environments than **Python**.
 all_coinpairs = list([str(x) for x in ALL])
 
 app = Flask(__name__)
+
+cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
+cache.init_app(app)
+
+
+class HashMethod():
+
+    def __init__(self, *options) -> None:
+        self.options = list(map(lambda x: str(x).strip().lower(), list(options)))
+        self.out = []
+
+    def __call__(self, x) -> None:
+        self.out = []
+        for key, value in eval(x):
+            key=str(key).strip().lower()
+            if key in self.options:
+                value=str(value).strip().lower()
+                self.out.append((key, value))
+        return self
+
+    def hexdigest(self):
+        return repr(self.out) if self.out else ""
+
 
 api = Api(
     app,
@@ -91,29 +116,115 @@ def index():
 
 
 
-price_ns = api.namespace('price', description='Price related operations')
+coinpairs_ns = api.namespace('coinpairs', description='Coinpairs related operations')
 
 
 
-@price_ns.route('/')
-class Price(Resource):
+@coinpairs_ns.route('/')
+class CoinPairsList(Resource):
 
     def get(self):
-        '''Get coinpairs price'''
-        coinpairs = all_coinpairs
-        out = {}
+        """Shows a list of all supported coinpairs"""
+        return all_coinpairs
+
+
+
+coinpair_value_get = reqparse.RequestParser()
+coinpair_value_get.add_argument(
+    'coinpair',
+    choices = all_coinpairs,
+    type = str,
+    help = 'Coinpair symbols')
+
+bad_coinpair_choice = (400, 'Bad coinpair choice')
+coinpair_value_not_found = (404, 'Coinpair value not found')
+
+@coinpairs_ns.route('/get_value')
+@coinpairs_ns.response(200, 'Success!')
+@coinpairs_ns.response(*bad_coinpair_choice)
+@coinpairs_ns.response(*coinpair_value_not_found)
+class CoinPairValue(Resource):
+
+    @coinpairs_ns.expect(coinpair_value_get)
+    @cache.cached(timeout=5, query_string=True, hash_method=HashMethod('format', 'simple_format'))
+    def get(self):
+        """Get the price of a specific coinpair"""
+
+        args = coinpair_value_get.parse_args()
+        coinpair = args['coinpair']
+
+        if coinpair not in all_coinpairs:
+            abort(*bad_coinpair_choice)
+
         detail = {}
-        value = get_price(coinpairs=coinpairs, detail=detail, serializable=True)
+        value = get_price(
+            coinpairs=coinpair,
+            detail=detail,
+            serializable=True,
+            ignore_zero_weighing=True)
+
         if isinstance(value, dict):
             value = dict([(str(k), float(v)) for (k, v) in value.items()])
+
         if isinstance(value, Decimal):
             value = float(value)
-        out['required_coinpairs'] = coinpairs 
+
+        for p in detail.get('prices', []):
+            if not p.get('ok', True):
+                source = p.get('description', 'unknown')
+                error = p.get('error', 'unknown')
+                app.logger.warning(f"{coinpair} {source} {error}")
+
+        if not value:
+            app.logger.error(f"not value for {coinpair}")
+            abort(*coinpair_value_not_found)
+
+        out = {}
+        out['required_coinpair'] = coinpair 
         out['value'] = value
         out['detail'] = detail
+
         return out
 
 
 
+@api.route('/info')
+class Info(Resource):
+
+    def get(self):
+        """Shows API info related"""
+        return {
+            'name:': title,
+            'version' : version
+        }
+
+
+
+@app.before_first_request
+def before_first_request_func():
+    default_logger_level = app.logger.level
+    app.logger.setLevel(1)
+    app.logger.info("First request...")
+    app.logger.setLevel(default_logger_level)
+
+
+def main(host='0.0.0.0', port=7989, debug=False):
+    default_logger_level = app.logger.level
+    app.logger.setLevel(1)
+    app.logger.info(f"{title} (v{version})")
+    app.logger.info(f"service at {host}:{port}")
+    app.logger.setLevel(default_logger_level)
+    app.run(debug=debug, host=host, port=port)
+
+
+@command()
+@option('-a', '--addr', 'host', type=str, default='0.0.0.0', help='Server host addr.')
+@option('-p', '--port', 'port', type=int, default=7989, help='Server port.')
+def server_cli(host, port):
+    """MoC prices source API Rest webservice"""
+    main(host=host, port=port)
+
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    main(debug=True)
