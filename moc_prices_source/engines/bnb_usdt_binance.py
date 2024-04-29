@@ -24,8 +24,3 @@ if __name__ == '__main__':
     print(f"URI = {repr(engine.uri)}")
     print()
     print(engine)
-    print()
-    if engine.error:
-        print()
-        print(engine.error)
-        print()

@@ -57,6 +57,7 @@ USDT = Coin('Tether',         'usdt', '₮')
 BNB  = Coin('Binance Coin',   'bnb',  'Ƀ')
 ARS  = Coin('Peso Argentino', 'ars',  '$')
 MXN  = Coin('Peso Mexicano',  'mxn',  '$')
+COP  = Coin('Peso Colombiano','cop',  '$')
 GAS  = Coin('Gas',            'gas')
 
 
@@ -124,7 +125,9 @@ class CoinPair(object):
 
 BTC_USD         = CoinPair(BTC,  USD)
 BTC_ARS         = CoinPair(BTC,  ARS)
+BTC_COP         = CoinPair(BTC,  COP)
 RIF_BTC         = CoinPair(RIF,  BTC)
+RIF_BTC_MP1P    = CoinPair(RIF,  BTC, "mp1%") # To move the price 1 percent
 RIF_USD         = CoinPair(RIF,  USD) # Leave this as legacy
 RIF_USD_B       = CoinPair(RIF,  USD, "B") # Passing through Bitcoin
 RIF_USD_T       = CoinPair(RIF,  USD, "T") # Passing through Tether
@@ -132,6 +135,9 @@ RIF_USD_TB      = CoinPair(RIF,  USD, "TB") # Passing through Tether & Bitcoin
 RIF_USD_WMTB    = CoinPair(RIF,  USD, "WMTB") # Passing through Tether & Bitcoin usinng weighted_median
 RIF_USDT        = CoinPair(RIF,  USDT)
 RIF_USDT_MA     = CoinPair(RIF,  USDT, "MA") # Using the magic average algorithm with orderbook depth
+RIF_USDT_MA2    = CoinPair(RIF,  USDT, "MA2")
+RIF_USDT_MA3    = CoinPair(RIF,  USDT, "MA3")
+RIF_USDT_MP1P   = CoinPair(RIF,  USDT, "mp1%") # To move the price 1 percent
 MOC_BTC         = CoinPair(MOC,  BTC)
 MOC_USD         = CoinPair(MOC,  USD)
 ETH_BTC         = CoinPair(ETH,  BTC)
@@ -144,8 +150,9 @@ BNB_USD         = CoinPair(BNB,  USD)
 USD_ARS         = CoinPair(USD,  ARS)
 USD_ARS_CCL     = CoinPair(USD,  ARS, "CCL")
 USD_ARS_CCB     = CoinPair(USD,  ARS, "CCB")
-USD_ARS_CCB_MOC = CoinPair(USD,  ARS, "CCB by MOC")
 USD_MXN         = CoinPair(USD,  MXN)
+USD_COP         = CoinPair(USD,  COP)
+USD_COP_CCB     = CoinPair(USD,  COP, "CCB")
 GAS_BTC         = CoinPair(GAS,  BTC)
 
 
