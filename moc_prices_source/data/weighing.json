@@ -40,7 +40,6 @@
     "eth_btc_kraken":   0.25,
     "eth_btc_binance":  0.25,
     "eth_btc_gemini":   0,
-
     "btc_usdt_binance":  0.80,
     "btc_usdt_bitfinex": 0.05,
     "btc_usdt_kraken":   0.05,
