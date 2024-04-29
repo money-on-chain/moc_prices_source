@@ -9,8 +9,8 @@ class Engine(EngineWebScraping):
     _uri         = "https://dolarhoy.com/cotizaciondolarcontadoconliqui"
     _coinpair    = USD_ARS_CCL
 
-    _max_age                       = 3600 # 1hs.
-    _max_time_without_price_change = 0    # zero means infinity
+    _max_age                       = 10800 # 3hs.
+    _max_time_without_price_change = 0     # zero means infinity
 
     def _scraping(self, html):
         value = None
