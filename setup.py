@@ -47,17 +47,17 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
-        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 3.8'
     ],
     package_data={
         "moc_prices_source": ["version.txt",
                               "data/*.json"]
     },
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     install_requires=requirements,
     scripts=['moc_prices_source_check',
-             'moc_prices_source_to_db']
+             'moc_prices_source_to_db',
+             'moc_prices_source_api']
 )
