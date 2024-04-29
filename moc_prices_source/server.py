@@ -200,14 +200,6 @@ class Info(Resource):
 
 
 
-@app.before_first_request
-def before_first_request_func():
-    default_logger_level = app.logger.level
-    app.logger.setLevel(1)
-    app.logger.info("First request...")
-    app.logger.setLevel(default_logger_level)
-
-
 def main(host='0.0.0.0', port=7989, debug=False):
     default_logger_level = app.logger.level
     app.logger.setLevel(1)
