@@ -68,8 +68,36 @@ def get_prices(coinpairs=None, engines_names=None, engines_list=None):
     if not engines_list:
         return []
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=len(engines_list)) as executor:
-        concurrent.futures.wait([ executor.submit(engine) for engine in engines_list ] )
+    ##########################################################################
+    # FIXME! I need to figure out a better fix for this. I replace this:     #
+    #                                                                        #
+    # with concurrent.futures.ThreadPoolExecutor(                            #
+    #     max_workers=len(engines_list)) as executor:                        #
+    #     concurrent.futures.wait([ executor.submit(engine                   #
+    #         ) for engine in engines_list ] )                               #
+    #                                                                        #
+    # for this:                                                              #
+    #                                                                        #
+
+    stack = engines_list[:]
+   
+    while stack:
+            
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(stack)
+                                                   ) as executor:
+            concurrent.futures.wait(
+                [ executor.submit(engine) for engine in stack ])
+
+        new_stack = []
+        
+        for engine in engines_list:
+            d = engine.as_dict
+            if not(d['price']) and d['ok']:
+                new_stack.append(engine)
+        stack = new_stack
+
+    #                                                                        #
+    ##########################################################################
 
     return [ engine.as_dict for engine in engines_list ]
 
