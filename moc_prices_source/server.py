@@ -175,9 +175,12 @@ class CoinPairValue(Resource):
                 error = p.get('error', 'unknown')
                 app.logger.warning(f"{coinpair} {source} {error}")
 
-        if not value:
+        if value:
+            app.logger.info(f"value for {coinpair}: {value}")
+        else:
             app.logger.error(f"not value for {coinpair}")
             abort(*coinpair_value_not_found)
+            
 
         out = {}
         out['required_coinpair'] = coinpair 
@@ -201,11 +204,11 @@ class Info(Resource):
 
 
 def main(host='0.0.0.0', port=7989, debug=False):
-    default_logger_level = app.logger.level
+    #default_logger_level = app.logger.level
     app.logger.setLevel(1)
     app.logger.info(f"{title} (v{version})")
     app.logger.info(f"service at {host}:{port}")
-    app.logger.setLevel(default_logger_level)
+    #app.logger.setLevel(default_logger_level)
     app.run(debug=debug, host=host, port=port)
 
 
