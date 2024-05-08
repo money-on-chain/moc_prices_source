@@ -51,7 +51,9 @@ cache.init_app(app)
 
 class HashMethod():
 
-    def __init__(self, *options) -> None:
+    def __init__(self, *options, info=lambda x: None, pre="") -> None:
+        self._pre = pre
+        self.info = info
         self.options = list(map(lambda x: str(x).strip().lower(), list(options)))
         self.out = []
 
@@ -65,7 +67,11 @@ class HashMethod():
         return self
 
     def hexdigest(self):
-        return repr(self.out) if self.out else ""
+        hash_ = repr(self.out) if self.out else ""
+        if self._pre:
+            hash_ = f"{self._pre}{hash_}"
+        self.info(f"hash = {repr(hash_)}")
+        return hash_
 
 
 api = Api(
@@ -146,7 +152,15 @@ coinpair_value_not_found = (404, 'Coinpair value not found')
 class CoinPairValue(Resource):
 
     @coinpairs_ns.expect(coinpair_value_get)
-    @cache.cached(timeout=5, query_string=True, hash_method=HashMethod('format', 'simple_format'))
+    @cache.cached(
+        timeout=5,
+        query_string=True,
+        hash_method=HashMethod(
+            'coinpair',
+            pre="get_coinpair_value",
+            #info=lambda x: app.logger.info(f"Cache: {x}")
+        )
+    )
     def get(self):
         """Get the price of a specific coinpair"""
 
