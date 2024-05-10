@@ -183,16 +183,32 @@ class CoinPairValue(Resource):
         if isinstance(value, Decimal):
             value = float(value)
 
+        sources_count = {}
+        sources_count_ok = {}
         for p in detail.get('prices', []):
-            if not p.get('ok', True):
+            sub_coinpair = p.get('coinpair', 'unknown')
+            sources_count[sub_coinpair] = sources_count.get(sub_coinpair, 0) + 1
+            if  p.get('ok'):
+                sources_count_ok[sub_coinpair] = sources_count_ok.get(sub_coinpair, 0) + 1
+            else:
                 source = p.get('description', 'unknown')
                 error = p.get('error', 'unknown')
-                app.logger.warning(f"{coinpair} {source} {error}")
+                if coinpair==sub_coinpair:
+                    app.logger.warning(f"{coinpair} --> {source} {error}")
+                else:
+                    app.logger.warning(f"{sub_coinpair} for {coinpair} --> {source} {error}")
+
+        if sources_count:
+            sources_count_str = ', '.join([ f"{k}: {sources_count_ok[k]} of {v}" for (k, v) in sources_count.items()])
+            if len(sources_count)>1:
+                app.logger.info(f"Sources count for {coinpair}: {sources_count_str}")
+            else:
+                app.logger.info(f"Sources count for {sources_count_str}")
 
         if value:
-            app.logger.info(f"value for {coinpair}: {value}")
+            app.logger.info(f"Value for {coinpair}: {value}")
         else:
-            app.logger.error(f"not value for {coinpair}")
+            app.logger.error(f"Not value for {coinpair}")
             abort(*coinpair_value_not_found)
             
 
