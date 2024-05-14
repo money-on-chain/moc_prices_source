@@ -1,19 +1,22 @@
 import datetime, requests, sys
-from os.path      import dirname, abspath
-from json         import load, dumps
+from os.path import dirname, abspath
+from json import load, dumps, loads
 from json.decoder import JSONDecodeError
-from sys          import stderr
-from statistics   import median, mean
-from tabulate     import tabulate
-from decimal      import Decimal
+from sys import stderr
+from statistics import median, mean
+from tabulate import tabulate
+from decimal import Decimal
+from os import environ
 
 bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
-sys.path.append(dirname(base_dir))
+sys.path.insert(0, dirname(base_dir))
 
 from moc_prices_source.conf import get
 
 sys.path = bkpath
+
+env_pre = 'MOC_PRICES_SOURCE'
 
 on_remote_differences_options = ['halt', 'error', 'remote', 'local']
 
@@ -56,7 +59,7 @@ kargs = dict(
     out          = locals(),
     call_back    = call_back,
     files        = ['remote_weighing.json', 'remote_weighing_default.json'],
-    env_pre      = 'MOC_PRICES_SOURCE',
+    env_pre      = env_pre,
     dir_         = '/data/',
     copy_to_home = False,
     places       = dirname(abspath(__file__)))
@@ -73,8 +76,7 @@ class WeighingException(Exception):
 
 def get_json_file():
 
-    def config_error(e, source):
-        s = "Config file error\nLocation: {}\n{}"
+    def config_error(e, source, s="Config file error\nLocation: {}\n{}"):
         print(s.format(source, e), file=stderr)
         exit(1)
 
@@ -116,6 +118,20 @@ def get_json_file():
                 exit(1)
             if on_remote_differences=='remote':
                 data = url_data
+
+    env = env_pre + "_WEIGHING_OVERRIDE"
+    override_raw = environ.get(env, None)
+    if override_raw:
+        str_error = "Env var {} error: {}"
+        try:
+            override = loads(override_raw)
+        except JSONDecodeError as e:
+            config_error(e, env, str_error)
+        if not validate_json_data(override):
+            str_err_map = "Bad mapping, has to be a dictionary with string keys and float values"
+            config_error(str_err_map, env, str_error)
+
+        data = override
 
     return data
 
