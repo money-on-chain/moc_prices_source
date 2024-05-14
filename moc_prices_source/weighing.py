@@ -171,6 +171,11 @@ class Weighing(object):
         return dict(self._data)
 
     @property
+    def as_json(self):
+        self._load()
+        return dumps(dict([(k, float(v)) for k, v in self._data.items()]), indent=4)
+
+    @property
     def names(self):
         return list(self.as_dict.keys())
 

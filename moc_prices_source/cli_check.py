@@ -227,9 +227,12 @@ COINPAIRS_FILTER:
         return
 
     if show_weighing:
-        print()
-        print(weighing)
-        print()
+        if show_json:
+            print(weighing.as_json)
+        else:
+            print()
+            print(weighing)
+            print()
         return
 
     if show_computed_pairs:
