@@ -17,6 +17,7 @@ sys.path = bkpath
 
 on_remote_differences_options = ['halt', 'error', 'remote', 'local']
 
+enabled = None
 url = None
 refresh_time_in_minutes = 60
 on_remote_differences = on_remote_differences_options[0]
@@ -24,6 +25,10 @@ envs = {}
 
 def call_back(options):
 
+    enabled = None if not 'enabled' in options else options['enabled'] 
+    if not(isinstance(enabled, bool) or enabled==None):
+        raise ValueError('enabled must be bool or null')
+    
     url = None if not 'url' in options else options['url'] 
     if not(isinstance(url, str) or url==None):
         raise ValueError('url must be str or null')
@@ -98,7 +103,7 @@ def get_json_file():
         str_err_map = "Bad mapping, has to be a dictionary with string keys and float values"
         config_error(str_err_map, filename)
     
-    if url and not(on_remote_differences=='local') :
+    if enabled and  url and not(on_remote_differences=='local') :
         try:
             url_data = validate_json_data(requests.get(url).json())
         except:
