@@ -69,12 +69,16 @@ class OutputBase(object):
 
 class OutputDB(OutputBase):
 
-    def _start(self):
+    def _call(self, value):
         if not database:
             for l in database_error_message.split('\n'):
                 if l:
                     self._critical(l)
             exit(1)
+            exit(1)
+
+    def _call(self, value):
+            exit(1)        
 
     def _call(self, value):
         data = {}
@@ -171,8 +175,10 @@ def get_values(log):
 @option('-f', '--frequency', 'frequency', type=int, default=5,
     help='Loop delay in seconds.')
 @option('-i', '--interval', 'interval', type=int, default=0,
-    help='How long the program runs (in minutes, 0 = infinity)')
-def cli_values_to_db(frequency, verbose=0, interval=0):
+    help='How long the program runs (in minutes, 0=∞).')
+@option('-n', '--name', 'name', type=str, default=app_name,
+    help=f"Time series name (default={repr(app_name)}).")
+def cli_values_to_db(frequency, verbose=0, interval=0, name=app_name):
     """ MoC prices source to DB """
 
     # Logger
@@ -183,9 +189,9 @@ def cli_values_to_db(frequency, verbose=0, interval=0):
     elif verbose>1:
         level = DEBUG
     log = make_log(app_name, level = level)
-    log.info(f'Starts (frequency {frequency}s)')
+    log.info(f'Starts (frequency {frequency}s, time series {repr(name)})')
 
-    output = OutputDB(app_name, verbose=log.verbose, critical=log.critical)
+    output = OutputDB(name, verbose=log.verbose, critical=log.critical)
 
     start_time = datetime.datetime.now()
 

@@ -13,7 +13,8 @@ sys.path = bkpath
 
 
 db_conf = None
-envs    = {}
+envs = {}
+config_file = None
 
 
 def call_back(options):
