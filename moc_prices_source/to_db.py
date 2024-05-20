@@ -103,13 +103,24 @@ def get_values(log):
     get_price(ALL, detail=d)
 
     # Log errors
+    sources_count = {}
+    sources_count_ok = {}
     for e in d['prices']:
-        if not(e['ok']):
-            coinpair = e['coinpair']
+        coinpair = e['coinpair']
+        weighing = e['weighing']
+        if weighing:
+            sources_count[coinpair] = sources_count.get(coinpair, 0) + 1
+            sources_count_ok[coinpair] = sources_count_ok.get(coinpair, 0)
+        if e['ok']:
+            if weighing:
+                sources_count_ok[coinpair] += 1
+        else:
             exchange = e['description']
             error    = e['error']
-            log.warning(f'{exchange} {coinpair} {error}')
-
+            log.warning(f"{coinpair} --> {exchange} {error}")
+    for coinpair, count in sources_count.items():
+        if sources_count_ok[coinpair]!=count:
+            log.warning(f"Sources count for {coinpair}: {sources_count_ok[coinpair]} of {count}")
     data = []
 
     for p in d['prices']:
@@ -143,7 +154,7 @@ def get_values(log):
             'mean_price':            mean_price,
             'weighted_median_price': weighted_median_price
         }
-        log.info(f'{coinpair} weighted:{weighted_median_price}, median;{median_price}, mean:{mean_price}')
+        log.verbose(f'{coinpair} weighted:{weighted_median_price}, median;{median_price}, mean:{mean_price}')
         data.append(row)
 
     out = []
