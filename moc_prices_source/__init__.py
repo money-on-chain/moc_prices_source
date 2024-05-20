@@ -9,7 +9,7 @@ with open(base_dir + "/version.txt", "r") as file_:
 __version__ = version
 
 bkpath   = sys.path[:]
-sys.path.append(dirname(base_dir))
+sys.path.insert(0, dirname(base_dir))
 
 from moc_prices_source.engines        import get_coinpair_list, get_engines_names, get_prices, session_storage
 from moc_prices_source.computed_pairs import computed_pairs
