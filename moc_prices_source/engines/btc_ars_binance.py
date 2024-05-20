@@ -9,7 +9,9 @@ class Engine(BaseWithFailover):
     _uri          = base_uri.format("api.binance.com")
     _uri_failover = base_uri.format("moc-proxy-api-binance.moneyonchain.com")
     _coinpair     = BTC_ARS
-    _max_time_without_price_change = 0 # zero means infinity
+
+    _max_age                       = 3600 # 1hs.
+    _max_time_without_price_change = 0    # zero means infinity
 
     def _map(self, data):
         return {
