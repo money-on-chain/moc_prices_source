@@ -27,9 +27,11 @@ class OutputBase(object):
 
     def __init__(self, name,
                  verbose  = print,
-                 critical = lambda m: print(m, file=sys.stderr)):
+                 critical = lambda m: print(m, file=sys.stderr),
+                 info = lambda m: print(m, file=sys.stderr)):
         self._verbose  = verbose
         self._critical = critical
+        self._info = info
         self._name = name
         self._open = False
         self._start()
@@ -89,6 +91,8 @@ class OutputDB(OutputBase):
                 'fields':      data[timestamp]
             }
             database.write(**kargs)
+            into = f"{kargs['measurement']}@{kargs['time_'].strftime('%Y-%m-%dT%H:%M:%S')}"
+            self._info(f"Insert into {into} {len(kargs['fields'])} fileds.")
 
 
 
@@ -185,7 +189,10 @@ def cli_values_to_db(frequency, verbose=0, interval=0, name=app_name):
     log = make_log(app_name, level = level)
     log.info(f'Starts (frequency {frequency}s, time series {repr(name)})')
 
-    output = OutputDB(name, verbose=log.verbose, critical=log.critical)
+    output = OutputDB(name,
+                      verbose=log.verbose,
+                      critical=log.critical,
+                      info=log.info)
 
     start_time = datetime.datetime.now()
 
@@ -198,6 +205,7 @@ def cli_values_to_db(frequency, verbose=0, interval=0, name=app_name):
     try:
         while condition():
             output(get_values(log))
+            log.info(f'Wait {frequency}s ...')
             sleep(frequency)
     except KeyboardInterrupt:
         log.verbose('Keyboard interrupt!')
