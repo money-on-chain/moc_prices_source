@@ -75,12 +75,6 @@ class OutputDB(OutputBase):
                 if l:
                     self._critical(l)
             exit(1)
-            exit(1)
-
-    def _call(self, value):
-            exit(1)        
-
-    def _call(self, value):
         data = {}
         for timestamp, name, v in value:
             if not timestamp in data:
