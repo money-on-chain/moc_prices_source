@@ -118,7 +118,7 @@ def summary(coinpairs, md=False):
         'computed': 'Computed'
     }
     table = [[str(pair), pair.from_.symbol+'/'+pair.to_.symbol, pair.variant,
-              str_source[data['type']]] for pair, data in summary_data.items()]
+             str_source[data['type']]] for pair, data in summary_data.items()]
     table.sort()
     headers=['Name', 'Coinpair', 'Variant', 'Method']
     print()
@@ -133,7 +133,11 @@ def summary(coinpairs, md=False):
     headers=['Method', 'Description']
     show_table(table, headers)
     print()
-    
+    table = [[str(pair), pair.description] for pair, data in summary_data.items()]
+    table.sort()
+    headers=['Name', 'Comment/Description']
+    show_table(table, headers)
+    print()    
 
 
     title="Formulas used in the computed coinpairs"
@@ -318,21 +322,28 @@ COINPAIRS_FILTER:
         row.append(d['mean_price'])
         row.append(d['weighted_median_price'])
         if 'prices' in d:
-            row.append(len(d['prices']))
+            if 'ok_sources_count' in d:
+                row.append(f"{d['ok_sources_count']} of {len(d['prices'])}")
+            else:
+                row.append(len(d['prices']))
         else:
             row.append('N/A')
+        row.append('✓' if d['ok'] else '✕')
         table.append(row)
     if table:
         table.sort(key=lambda x: str(x[1]))
         print()
         print(tabulate(table, headers=[
-            '', 'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources'
+            '', 'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources', 'Ok'
         ]))
 
     errors = []
     for p in prices:
         if not p["ok"] and p['weighing']:
-            errors.append((p["name"], p["error"]))
+            errors.append((f"Source {p['name']}", p["error"]))
+    for k, v in values.items():
+        if 'error' in v and v["error"]:
+            errors.append((f"Coinpair {k}", v["error"]))    
 
     if errors:
         print()

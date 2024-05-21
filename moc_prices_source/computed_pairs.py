@@ -1,7 +1,8 @@
 import sys
 from os.path import dirname, abspath
 from inspect import getsource
-from types   import LambdaType
+from types import LambdaType
+from decimal import Decimal
 
 base_dir = dirname(abspath(__file__))
 
@@ -11,12 +12,20 @@ sys.path.insert(0, dirname(base_dir), )
 from moc_prices_source.engines.coins import \
     RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, \
     RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, \
-    USD_ARS_CCB, BTC_ARS, RIF_USD_TB, RIF_USD_WMTB, USD_COP_CCB, BTC_COP
+    USD_ARS_CCB, BTC_ARS, RIF_USD_TB, RIF_USD_WMTB, USD_COP_CCB, BTC_COP, \
+    USD_ARS_CCBFO, BTC_USD_OCH
 from moc_prices_source.weighing import weighted_median
 from moc_prices_source.cli import tabulate
 
 sys.path = bkpath
 
+def get_btc_usd(onchain, offchain, diff=.001):
+    low = offchain * Decimal(1.0 - diff)
+    hi = offchain * Decimal(1.0 + diff)
+    if low <= onchain <= hi:
+        return onchain 
+    else:
+        return offchain 
 
 
 computed_pairs = {
@@ -61,6 +70,10 @@ computed_pairs = {
     USD_ARS_CCB: {
         'requirements': [BTC_ARS, BTC_USD],
         'formula': lambda btc_ars, btc_usd: btc_ars / btc_usd
+    },
+    USD_ARS_CCBFO: {
+        'requirements': [BTC_ARS, BTC_USD, BTC_USD_OCH],
+        'formula': lambda btc_ars, btc_usd, btc_usd_och: btc_ars / get_btc_usd(btc_usd_och, btc_usd, diff=.001)
     },
     USD_COP_CCB: {
         'requirements': [BTC_COP, BTC_USD],

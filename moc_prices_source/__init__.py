@@ -98,7 +98,7 @@ def get_price(
                 percentual_weighing = weighing / sum_weighing
             v['percentual_weighing'] = percentual_weighing
 
-    for d in coinpair_prices.values():
+    for k, d in coinpair_prices.items():
         if not 'weighings' in d:
             d['weighings'] = []
         if not 'prices' in d:
@@ -108,6 +108,19 @@ def get_price(
             d['prices'].append(v['price'])
         del d['data']
         del d['sum_weighing']
+
+        ok_sources_count = len(list(filter(bool, d['weighings'])))
+        min_ok_sources_count = k.min_ok_sources_count
+
+        d['ok_sources_count'] = ok_sources_count
+        d['min_ok_sources_count'] = min_ok_sources_count
+        d['ok'] = True
+        d['error'] = ''
+
+        if ok_sources_count < min_ok_sources_count:
+            d['ok'] = False
+            d['error'] = f"Not enough price sources ({ok_sources_count} < {min_ok_sources_count})"
+
         d['median_price'] = median(d['prices'])
         d['mean_price'] = mean(d['prices'])
         if any (d['weighings']):
@@ -121,6 +134,7 @@ def get_price(
             requirements = computed_pairs[r]['requirements']
             if set(requirements).issubset(set(coinpair_prices.keys())):
                 coinpair_prices[r] = {}
+                coinpair_prices[r]['ok'] = all([ coinpair_prices[q]['ok'] for q in requirements ])
                 coinpair_prices[r]['requirements'] = requirements
                 formula = computed_pairs[r]['formula']
                 for k in ['median_price', 'mean_price', 'weighted_median_price']:
@@ -137,10 +151,10 @@ def get_price(
     for key, value in coinpair_prices.items():
         if requested:
             if key in requested:
-                if value['weighted_median_price']:
+                if value['weighted_median_price'] and value['ok']:
                     out[key] = value['weighted_median_price']
         else:
-            if value['weighted_median_price']:
+            if value['weighted_median_price'] and value['ok']:
                 out[key] = value['weighted_median_price']
 
     if requested and len(requested)==1:

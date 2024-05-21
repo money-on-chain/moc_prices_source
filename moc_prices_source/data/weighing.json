@@ -90,6 +90,8 @@
     "btc_cop_buenbit":   0.2,
     "btc_cop_cryptomkt": 0.2,
     "btc_cop_coinbase":  0.2,
-    "btc_cop_buda":      0.2
+    "btc_cop_buda":      0.2,
+
+    "btc_usd_onchain": 1
 
 }

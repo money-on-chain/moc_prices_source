@@ -188,7 +188,7 @@ class CoinPairValue(Resource):
         for p in detail.get('prices', []):
             sub_coinpair = p.get('coinpair', 'unknown')
             sources_count[sub_coinpair] = sources_count.get(sub_coinpair, 0) + 1
-            if  p.get('ok'):
+            if p.get('ok'):
                 sources_count_ok[sub_coinpair] = sources_count_ok.get(sub_coinpair, 0) + 1
             else:
                 source = p.get('description', 'unknown')
@@ -197,6 +197,14 @@ class CoinPairValue(Resource):
                     app.logger.warning(f"{coinpair} --> {source} {error}")
                 else:
                     app.logger.warning(f"{sub_coinpair} for {coinpair} --> {source} {error}")
+
+        for sub_coinpair, p in detail.get('values', {}).items():
+            error = p.get('error')
+            if error:
+                if coinpair==sub_coinpair:
+                    app.logger.warning(f"{coinpair} --> {error}")
+                else:
+                    app.logger.warning(f"{sub_coinpair} for {coinpair} --> {error}")
 
         if sources_count:
             sources_count_str = ', '.join([ f"{k}: {sources_count_ok[k]} of {v}" for (k, v) in sources_count.items()])
