@@ -1,6 +1,12 @@
 from engine_base import BaseOnChain, BTC_USD_OCH, get_env
 from decimal import Decimal
 
+
+
+btc_usd_oracle_addr_options = {
+    'mainnet': '0xe2927A0620b82A66D67F678FC9b826B0E01B1bFD', 
+}
+
 oracle_simplified_abi = """
   [
     {
@@ -30,11 +36,16 @@ class Engine(BaseOnChain):
     _description   = "MOC onchain"
     _coinpair      = BTC_USD_OCH
     _uri           = get_env('RSK_NODE', 'https://public-node.rsk.co')
-    _oracle_addr   = get_env('BTC_USD_ORACLE_ADDR', '0xe2927A0620b82A66D67F678FC9b826B0E01B1bFD')
+    _oracle_addr   = get_env('BTC_USD_ORACLE_ADDR', 'mainnet')
 
     def _get_price(self):
 
-        oracle_addr = self.to_checksum_address(self._oracle_addr)
+        oracle_addr = self.to_checksum_address(
+            btc_usd_oracle_addr_options.get(
+                self._oracle_addr.lower().strip(),
+                self._oracle_addr.lower().strip()
+            )
+        )
 
         try:            
 

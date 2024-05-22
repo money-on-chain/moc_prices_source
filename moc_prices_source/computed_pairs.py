@@ -13,7 +13,7 @@ from moc_prices_source.engines.coins import \
     RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, \
     RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, \
     USD_ARS_CCB, BTC_ARS, RIF_USD_TB, RIF_USD_WMTB, USD_COP_CCB, BTC_COP, \
-    USD_ARS_CCBFO, BTC_USD_OCH
+    USD_ARS_CCBFO, USD_COP_CCBFO, BTC_USD_OCH
 from moc_prices_source.weighing import weighted_median
 from moc_prices_source.cli import tabulate
 
@@ -78,6 +78,10 @@ computed_pairs = {
     USD_COP_CCB: {
         'requirements': [BTC_COP, BTC_USD],
         'formula': lambda btc_cop, btc_usd: btc_cop / btc_usd
+    },
+    USD_COP_CCBFO: {
+        'requirements': [BTC_COP, BTC_USD, BTC_USD_OCH],
+        'formula': lambda btc_cop, btc_usd, btc_usd_och: btc_cop / get_btc_usd(btc_usd_och, btc_usd, diff=.001)
     },
 }
 
