@@ -148,12 +148,26 @@ def get_values(log):
         mean_price =            v['mean_price']
         weighted_median_price = v['weighted_median_price']
         row = {
-            'timestamp':             datetime.datetime.now().replace(microsecond=0),
-            'coinpair':              coinpair,
-            'median_price':          median_price,
-            'mean_price':            mean_price,
+            'timestamp': datetime.datetime.now().replace(microsecond=0),
+            'coinpair': coinpair,
+            'median_price': median_price,
+            'mean_price': mean_price,
             'weighted_median_price': weighted_median_price
         }
+
+        for key in ['ok_sources_count',
+                    'min_ok_sources_count',
+                    'ok',
+                    'error']:
+            if key in v:
+                row[key]=v[key]
+
+        if 'ok' in v:
+            row['int_ok'] = 1 if v['ok'] else 0
+
+        if coinpair in sources_count:
+            row['sources_count'] = sources_count[coinpair]
+
         log.verbose(f'{coinpair} weighted:{weighted_median_price}, median;{median_price}, mean:{mean_price}')
         data.append(row)
 
