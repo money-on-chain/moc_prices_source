@@ -163,11 +163,9 @@ BNB_USD = CoinPair(BNB, USD)
 USD_ARS = CoinPair(USD, ARS)
 USD_ARS_CCL = CoinPair(USD, ARS, "CCL")
 USD_ARS_CCB = CoinPair(USD, ARS, "CCB")
-USD_ARS_CCBFO = CoinPair(USD, ARS, "CCBfo", "Corrected for oracle publish")
 USD_MXN = CoinPair(USD, MXN)
 USD_COP = CoinPair(USD, COP)
 USD_COP_CCB = CoinPair(USD, COP, "CCB")
-USD_COP_CCBFO = CoinPair(USD, COP, "CCBfo", "Corrected for oracle publish")
 GAS_BTC = CoinPair(GAS, BTC)
 
 
