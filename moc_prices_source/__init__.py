@@ -30,7 +30,7 @@ def get_price(
     detail               = {},
     weighing             = weighing,
     serializable         = False,
-    ignore_zero_weighing = False):
+    ignore_zero_weighing = True):
 
     start_time = datetime.datetime.now()
 
@@ -112,21 +112,23 @@ def get_price(
         ok_sources_count = len(list(filter(bool, d['weighings'])))
         min_ok_sources_count = k.min_ok_sources_count
 
-        d['ok_sources_count'] = ok_sources_count
-        d['min_ok_sources_count'] = min_ok_sources_count
-        d['ok'] = True
-        d['error'] = ''
-
-        if ok_sources_count < min_ok_sources_count:
-            d['ok'] = False
-            d['error'] = f"Not enough price sources ({ok_sources_count} < {min_ok_sources_count})"
-
         d['median_price'] = median(d['prices'])
         d['mean_price'] = mean(d['prices'])
         if any (d['weighings']):
             d['weighted_median_price'] = weighted_median(d['prices'], d['weighings'])
         else:
             d['weighted_median_price'] = None
+
+        d['ok_sources_count'] = ok_sources_count
+        d['min_ok_sources_count'] = min_ok_sources_count
+        d['ok'] = True
+        d['error'] = ''
+        d['ok_value'] = d['weighted_median_price']
+
+        if ok_sources_count < min_ok_sources_count:
+            d['ok'] = False
+            d['error'] = f"Not enough price sources ({ok_sources_count} < {min_ok_sources_count})"
+            d['ok_value'] = None
 
     if requested:
         for r in [r for r in requested if (

@@ -198,8 +198,8 @@ sources and if necessary we apply the changes to the parameterization.""")
         help='Show the summary and exit.')
 @option('-m', '--markdown', 'md_summary', is_flag=True,
         help='Set markdown for the summary format.')
-@option('-z', '--ignore-zero-weighing', 'ignore_zero_weighing', is_flag=True,
-        help='Ignore sources with zero weighing.')
+@option('-n', '--not-ignore-zero-weighing', 'not_ignore_zero_weighing',
+        is_flag=True, help='Ignore sources with zero weighing.')
 @cli.argument('coinpairs_filter', required=False)
 def cli_check(
         show_version=False,
@@ -209,7 +209,7 @@ def cli_check(
         coinpairs_filter=None,
         show_summary=False,
         md_summary=False,
-        ignore_zero_weighing=False
+        not_ignore_zero_weighing=False
     ):
     """\b
 Description:
@@ -266,7 +266,7 @@ COINPAIRS_FILTER:
 
     get_price(
         coinpairs,
-        ignore_zero_weighing=ignore_zero_weighing,
+        ignore_zero_weighing=not(not_ignore_zero_weighing),
         detail=data,
         serializable=show_json)
 
