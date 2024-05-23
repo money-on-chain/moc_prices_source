@@ -145,6 +145,8 @@ def get_price(
                         coinpair_prices[r][k] = formula(*args)
                     except:
                         coinpair_prices[r][k] = None
+                coinpair_prices[r]['ok_value'] = (coinpair_prices[r]['weighted_median_price'] if 
+                                                  coinpair_prices[r]['ok'] else None)
 
     detail['values'] = coinpair_prices
 

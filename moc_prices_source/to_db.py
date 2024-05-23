@@ -162,7 +162,8 @@ def get_values(log, coinpairs=ALL, ignore_zero_weighing=False):
         for key in ['ok_sources_count',
                     'min_ok_sources_count',
                     'ok',
-                    'error']:
+                    'error',
+                    'ok_value']:
             if key in v:
                 row[key]=v[key]
 
