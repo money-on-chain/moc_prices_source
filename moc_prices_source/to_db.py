@@ -1,16 +1,17 @@
 import sys, datetime
-from os.path  import dirname, abspath
-from time     import sleep
+from os.path import dirname, abspath
+from time import sleep
 from tabulate import tabulate
+from fnmatch import fnmatch as match
 
 bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
 sys.path.insert(0, dirname(base_dir))
 
-from moc_prices_source            import get_price
-from moc_prices_source            import ALL
-from moc_prices_source.cli        import command, option
-from moc_prices_source.database   import database, database_error_message
+from moc_prices_source import get_price
+from moc_prices_source import ALL
+from moc_prices_source.cli import command, option, cli
+from moc_prices_source.database import database, database_error_message
 from moc_prices_source.my_logging import make_log, INFO, DEBUG, VERBOSE
 
 sys.path = bkpath
@@ -96,11 +97,14 @@ class OutputDB(OutputBase):
 
 
 
-def get_values(log):
+def get_values(log, coinpairs=ALL, ignore_zero_weighing=False):
 
     # Get prices
     d = {}
-    get_price(ALL, detail=d)
+    get_price(
+        coinpairs,
+        ignore_zero_weighing = ignore_zero_weighing,
+        detail=d)
 
     # Log errors
     sources_count = {}
@@ -201,8 +205,37 @@ def get_values(log):
     help='How long the program runs (in minutes, 0=∞).')
 @option('-n', '--name', 'name', type=str, default=app_name,
     help=f"Time series name (default={repr(app_name)}).")
-def cli_values_to_db(frequency, verbose=0, interval=0, name=app_name):
-    """ MoC prices source to DB """
+@option('-z', '--ignore-zero-weighing', 'ignore_zero_weighing', is_flag=True,
+        help='Ignore sources with zero weighing.')
+@cli.argument('coinpairs_filter', required=False)
+def cli_values_to_db(
+    frequency,
+    verbose=0,
+    interval=0,
+    name=app_name,
+    coinpairs_filter=None,
+    ignore_zero_weighing=False):
+    """\b
+Description:
+    CLI-type tool that save the data obtained by
+    the `moc_price_source` library into a InfluxDB.
+\n\b
+COINPAIRS_FILTER:
+    Is a display pairs filter that accepts wildcards.
+    Example: "btc*"
+    Default value: "*" (all available pairs)
+"""
+    
+    if coinpairs_filter:
+        coinpairs = list(filter(
+            lambda i: match(str(i).lower(), str(coinpairs_filter).lower()), ALL))
+    else:
+        coinpairs = ALL
+    if not coinpairs:
+        print(
+            f"The {repr(coinpairs_filter)} filter did not return any results.",
+            file=sys.stderr)
+        return 1
 
     # Logger
     if verbose==0:
@@ -213,6 +246,10 @@ def cli_values_to_db(frequency, verbose=0, interval=0, name=app_name):
         level = DEBUG
     log = make_log(app_name, level = level)
     log.info(f'Starts (frequency {frequency}s, time series {repr(name)})')
+    if len(coinpairs)>3:
+        log.info(f'Coinpairs count: {len(coinpairs)}')
+    else:
+        log.info(f"Coinpairs: {', '.join([str(c) for c in coinpairs])}")
 
     output = OutputDB(name,
                       verbose=log.verbose,
@@ -229,7 +266,8 @@ def cli_values_to_db(frequency, verbose=0, interval=0, name=app_name):
 
     try:
         while condition():
-            output(get_values(log))
+            output(get_values(log, coinpairs,
+                              ignore_zero_weighing=ignore_zero_weighing))
             log.info(f'Wait {frequency}s ...')
             sleep(frequency)
     except KeyboardInterrupt:

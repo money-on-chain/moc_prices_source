@@ -91,9 +91,9 @@ def get_price(
         for v in d['data']:
             weighing = v['weighing']
             if not weighing:
-                percentual_weighing = 0
+                percentual_weighing = Decimal('0.0')
             elif not sum_weighing:
-                percentual_weighing = 0
+                percentual_weighing = Decimal('0.0')
             else:
                 percentual_weighing = weighing / sum_weighing
             v['percentual_weighing'] = percentual_weighing

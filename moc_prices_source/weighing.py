@@ -201,7 +201,12 @@ weighing = Weighing()
 
 
 def weighted_median(values, weights):
-    
+
+    if not all(weights):
+        non_zero = [(v, w) for (v, w) in zip(values, weights) if w]
+        values = [v for (v, w) in non_zero]
+        weights = [w for (v, w) in non_zero]
+   
     count = len(values)
     
     if 1==count:
@@ -228,16 +233,27 @@ def weighted_median(values, weights):
 
 
 def weighted_median_idx(values, weights):
-    ''' compute the weighted median of values list. The weighted median is computed as follows:
+    '''
+    Compute the weighted median of values list.
+    The weighted median is computed as follows:
+
     1- sort both lists (values and weights) based on values.
-    2- select the 0.5 point from the weights and return the corresponding values as results
-    e.g. values = [1, 3, 0] and weights=[0.1, 0.3, 0.6] assuming weights are probabilities.
-    sorted values = [0, 1, 3] and corresponding sorted weights = [0.6,     0.1, 0.3] the 0.5 point on
-    weight corresponds to the first item which is 0. so the weighted     median is 0.'''
+    
+    2- select the 0.5 point from the weights and return the corresponding
+       values as results.
+    
+    e.g. values = [1, 3, 0] and weights=[0.1, 0.3, 0.6] assuming weights
+    are probabilities.
+    
+    sorted values = [0, 1, 3] and corresponding sorted weights = [0.6, 0.1,
+    0.3] the 0.5 point on weight corresponds to the first item which is 0.
+    so the weighted median is 0.
+    '''
 
     # convert the weights into probabilities
     sum_weights = sum(weights)
     weights = [w / sum_weights for w in weights]
+    
     # sort values and weights based on values
     sorted_tuples = sorted(zip(values, weights, range(len(values))))
 
