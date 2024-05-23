@@ -189,7 +189,7 @@ def get_price(
             for k in ['weighings', 'prices']:
                 if k in d:
                     d[k] = [ float(x) for x in d[k] if d[k] ]
-            for k in ['median_price', 'mean_price', 'weighted_median_price']:
+            for k in ['median_price', 'mean_price', 'weighted_median_price', 'ok_value']:
                 if d[k]:
                     d[k] = float(d[k])
         for k in list(coinpair_prices.keys()):
