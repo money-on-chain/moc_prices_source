@@ -41,17 +41,17 @@ user@host:~$ moc_prices_source_check "BTC/USD"
 
 From     To      V.    Exchnage    Response        Weight    %  Time
 -------  ------  ----  ----------  ------------  --------  ---  ------
-Bitcoin  Dollar        Bitfinex    $  29.45100K      0.18   18  0.9s
-Bitcoin  Dollar        Bitstamp    $  29.39500K      0.22   22  0.9s
-Bitcoin  Dollar        Coinbase    $  29.39194K      0.25   25  0.71s
-Bitcoin  Dollar        Gemini      $  29.40548K      0.17   17  1.09s
-Bitcoin  Dollar        Kraken      $  29.38410K      0.18   18  0.71s
+Bitcoin  Dollar        Bitfinex    $  67.10800K      0.18   18  1.64s
+Bitcoin  Dollar        Bitstamp    $  66.99300K      0.22   22  1.82s
+Bitcoin  Dollar        Coinbase    $  66.98946K      0.25   25  1.42s
+Bitcoin  Dollar        Gemini      $  67.01356K      0.17   17  2.05s
+Bitcoin  Dollar        Kraken      $  67.00500K      0.18   18  1.64s
 
-    Coin pair      Mediam     Mean    Weighted median    Sources
---  -----------  --------  -------  -----------------  ---------
-↓   BTC/USD         29395  29405.5              29395          5
+    Coin pair      Mediam     Mean    Weighted median  Sources    Ok
+--  -----------  --------  -------  -----------------  ---------  ----
+↓   BTC/USD         67005  67021.8              67005  5 of 5     ✓
 
-Response time 1.1s
+Response time 2.06s
 
 user@host:~$ 
 ```
