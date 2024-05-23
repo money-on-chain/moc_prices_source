@@ -199,7 +199,7 @@ sources and if necessary we apply the changes to the parameterization.""")
 @option('-m', '--markdown', 'md_summary', is_flag=True,
         help='Set markdown for the summary format.')
 @option('-n', '--not-ignore-zero-weighing', 'not_ignore_zero_weighing',
-        is_flag=True, help='Ignore sources with zero weighing.')
+        is_flag=True, help='Not ignore sources with zero weighing.')
 @cli.argument('coinpairs_filter', required=False)
 def cli_check(
         show_version=False,
