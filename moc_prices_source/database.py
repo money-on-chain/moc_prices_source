@@ -1,19 +1,25 @@
-import datetime, json, sys
-from sys             import stderr
-from influxdb        import InfluxDBClient
-from os.path         import dirname, abspath
+import datetime, sys
+from influxdb import InfluxDBClient
+from os.path import dirname, abspath
 
 bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
-sys.path.append(dirname(base_dir))
+sys.path.insert(0, dirname(base_dir))
 
 from moc_prices_source.conf import get
 
 sys.path = bkpath
 
 
+to_gmt = int(round(float((datetime.datetime.utcnow() -
+                          datetime.datetime.now()).seconds)/3600))
+if to_gmt==24:
+    to_gmt=0
+
+
 db_conf = None
-envs    = {}
+envs = {}
+config_file = None
 
 
 def call_back(options):
@@ -57,7 +63,7 @@ class Database(object):
     def _validate_time(time_):
         if time_ is None:
             time_ = datetime.datetime.utcnow()
-        return time_
+        return time_ + datetime.timedelta(hours=to_gmt)
 
 
     def write(self, measurement, fields, tags={}, time_ = None):

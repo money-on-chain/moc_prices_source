@@ -310,6 +310,10 @@ class Base(object):
         except Exception:
             self._error = "Engine error (bad mapping) trying to get 'price'"
             return False
+        
+        if not self._price:
+            self._error = "No price"
+            return False
 
         if 'timestamp' in info:
             if isinstance(info['timestamp'], datetime.datetime):
@@ -407,8 +411,9 @@ class BaseWithFailover(Base):
 
     _uri_failover = None
 
-    def __call__(self):
-        start_time = datetime.datetime.now()
+    def __call__(self, start_time=None):
+        if start_time is None:
+            start_time = datetime.datetime.now()
         ok = Base.__call__(self, start_time)
         if self._uri_failover and not ok:
             uri_failover, uri = self._uri_failover, self._uri

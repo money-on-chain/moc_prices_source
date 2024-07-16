@@ -1,16 +1,17 @@
 import sys, datetime
-from os.path  import dirname, abspath
-from time     import sleep
+from os.path import dirname, abspath
+from time import sleep
 from tabulate import tabulate
+from fnmatch import fnmatch as match
 
 bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
-sys.path.append(dirname(base_dir))
+sys.path.insert(0, dirname(base_dir))
 
-from moc_prices_source            import get_price
-from moc_prices_source            import ALL
-from moc_prices_source.cli        import command, option
-from moc_prices_source.database   import database, database_error_message
+from moc_prices_source import get_price
+from moc_prices_source import ALL
+from moc_prices_source.cli import command, option, cli
+from moc_prices_source.database import database, database_error_message
 from moc_prices_source.my_logging import make_log, INFO, DEBUG, VERBOSE
 
 sys.path = bkpath
@@ -27,9 +28,11 @@ class OutputBase(object):
 
     def __init__(self, name,
                  verbose  = print,
-                 critical = lambda m: print(m, file=sys.stderr)):
+                 critical = lambda m: print(m, file=sys.stderr),
+                 info = lambda m: print(m, file=sys.stderr)):
         self._verbose  = verbose
         self._critical = critical
+        self._info = info
         self._name = name
         self._open = False
         self._start()
@@ -69,14 +72,12 @@ class OutputBase(object):
 
 class OutputDB(OutputBase):
 
-    def _start(self):
+    def _call(self, value):
         if not database:
             for l in database_error_message.split('\n'):
                 if l:
                     self._critical(l)
             exit(1)
-
-    def _call(self, value):
         data = {}
         for timestamp, name, v in value:
             if not timestamp in data:
@@ -91,23 +92,39 @@ class OutputDB(OutputBase):
                 'fields':      data[timestamp]
             }
             database.write(**kargs)
+            into = f"{kargs['measurement']}@{kargs['time_'].strftime('%Y-%m-%dT%H:%M:%S')}"
+            self._info(f"Insert into {into} {len(kargs['fields'])} fileds.")
 
 
 
-def get_values(log):
+def get_values(log, coinpairs=ALL, ignore_zero_weighing=False):
 
     # Get prices
     d = {}
-    get_price(ALL, detail=d)
+    get_price(
+        coinpairs,
+        ignore_zero_weighing = ignore_zero_weighing,
+        detail=d)
 
     # Log errors
+    sources_count = {}
+    sources_count_ok = {}
     for e in d['prices']:
-        if not(e['ok']):
-            coinpair = e['coinpair']
+        coinpair = e['coinpair']
+        weighing = e['weighing']
+        if weighing:
+            sources_count[coinpair] = sources_count.get(coinpair, 0) + 1
+            sources_count_ok[coinpair] = sources_count_ok.get(coinpair, 0)
+        if e['ok']:
+            if weighing:
+                sources_count_ok[coinpair] += 1
+        else:
             exchange = e['description']
             error    = e['error']
-            log.warning(f'{exchange} {coinpair} {error}')
-
+            log.warning(f"{coinpair} --> {exchange} {error}")
+    for coinpair, count in sources_count.items():
+        if sources_count_ok[coinpair]!=count:
+            log.warning(f"Sources count for {coinpair}: {sources_count_ok[coinpair]} of {count}")
     data = []
 
     for p in d['prices']:
@@ -135,13 +152,28 @@ def get_values(log):
         mean_price =            v['mean_price']
         weighted_median_price = v['weighted_median_price']
         row = {
-            'timestamp':             datetime.datetime.now().replace(microsecond=0),
-            'coinpair':              coinpair,
-            'median_price':          median_price,
-            'mean_price':            mean_price,
+            'timestamp': datetime.datetime.now().replace(microsecond=0),
+            'coinpair': coinpair,
+            'median_price': median_price,
+            'mean_price': mean_price,
             'weighted_median_price': weighted_median_price
         }
-        log.info(f'{coinpair} weighted:{weighted_median_price}, median;{median_price}, mean:{mean_price}')
+
+        for key in ['ok_sources_count',
+                    'min_ok_sources_count',
+                    'ok',
+                    'error',
+                    'ok_value']:
+            if key in v:
+                row[key]=v[key]
+
+        if 'ok' in v:
+            row['int_ok'] = 1 if v['ok'] else 0
+
+        if coinpair in sources_count:
+            row['sources_count'] = sources_count[coinpair]
+
+        log.verbose(f'{coinpair} weighted:{weighted_median_price}, median;{median_price}, mean:{mean_price}')
         data.append(row)
 
     out = []
@@ -171,9 +203,40 @@ def get_values(log):
 @option('-f', '--frequency', 'frequency', type=int, default=5,
     help='Loop delay in seconds.')
 @option('-i', '--interval', 'interval', type=int, default=0,
-    help='How long the program runs (in minutes, 0 = infinity)')
-def cli_values_to_db(frequency, verbose=0, interval=0):
-    """ MoC prices source to DB """
+    help='How long the program runs (in minutes, 0=∞).')
+@option('-n', '--name', 'name', type=str, default=app_name,
+    help=f"Time series name (default={repr(app_name)}).")
+@option('-z', '--ignore-zero-weighing', 'ignore_zero_weighing', is_flag=True,
+        help='Ignore sources with zero weighing.')
+@cli.argument('coinpairs_filter', required=False)
+def cli_values_to_db(
+    frequency,
+    verbose=0,
+    interval=0,
+    name=app_name,
+    coinpairs_filter=None,
+    ignore_zero_weighing=False):
+    """\b
+Description:
+    CLI-type tool that save the data obtained by
+    the `moc_price_source` library into a InfluxDB.
+\n\b
+COINPAIRS_FILTER:
+    Is a display pairs filter that accepts wildcards.
+    Example: "btc*"
+    Default value: "*" (all available pairs)
+"""
+    
+    if coinpairs_filter:
+        coinpairs = list(filter(
+            lambda i: match(str(i).lower(), str(coinpairs_filter).lower()), ALL))
+    else:
+        coinpairs = ALL
+    if not coinpairs:
+        print(
+            f"The {repr(coinpairs_filter)} filter did not return any results.",
+            file=sys.stderr)
+        return 1
 
     # Logger
     if verbose==0:
@@ -183,9 +246,16 @@ def cli_values_to_db(frequency, verbose=0, interval=0):
     elif verbose>1:
         level = DEBUG
     log = make_log(app_name, level = level)
-    log.info(f'Starts (frequency {frequency}s)')
+    log.info(f'Starts (frequency {frequency}s, time series {repr(name)})')
+    if len(coinpairs)>3:
+        log.info(f'Coinpairs count: {len(coinpairs)}')
+    else:
+        log.info(f"Coinpairs: {', '.join([str(c) for c in coinpairs])}")
 
-    output = OutputDB(app_name, verbose=log.verbose, critical=log.critical)
+    output = OutputDB(name,
+                      verbose=log.verbose,
+                      critical=log.critical,
+                      info=log.info)
 
     start_time = datetime.datetime.now()
 
@@ -197,7 +267,9 @@ def cli_values_to_db(frequency, verbose=0, interval=0):
 
     try:
         while condition():
-            output(get_values(log))
+            output(get_values(log, coinpairs,
+                              ignore_zero_weighing=ignore_zero_weighing))
+            log.info(f'Wait {frequency}s ...')
             sleep(frequency)
     except KeyboardInterrupt:
         log.verbose('Keyboard interrupt!')

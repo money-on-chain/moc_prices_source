@@ -11,6 +11,7 @@ class Engine(BaseWithFailover):
     _uri          = base_uri.format("api.binance.com")
     _uri_failover = base_uri.format("moc-proxy-api-binance.moneyonchain.com")
     _coinpair     = RIF_USDT_MA
+    _max_quantity = max_quantity
     _max_time_without_price_change = 0 # zero means infinity
 
 
@@ -24,15 +25,15 @@ class Engine(BaseWithFailover):
                 spent, accumulated = Decimal('0'), Decimal('0')
                 for x in data[type_]:
                     price, quantity = list(map(Decimal, x))
-                    if (accumulated + quantity) >= max_quantity:
-                        quantity = max_quantity - accumulated
+                    if (accumulated + quantity) >= self._max_quantity:
+                        quantity = self._max_quantity - accumulated
                     spent += price * quantity
                     accumulated += quantity
-                    if accumulated >= max_quantity:
+                    if accumulated >= self._max_quantity:
                         break               
                 total += accumulated
                 values.append(spent * accumulated)
-            return {'price': (sum(values)/total)/max_quantity}
+            return {'price': (sum(values)/total)/self._max_quantity}
 
 
 if __name__ == '__main__':

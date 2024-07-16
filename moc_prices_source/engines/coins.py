@@ -48,16 +48,17 @@ class Coin(object):
         return hash(str(self))
 
 
-BTC  = Coin('Bitcoin',        'btc',  '₿')
-USD  = Coin('Dollar',         'usd',  '$')
-RIF  = Coin('RIF Token',      'rif')
-MOC  = Coin('MOC Token',      'moc')
-ETH  = Coin('Ether',          'eth',  '⟠')
-USDT = Coin('Tether',         'usdt', '₮')
-BNB  = Coin('Binance Coin',   'bnb',  'Ƀ')
-ARS  = Coin('Peso Argentino', 'ars',  '$')
-MXN  = Coin('Peso Mexicano',  'mxn',  '$')
-GAS  = Coin('Gas',            'gas')
+BTC  = Coin('Bitcoin', 'btc', '₿')
+USD  = Coin('Dollar', 'usd', '$')
+RIF  = Coin('RIF Token', 'rif')
+MOC  = Coin('MOC Token', 'moc')
+ETH  = Coin('Ether', 'eth', '⟠')
+USDT = Coin('Tether', 'usdt', '₮')
+BNB  = Coin('Binance Coin', 'bnb', 'Ƀ')
+ARS  = Coin('Peso Argentino', 'ars', '$')
+MXN  = Coin('Peso Mexicano', 'mxn', '$')
+COP  = Coin('Peso Colombiano','cop', '$')
+GAS  = Coin('Gas', 'gas')
 
 
 Coins = [ c for c in locals().values() if isinstance(c, Coin) ]
@@ -75,11 +76,23 @@ def get_coin(value):
 
 class CoinPair(object):
 
-    def __init__(self, from_: Coin, to_: Coin, variant=None):
-        self._from    = from_
-        self._to      = to_
+    def __init__(self,
+                 from_: Coin, to_: Coin, variant=None, description=None,
+                 min_ok_sources_count = 0):
+        self._from = from_
+        self._to = to_
         self._variant = str(variant) if variant else None
+        self._description = str(description) if description else None
+        self._min_ok_sources_count = int(min_ok_sources_count) if min_ok_sources_count else 0
 
+    @property
+    def min_ok_sources_count(self):
+        return self._min_ok_sources_count
+    
+    @property
+    def description(self):
+        return self._description
+    
     @property
     def variant(self):
         return self._variant
@@ -122,31 +135,38 @@ class CoinPair(object):
         return hash(str(self))
 
 
-BTC_USD         = CoinPair(BTC,  USD)
-BTC_ARS         = CoinPair(BTC,  ARS)
-RIF_BTC         = CoinPair(RIF,  BTC)
-RIF_USD         = CoinPair(RIF,  USD) # Leave this as legacy
-RIF_USD_B       = CoinPair(RIF,  USD, "B") # Passing through Bitcoin
-RIF_USD_T       = CoinPair(RIF,  USD, "T") # Passing through Tether
-RIF_USD_TB      = CoinPair(RIF,  USD, "TB") # Passing through Tether & Bitcoin
-RIF_USD_WMTB    = CoinPair(RIF,  USD, "WMTB") # Passing through Tether & Bitcoin usinng weighted_median
-RIF_USDT        = CoinPair(RIF,  USDT)
-RIF_USDT_MA     = CoinPair(RIF,  USDT, "MA") # Using the magic average algorithm with orderbook depth
-MOC_BTC         = CoinPair(MOC,  BTC)
-MOC_USD         = CoinPair(MOC,  USD)
-ETH_BTC         = CoinPair(ETH,  BTC)
-ETH_USD         = CoinPair(ETH,  USD)
-BTC_USDT        = CoinPair(BTC,  USDT)
-USDT_USD        = CoinPair(USDT, USD)
-USDT_USD_B      = CoinPair(USDT, USD, "B") # Passing through Bitcoin
-BNB_USDT        = CoinPair(BNB,  USDT)
-BNB_USD         = CoinPair(BNB,  USD)
-USD_ARS         = CoinPair(USD,  ARS)
-USD_ARS_CCL     = CoinPair(USD,  ARS, "CCL")
-USD_ARS_CCB     = CoinPair(USD,  ARS, "CCB")
-USD_ARS_CCB_MOC = CoinPair(USD,  ARS, "CCB by MOC")
-USD_MXN         = CoinPair(USD,  MXN)
-GAS_BTC         = CoinPair(GAS,  BTC)
+BTC_USD = CoinPair(BTC, USD)
+BTC_USD_OCH = CoinPair(BTC, USD, "och", "Obtained from the blockchain")
+BTC_ARS = CoinPair(BTC, ARS, min_ok_sources_count=3)
+BTC_COP = CoinPair(BTC, COP, min_ok_sources_count=2)
+RIF_BTC = CoinPair(RIF, BTC)
+RIF_BTC_MP1P = CoinPair(RIF, BTC, "mp1%", "To move the price 1 percent")
+RIF_USD = CoinPair(RIF, USD, description="Leave this as legacy")
+RIF_USD_B = CoinPair(RIF, USD, "B", "Passing through Bitcoin")
+RIF_USD_T = CoinPair(RIF, USD, "T", "Passing through Tether")
+RIF_USD_TB = CoinPair(RIF, USD, "TB", "Passing through Tether & Bitcoin")
+RIF_USD_WMTB = CoinPair(RIF, USD, "WMTB", "Passing through Tether & Bitcoin usinng weighted_median")
+RIF_USDT = CoinPair(RIF, USDT)
+RIF_USDT_MA = CoinPair(RIF, USDT, "MA", "Using the magic average algorithm with orderbook depth")
+RIF_USDT_MA2 = CoinPair(RIF, USDT, "MA2")
+RIF_USDT_MA3 = CoinPair(RIF, USDT, "MA3")
+RIF_USDT_MP1P = CoinPair(RIF, USDT, "mp1%", "To move the price 1 percent")
+MOC_BTC = CoinPair(MOC, BTC)
+MOC_USD = CoinPair(MOC, USD)
+ETH_BTC = CoinPair(ETH, BTC)
+ETH_USD = CoinPair(ETH, USD)
+BTC_USDT = CoinPair(BTC, USDT)
+USDT_USD = CoinPair(USDT, USD)
+USDT_USD_B = CoinPair(USDT, USD, "B", "Passing through Bitcoin")
+BNB_USDT = CoinPair(BNB, USDT)
+BNB_USD = CoinPair(BNB, USD)
+USD_ARS = CoinPair(USD, ARS)
+USD_ARS_CCL = CoinPair(USD, ARS, "CCL")
+USD_ARS_CCB = CoinPair(USD, ARS, "CCB")
+USD_MXN = CoinPair(USD, MXN)
+USD_COP = CoinPair(USD, COP)
+USD_COP_CCB = CoinPair(USD, COP, "CCB")
+GAS_BTC = CoinPair(GAS, BTC)
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]

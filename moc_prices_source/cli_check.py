@@ -118,7 +118,7 @@ def summary(coinpairs, md=False):
         'computed': 'Computed'
     }
     table = [[str(pair), pair.from_.symbol+'/'+pair.to_.symbol, pair.variant,
-              str_source[data['type']]] for pair, data in summary_data.items()]
+             str_source[data['type']]] for pair, data in summary_data.items()]
     table.sort()
     headers=['Name', 'Coinpair', 'Variant', 'Method']
     print()
@@ -133,7 +133,11 @@ def summary(coinpairs, md=False):
     headers=['Method', 'Description']
     show_table(table, headers)
     print()
-    
+    table = [[str(pair), pair.description] for pair, data in summary_data.items()]
+    table.sort()
+    headers=['Name', 'Comment/Description']
+    show_table(table, headers)
+    print()    
 
 
     title="Formulas used in the computed coinpairs"
@@ -194,6 +198,8 @@ sources and if necessary we apply the changes to the parameterization.""")
         help='Show the summary and exit.')
 @option('-m', '--markdown', 'md_summary', is_flag=True,
         help='Set markdown for the summary format.')
+@option('-n', '--not-ignore-zero-weighing', 'not_ignore_zero_weighing',
+        is_flag=True, help='Not ignore sources with zero weighing.')
 @cli.argument('coinpairs_filter', required=False)
 def cli_check(
         show_version=False,
@@ -202,7 +208,8 @@ def cli_check(
         show_computed_pairs=False,
         coinpairs_filter=None,
         show_summary=False,
-        md_summary=False
+        md_summary=False,
+        not_ignore_zero_weighing=False
     ):
     """\b
 Description:
@@ -227,9 +234,12 @@ COINPAIRS_FILTER:
         return
 
     if show_weighing:
-        print()
-        print(weighing)
-        print()
+        if show_json:
+            print(weighing.as_json)
+        else:
+            print()
+            print(weighing)
+            print()
         return
 
     if show_computed_pairs:
@@ -254,7 +264,11 @@ COINPAIRS_FILTER:
 
     data = {}
 
-    get_price(coinpairs, detail=data, serializable=show_json)
+    get_price(
+        coinpairs,
+        ignore_zero_weighing=not(not_ignore_zero_weighing),
+        detail=data,
+        serializable=show_json)
 
     if show_json:
         print(json.dumps(data, indent=4, sort_keys=True))
@@ -315,21 +329,28 @@ COINPAIRS_FILTER:
         row.append(d['mean_price'])
         row.append(d['weighted_median_price'])
         if 'prices' in d:
-            row.append(len(d['prices']))
+            if 'ok_sources_count' in d:
+                row.append(f"{d['ok_sources_count']} of {len(d['prices'])}")
+            else:
+                row.append(len(d['prices']))
         else:
             row.append('N/A')
+        row.append('✓' if d['ok'] else '✕')
         table.append(row)
     if table:
         table.sort(key=lambda x: str(x[1]))
         print()
         print(tabulate(table, headers=[
-            '', 'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources'
+            '', 'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources', 'Ok'
         ]))
 
     errors = []
     for p in prices:
         if not p["ok"] and p['weighing']:
-            errors.append((p["name"], p["error"]))
+            errors.append((f"Source {p['name']}", p["error"]))
+    for k, v in values.items():
+        if 'error' in v and v["error"]:
+            errors.append((f"Coinpair {k}", v["error"]))    
 
     if errors:
         print()

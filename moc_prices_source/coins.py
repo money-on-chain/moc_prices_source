@@ -3,7 +3,7 @@ from os.path  import dirname, abspath
 
 bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
-sys.path.append(dirname(base_dir))
+sys.path.insert(0, dirname(base_dir))
 
 from moc_prices_source.engines.coins import *
 

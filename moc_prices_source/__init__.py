@@ -9,7 +9,7 @@ with open(base_dir + "/version.txt", "r") as file_:
 __version__ = version
 
 bkpath   = sys.path[:]
-sys.path.append(dirname(base_dir))
+sys.path.insert(0, dirname(base_dir))
 
 from moc_prices_source.engines        import get_coinpair_list, get_engines_names, get_prices, session_storage
 from moc_prices_source.computed_pairs import computed_pairs
@@ -30,7 +30,7 @@ def get_price(
     detail               = {},
     weighing             = weighing,
     serializable         = False,
-    ignore_zero_weighing = False):
+    ignore_zero_weighing = True):
 
     start_time = datetime.datetime.now()
 
@@ -91,14 +91,14 @@ def get_price(
         for v in d['data']:
             weighing = v['weighing']
             if not weighing:
-                percentual_weighing = 0
+                percentual_weighing = Decimal('0.0')
             elif not sum_weighing:
-                percentual_weighing = 0
+                percentual_weighing = Decimal('0.0')
             else:
                 percentual_weighing = weighing / sum_weighing
             v['percentual_weighing'] = percentual_weighing
 
-    for d in coinpair_prices.values():
+    for k, d in coinpair_prices.items():
         if not 'weighings' in d:
             d['weighings'] = []
         if not 'prices' in d:
@@ -108,6 +108,10 @@ def get_price(
             d['prices'].append(v['price'])
         del d['data']
         del d['sum_weighing']
+
+        ok_sources_count = len(list(filter(bool, d['weighings'])))
+        min_ok_sources_count = k.min_ok_sources_count
+
         d['median_price'] = median(d['prices'])
         d['mean_price'] = mean(d['prices'])
         if any (d['weighings']):
@@ -115,12 +119,24 @@ def get_price(
         else:
             d['weighted_median_price'] = None
 
+        d['ok_sources_count'] = ok_sources_count
+        d['min_ok_sources_count'] = min_ok_sources_count
+        d['ok'] = True
+        d['error'] = ''
+        d['ok_value'] = d['weighted_median_price']
+
+        if ok_sources_count < min_ok_sources_count:
+            d['ok'] = False
+            d['error'] = f"Not enough price sources ({ok_sources_count} < {min_ok_sources_count})"
+            d['ok_value'] = None
+
     if requested:
         for r in [r for r in requested if (
             (r in computed_pairs) and (not r in coinpair_prices)) ]:
             requirements = computed_pairs[r]['requirements']
             if set(requirements).issubset(set(coinpair_prices.keys())):
                 coinpair_prices[r] = {}
+                coinpair_prices[r]['ok'] = all([ coinpair_prices[q]['ok'] for q in requirements ])
                 coinpair_prices[r]['requirements'] = requirements
                 formula = computed_pairs[r]['formula']
                 for k in ['median_price', 'mean_price', 'weighted_median_price']:
@@ -129,6 +145,8 @@ def get_price(
                         coinpair_prices[r][k] = formula(*args)
                     except:
                         coinpair_prices[r][k] = None
+                coinpair_prices[r]['ok_value'] = (coinpair_prices[r]['weighted_median_price'] if 
+                                                  coinpair_prices[r]['ok'] else None)
 
     detail['values'] = coinpair_prices
 
@@ -137,10 +155,10 @@ def get_price(
     for key, value in coinpair_prices.items():
         if requested:
             if key in requested:
-                if value['weighted_median_price']:
+                if value['weighted_median_price'] and value['ok']:
                     out[key] = value['weighted_median_price']
         else:
-            if value['weighted_median_price']:
+            if value['weighted_median_price'] and value['ok']:
                 out[key] = value['weighted_median_price']
 
     if requested and len(requested)==1:
@@ -171,7 +189,7 @@ def get_price(
             for k in ['weighings', 'prices']:
                 if k in d:
                     d[k] = [ float(x) for x in d[k] if d[k] ]
-            for k in ['median_price', 'mean_price', 'weighted_median_price']:
+            for k in ['median_price', 'mean_price', 'weighted_median_price', 'ok_value']:
                 if d[k]:
                     d[k] = float(d[k])
         for k in list(coinpair_prices.keys()):
