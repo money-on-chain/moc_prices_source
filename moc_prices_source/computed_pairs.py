@@ -10,9 +10,10 @@ bkpath   = sys.path[:]
 sys.path.insert(0, dirname(base_dir), )
 
 from moc_prices_source.engines.coins import \
-    RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, RIF_USD_B, \
-    RIF_USD_T, ETH_USD, USDT_USD_B, USDT_USD, BTC_USDT, BNB_USD, BNB_USDT, \
-    USD_ARS_CCB, BTC_ARS, RIF_USD_TB, RIF_USD_WMTB, USD_COP_CCB, BTC_COP
+    RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, \
+    RIF_USD_B, RIF_USD_T, ETH_USD, ETH_USD_B, USDT_USD_B, USDT_USD, \
+    BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB, BTC_ARS, RIF_USD_TB, \
+    RIF_USD_WMTB, USD_COP_CCB, BTC_COP
 from moc_prices_source.weighing import weighted_median
 from moc_prices_source.cli import tabulate
 
@@ -47,7 +48,7 @@ computed_pairs = {
         'requirements': [RIF_BTC, BTC_USD],
         'formula': lambda rif_btc, btc_usd: rif_btc * btc_usd
     },
-    ETH_USD: {
+    ETH_USD_B: { # Passing through Bitcoin
         'requirements': [ETH_BTC, BTC_USD],
         'formula': lambda eth_btc, btc_usd: eth_btc * btc_usd
     },
