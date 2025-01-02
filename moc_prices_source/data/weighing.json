@@ -20,6 +20,12 @@
     "btc_usd_kraken":   0.18,
     "btc_usd_gemini":   0.17,
 
+    "eth_usd_coinbase": 0.25,
+    "eth_usd_bitstamp": 0.22,
+    "eth_usd_bitfinex": 0.18,
+    "eth_usd_kraken":   0.18,
+    "eth_usd_gemini":   0.17,
+
     "rif_btc_binance":   1,
     "rif_btc_sovryn":    0,
     "rif_btc_mexc":      0,
