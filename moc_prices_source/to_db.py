@@ -1,8 +1,12 @@
-import sys, datetime
-from os.path import dirname, abspath
+import sys, datetime, json
+from os.path import dirname, abspath, basename, expanduser
 from time import sleep
 from tabulate import tabulate
 from fnmatch import fnmatch as match
+from redis import Redis
+from json.decoder import JSONDecodeError
+from sys import stderr
+from decimal import Decimal
 
 bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
@@ -28,8 +32,8 @@ class OutputBase(object):
 
     def __init__(self, name,
                  verbose  = print,
-                 critical = lambda m: print(m, file=sys.stderr),
-                 info = lambda m: print(m, file=sys.stderr)):
+                 critical = lambda m: print(m, file=stderr),
+                 info = lambda m: print(m, file=stderr)):
         self._verbose  = verbose
         self._critical = critical
         self._info = info
@@ -72,12 +76,76 @@ class OutputBase(object):
 
 class OutputDB(OutputBase):
 
-    def _call(self, value):
-        if not database:
+    def __init__(self, name,
+                 verbose  = print,
+                 critical = lambda m: print(m, file=stderr),
+                 info = lambda m: print(m, file=stderr),
+                 only_redis = False):
+        
+        OutputBase.__init__(self, name,
+                 verbose  = verbose,
+                 critical = critical,
+                 info = info)
+        
+        self._only_redis = only_redis
+
+        if not database and not only_redis:
             for l in database_error_message.split('\n'):
                 if l:
                     self._critical(l)
             exit(1)
+        
+        app_dir  = dirname(abspath(__file__))
+        app_name = basename(app_dir)
+        redis_conf_files = [
+            expanduser("~") + '/.' + app_name + '/redis.json',
+            expanduser("~") + '/.' + app_name + '/redis_default.json',
+            app_dir + '/data/redis.json',
+            app_dir + '/data/redis_default.json']
+        redis_conf = {}
+        for file_ in redis_conf_files:
+            try:
+                with open(file_, 'r') as f:
+                    redis_conf = json.load(f)
+            except JSONDecodeError as e:
+                print(f'Error in "{file_}", {str(e)}', file=stderr)
+                exit(1)
+            except Exception as e:
+                redis_conf = {}
+            if redis_conf:
+                break
+
+        self._redis_enable = redis_conf.get('enable', False)
+
+        if only_redis and not self._redis_enable:
+            print(f'Error, Redis not enabled in config (File: {file_})',
+                  file=stderr)
+            exit(1)
+
+        if self._redis_enable:
+
+            redis_connection = {}
+
+            for key, type_ in [('host', str),
+                               ('port', int),
+                               ('db', int),
+                               ('unix_socket_path', str)]:
+                if key in redis_conf:
+                    try:
+                        redis_connection[key] = type_(redis_conf[key])
+                    except Exception as e:
+                        print(f'Error in "{file_}", {str(e)}', file=stderr)
+                        exit(1)
+
+            try:
+                self._redis = Redis(**redis_connection)
+                self._redis.ping()
+            except Exception as e:
+                print(f'Error in "{file_}", {str(e)}', file=stderr)
+                exit(1)
+
+
+    def _call(self, value):
         data = {}
         for timestamp, name, v in value:
             if not timestamp in data:
@@ -91,13 +159,34 @@ class OutputDB(OutputBase):
                 'time_':       timestamp,
                 'fields':      data[timestamp]
             }
-            database.write(**kargs)
-            into = f"{kargs['measurement']}@{kargs['time_'].strftime('%Y-%m-%dT%H:%M:%S')}"
-            self._info(f"Insert into {into} {len(kargs['fields'])} fileds.")
+            if database is not None and not self._only_redis:
+                database.write(**kargs)
+                into = f"{kargs['measurement']}@{kargs['time_'].strftime('%Y-%m-%dT%H:%M:%S')}"
+                self._info(
+                    f"Insert into {into} {len(kargs['fields'])} fileds.")
+            if self._redis_enable:
+                for (k, v) in kargs['fields'].items():
+                    for (key, value) in [
+                            (f"{self.name}/{k}", v),
+                            (f"{self.name}/{k}/timestamp", timestamp)]:
+                        if isinstance(value, Decimal):
+                            value = float(value)
+                        if isinstance(value, datetime.datetime):
+                            value = datetime.datetime.timestamp(value)
+                        elif value!=None and not(isinstance(
+                                value, (int, bool, float))):
+                            value = str(value)
+                        value = json.dumps(value)
+                        self._redis.set(key, value)
+                into = f"redis@{kargs['time_'].strftime('%Y-%m-%dT%H:%M:%S')}"
+                self._info(
+                    f"Insert into {into} {len(kargs['fields'])*2} fileds.")
 
 
 
-def get_values(log, coinpairs=ALL, ignore_zero_weighing=False):
+def get_values(log,
+               coinpairs = ALL,
+               ignore_zero_weighing = False):
 
     # Get prices
     d = {}
@@ -208,18 +297,22 @@ def get_values(log, coinpairs=ALL, ignore_zero_weighing=False):
     help=f"Time series name (default={repr(app_name)}).")
 @option('-z', '--ignore-zero-weighing', 'ignore_zero_weighing', is_flag=True,
         help='Ignore sources with zero weighing.')
+@option('-r', '--only-redis', 'only_redis', is_flag=True,
+        help='Use only redis database.')
 @cli.argument('coinpairs_filter', required=False)
 def cli_values_to_db(
     frequency,
-    verbose=0,
-    interval=0,
-    name=app_name,
-    coinpairs_filter=None,
-    ignore_zero_weighing=False):
+    verbose = 0,
+    interval = 0,
+    name = app_name,
+    coinpairs_filter = None,
+    ignore_zero_weighing = False,
+    only_redis = False):
     """\b
 Description:
     CLI-type tool that save the data obtained by
-    the `moc_price_source` library into a InfluxDB.
+    the `moc_price_source` library into a InfluxDB
+    and/or RedisDB.
 \n\b
 COINPAIRS_FILTER:
     Is a display pairs filter that accepts wildcards.
@@ -229,13 +322,14 @@ COINPAIRS_FILTER:
     
     if coinpairs_filter:
         coinpairs = list(filter(
-            lambda i: match(str(i).lower(), str(coinpairs_filter).lower()), ALL))
+            lambda i: match(str(i).lower(), str(coinpairs_filter).lower()),
+            ALL))
     else:
         coinpairs = ALL
     if not coinpairs:
         print(
             f"The {repr(coinpairs_filter)} filter did not return any results.",
-            file=sys.stderr)
+            file=stderr)
         return 1
 
     # Logger
@@ -255,7 +349,8 @@ COINPAIRS_FILTER:
     output = OutputDB(name,
                       verbose=log.verbose,
                       critical=log.critical,
-                      info=log.info)
+                      info=log.info,
+                      only_redis=only_redis)
 
     start_time = datetime.datetime.now()
 
