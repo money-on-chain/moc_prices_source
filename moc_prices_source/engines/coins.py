@@ -59,6 +59,7 @@ ARS  = Coin('Peso Argentino', 'ars', '$')
 MXN  = Coin('Peso Mexicano', 'mxn', '$')
 COP  = Coin('Peso Colombiano','cop', '$')
 GAS  = Coin('Gas', 'gas')
+BPRO = Coin('Bpro', 'bpro')
 
 
 Coins = [ c for c in locals().values() if isinstance(c, Coin) ]
@@ -170,6 +171,7 @@ USD_MXN = CoinPair(USD, MXN)
 USD_COP = CoinPair(USD, COP)
 USD_COP_CCB = CoinPair(USD, COP, "CCB")
 GAS_BTC = CoinPair(GAS, BTC)
+BPRO_BTC = CoinPair(BPRO, BTC)
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]
