@@ -304,11 +304,13 @@ class Base(object):
                 self._error = "Empty response from server"
             return False
 
+        self._error = None
         try:
             info = self._map(response)
             self._price = Decimal(str(info['price']))
         except Exception:
-            self._error = "Engine error (bad mapping) trying to get 'price'"
+            if self._error is None:
+                self._error = "Engine error (bad mapping) trying to get 'price'"
             return False
         
         if not self._price:

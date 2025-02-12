@@ -13,8 +13,12 @@ class Engine(Base):
     _max_time_without_price_change = 0    # zero means infinity
 
     def _map(self, data):
+        pair = 'btcncop'
+        if pair not in data['object']:
+            self._error = f"Engine error, {repr(pair)} no exists"
+            raise KeyError(self._error)
         value = {}
-        i = data['object']['btcncop']
+        i = data['object'][pair]
         value['price'] = (Decimal(i['selling_price']) + Decimal(i['purchase_price'])) / Decimal('2')
         return value
 
