@@ -14,11 +14,13 @@ class Engine(EngineWebScraping):
 
     def _scraping(self, html):
         value = None
+        def str2dec(x):
+            return Decimal(str(x).replace('$', '').replace(',', '.'))
         for s in html.find_all ('div', attrs={'class':'tile cotizacion_value'}):
-            d = list(map(lambda x: x.strip(), s.parent.strings))
-            if len(d)==6 and d[0]=='Contado con liqui' and d[1]=='Compra' and d[3]=='Venta':
+            d = list(map(lambda x: x.strip().lower(), s.parent.strings))
+            if len(d)==6 and d[0]=='contado con liqui' and d[1]=='compra' and d[3]=='venta':
                 try:
-                    value = (Decimal(d[2].replace('$', '')) + Decimal(d[4].replace('$', '')))/Decimal(2) 
+                    value = (str2dec(d[2]) + str2dec(d[4]))/Decimal(2) 
                 except:
                     value = None
                 if value:
