@@ -30,7 +30,7 @@ simplified_abi = """
 class Engine(BaseOnChain):
 
     _name          = BaseOnChain._name_from_file(__file__)
-    _description   = "Onchain"
+    _description   = "MOC onchain"
     _coinpair      = BPRO_BTC
     _uri           = get_env('RSK_NODE', 'https://public-node.rsk.co')
     _sc_addr       = get_env('MOC_STATE_ADDR', 'mainnet')

@@ -48,17 +48,17 @@ class Coin(object):
         return hash(str(self))
 
 
-BTC  = Coin('Bitcoin', 'btc', '₿')
-USD  = Coin('Dollar', 'usd', '$')
-RIF  = Coin('RIF Token', 'rif')
-MOC  = Coin('MOC Token', 'moc')
-ETH  = Coin('Ether', 'eth', '⟠')
+BTC = Coin('Bitcoin', 'btc', '₿')
+USD = Coin('Dollar', 'usd', '$')
+RIF = Coin('RIF Token', 'rif')
+MOC = Coin('MOC Token', 'moc')
+ETH = Coin('Ether', 'eth', '⟠')
 USDT = Coin('Tether', 'usdt', '₮')
-BNB  = Coin('Binance Coin', 'bnb', 'Ƀ')
-ARS  = Coin('Peso Argentino', 'ars', '$')
-MXN  = Coin('Peso Mexicano', 'mxn', '$')
-COP  = Coin('Peso Colombiano','cop', '$')
-GAS  = Coin('Gas', 'gas')
+BNB = Coin('Binance Coin', 'bnb', 'Ƀ')
+ARS = Coin('Peso Argentino', 'ars', '$')
+MXN = Coin('Peso Mexicano', 'mxn', '$')
+COP = Coin('Peso Colombiano','cop', '$')
+GAS = Coin('Gas', 'gas')
 BPRO = Coin('Bpro', 'bpro')
 
 
@@ -172,6 +172,9 @@ USD_COP = CoinPair(USD, COP)
 USD_COP_CCB = CoinPair(USD, COP, "CCB")
 GAS_BTC = CoinPair(GAS, BTC)
 BPRO_BTC = CoinPair(BPRO, BTC)
+BPRO_ARS = CoinPair(BPRO, ARS)
+BPRO_COP = CoinPair(BPRO, COP)
+USD_BPRO = CoinPair(USD, BPRO)
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]

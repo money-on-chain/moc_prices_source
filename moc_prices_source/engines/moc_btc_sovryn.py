@@ -5,7 +5,7 @@ from engine_base import BaseOnChain, MOC_BTC_SOV, get_env
 class Engine(BaseOnChain):
 
     _name          = BaseOnChain._name_from_file(__file__)
-    _description   = "Onchain"
+    _description   = "Sovryn onchain"
     _coinpair      = MOC_BTC_SOV
     _uri           = get_env('RSK_NODE', 'https://public-node.rsk.co')
     _pool_sc_addr  = '0xe321442dc4793c17f41fe3fb192a856a4864ceaf'

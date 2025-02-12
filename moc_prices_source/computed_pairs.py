@@ -13,7 +13,8 @@ from moc_prices_source.engines.coins import \
     RIF_USDT, BTC_USD, RIF_BTC, ETH_BTC, MOC_USD_WM, RIF_USD, \
     RIF_USD_B, RIF_USD_T, ETH_USD, ETH_USD_B, USDT_USD_B, USDT_USD, \
     BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB, BTC_ARS, RIF_USD_TB, \
-    RIF_USD_WMTB, USD_COP_CCB, BTC_COP, MOC_USD_SOV, MOC_BTC_SOV, MOC_USD_OKU
+    RIF_USD_WMTB, USD_COP_CCB, BTC_COP, MOC_USD_SOV, MOC_BTC_SOV, \
+    MOC_USD_OKU, BPRO_BTC, BPRO_ARS, BPRO_COP, USD_BPRO
 from moc_prices_source.weighing import weighted_median
 from moc_prices_source.cli import tabulate
 
@@ -22,6 +23,18 @@ sys.path = bkpath
 
 
 computed_pairs = {
+    USD_BPRO:{
+        'requirements': [BPRO_BTC, BTC_USD],
+        'formula': lambda bpro_btc, btc_usd: bpro_btc * btc_usd
+    },
+    BPRO_ARS:{
+        'requirements': [BPRO_BTC, BTC_ARS],
+        'formula': lambda bpro_btc, btc_ars: bpro_btc * btc_ars
+    },
+    BPRO_COP:{
+        'requirements': [BPRO_BTC, BTC_COP],
+        'formula': lambda bpro_btc, btc_cop: bpro_btc * btc_cop
+    },
     MOC_USD_SOV: { # Passing through Bitcoin
         'requirements': [MOC_BTC_SOV, BTC_USD],
         'formula': lambda moc_btc, btc_usd: moc_btc * btc_usd
