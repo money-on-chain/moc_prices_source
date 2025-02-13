@@ -1,13 +1,13 @@
 import requests, datetime, json
-from sys          import stderr
-from os.path      import basename, dirname, abspath, expanduser
-from decimal      import Decimal
+from sys import stderr
+from os.path import basename, dirname, abspath, expanduser
+from decimal import Decimal
 from json.decoder import JSONDecodeError
-from redis        import Redis, ConnectionError
-from coins        import *
-from bs4          import BeautifulSoup
-from web3         import Web3, HTTPProvider
-from os           import environ
+from redis import Redis
+from coins import *
+from bs4 import BeautifulSoup
+from web3 import Web3, HTTPProvider
+from os import environ
 
 
 class Base(object):

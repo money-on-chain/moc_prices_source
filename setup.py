@@ -59,5 +59,6 @@ setup(
     install_requires=requirements,
     scripts=['moc_prices_source_check',
              'moc_prices_source_to_db',
+             'moc_prices_source_from_db',
              'moc_prices_source_api']
 )
