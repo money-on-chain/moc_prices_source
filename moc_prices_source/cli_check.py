@@ -346,7 +346,7 @@ COINPAIRS_FILTER:
         print()
         print(tabulate(table, headers=[
             '', 'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources', 'Ok'
-        ]))
+        ], floatfmt=",.6f"))
 
     errors = []
     for p in prices:

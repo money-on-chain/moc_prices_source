@@ -48,17 +48,18 @@ class Coin(object):
         return hash(str(self))
 
 
-BTC  = Coin('Bitcoin', 'btc', '₿')
-USD  = Coin('Dollar', 'usd', '$')
-RIF  = Coin('RIF Token', 'rif')
-MOC  = Coin('MOC Token', 'moc')
-ETH  = Coin('Ether', 'eth', '⟠')
+BTC = Coin('Bitcoin', 'btc', '₿')
+USD = Coin('Dollar', 'usd', '$')
+RIF = Coin('RIF Token', 'rif')
+MOC = Coin('MOC Token', 'moc')
+ETH = Coin('Ether', 'eth', '⟠')
 USDT = Coin('Tether', 'usdt', '₮')
-BNB  = Coin('Binance Coin', 'bnb', 'Ƀ')
-ARS  = Coin('Peso Argentino', 'ars', '$')
-MXN  = Coin('Peso Mexicano', 'mxn', '$')
-COP  = Coin('Peso Colombiano','cop', '$')
-GAS  = Coin('Gas', 'gas')
+BNB = Coin('Binance Coin', 'bnb', 'Ƀ')
+ARS = Coin('Peso Argentino', 'ars', '$')
+MXN = Coin('Peso Mexicano', 'mxn', '$')
+COP = Coin('Peso Colombiano','cop', '$')
+GAS = Coin('Gas', 'gas')
+BPRO = Coin('Bpro', 'bpro')
 
 
 Coins = [ c for c in locals().values() if isinstance(c, Coin) ]
@@ -151,8 +152,10 @@ RIF_USDT_MA = CoinPair(RIF, USDT, "MA", "Using the magic average algorithm with 
 RIF_USDT_MA2 = CoinPair(RIF, USDT, "MA2")
 RIF_USDT_MA3 = CoinPair(RIF, USDT, "MA3")
 RIF_USDT_MP1P = CoinPair(RIF, USDT, "mp1%", "To move the price 1 percent")
-MOC_BTC = CoinPair(MOC, BTC)
-MOC_USD = CoinPair(MOC, USD)
+MOC_BTC_SOV = CoinPair(MOC, BTC, "Sovryn")
+MOC_USD_OKU = CoinPair(MOC, USD, "Oku")
+MOC_USD_SOV = CoinPair(MOC, USD, "Sovryn")
+MOC_USD_WM = CoinPair(MOC, USD, "WM")
 ETH_BTC = CoinPair(ETH, BTC)
 ETH_USD = CoinPair(ETH, USD)
 ETH_USD_B = CoinPair(ETH, USD, "B", "Passing through Bitcoin")
@@ -168,6 +171,10 @@ USD_MXN = CoinPair(USD, MXN)
 USD_COP = CoinPair(USD, COP)
 USD_COP_CCB = CoinPair(USD, COP, "CCB")
 GAS_BTC = CoinPair(GAS, BTC)
+BPRO_BTC = CoinPair(BPRO, BTC)
+BPRO_ARS = CoinPair(BPRO, ARS)
+BPRO_COP = CoinPair(BPRO, COP)
+USD_BPRO = CoinPair(USD, BPRO)
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]
