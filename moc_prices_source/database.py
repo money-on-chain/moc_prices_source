@@ -73,7 +73,7 @@ class Database(object):
         else:
             self._log.warning('DEBUG MODE ON')
         
-        self._log.info('Connect to InfluxDB')
+        self._log.info('Connected to InfluxDB')
 
 
     @staticmethod
