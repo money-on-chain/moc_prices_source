@@ -7,8 +7,12 @@ base_dir = dirname(abspath(__file__))
 sys.path.insert(0, dirname(base_dir))
 
 from moc_prices_source.conf import get
+from moc_prices_source.my_logging import make_log, INFO, DEBUG, VERBOSE
 
 sys.path = bkpath
+
+
+DEBUG = False
 
 
 to_gmt = int(round(float((datetime.datetime.utcnow() -
@@ -46,17 +50,30 @@ get(**kargs)
 
 class Database(object):
 
-    def __init__(self, **kargs):
+    def __init__(self, name, **kargs):
 
-        self.name = kargs['name']
-        del kargs['name']
+        self._log = make_log('database')
 
-        self.client = InfluxDBClient(**kargs)
+        self.name = name
+        
+        str_kargs = ', '.join( [f"{k}: {v}" for k, v in kargs.items()])
+        self._log.info(f'Try to connect to InfluxDB... ({str_kargs})')
 
-        if not self.name in [ d['name'] for d in self.client.get_list_database() ]:
-              self.client.create_database(self.name)
-
-        self.client.switch_database(self.name)
+        if not DEBUG:
+            try:
+                self.client = InfluxDBClient(**kargs)
+                if not self.name in [ d['name'] for d in self.client.get_list_database() ]:
+                    self.client.create_database(self.name)
+                self.client.switch_database(self.name)
+            except Exception as e:
+                self._log.critical(e)
+                self._log.critical("Maybe you need to check environment variables")
+                self._log.critical(f"Maybe you need to check config file {repr(config_file)}")
+                raise e
+        else:
+            self._log.warning('DEBUG MODE ON')
+        
+        self._log.info('Connect to InfluxDB')
 
 
     @staticmethod
@@ -80,6 +97,9 @@ class Database(object):
         body = []
         body.append(item)
 
+        if DEBUG:
+            return
+        
         out = self.client.write_points(body, time_precision='s')
 
         return out
@@ -208,22 +228,16 @@ class Database(object):
         return bool(points)
 
 
+def make_db_conn():
+    return Database(**db_conf)
 
-database_error_message = None
-try:
-    database = Database(**db_conf)
-except Exception as e:
-    database_error_message = str(f"""
-{str(e)}
-
-Maybe you need to check environment variables or config file {repr(config_file)}
-""")
-    database = None
 
 
 if __name__ == '__main__':
 
     print("File: {}, Ok!".format(repr(__file__)))
     print("Config file: {}, Ok!".format(repr(config_file)))
-    if not database:
-        print(database_error_message)
+    try:
+        database = make_db_conn()
+    except Exception as e:
+        exit(0)

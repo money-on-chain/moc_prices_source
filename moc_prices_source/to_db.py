@@ -15,7 +15,8 @@ sys.path.insert(0, dirname(base_dir))
 from moc_prices_source import get_price
 from moc_prices_source import ALL
 from moc_prices_source.cli import command, option, cli
-from moc_prices_source.database import database, database_error_message
+from moc_prices_source.database import make_db_conn
+from moc_prices_source.database import config_file as db_config_file
 from moc_prices_source.my_logging import make_log, INFO, DEBUG, VERBOSE
 
 sys.path = bkpath
@@ -89,11 +90,12 @@ class OutputDB(OutputBase):
         
         self._only_redis = only_redis
 
-        if not database and not only_redis:
-            for l in database_error_message.split('\n'):
-                if l:
-                    self._critical(l)
-            exit(1)
+        self._database = None
+        if not only_redis:
+            try:
+                self._database = make_db_conn()
+            except Exception as e:
+                exit(1)
         
         app_dir  = dirname(abspath(__file__))
         app_name = basename(app_dir)
@@ -159,8 +161,8 @@ class OutputDB(OutputBase):
                 'time_':       timestamp,
                 'fields':      data[timestamp]
             }
-            if database is not None and not self._only_redis:
-                database.write(**kargs)
+            if self._database is not None:
+                self._database.write(**kargs)
                 into = f"{kargs['measurement']}@{kargs['time_'].strftime('%Y-%m-%dT%H:%M:%S')}"
                 self._info(
                     f"Insert into {into} {len(kargs['fields'])} fileds.")
