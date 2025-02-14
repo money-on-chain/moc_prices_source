@@ -2,7 +2,7 @@ FROM python:3.8
 
 RUN apt-get update && \
     apt-get install -y \
-        locales redis
+        locales redis supervisor
 
 RUN echo $TZ > /etc/timezone && \
     apt-get update && apt-get install -y tzdata && \
@@ -24,4 +24,7 @@ COPY ./files/conf/redis.json /root/.moc_prices_source/
 COPY ./files/run.sh /
 COPY ./files/check.sh /
 
-CMD ["/run.sh"]
+RUN mkdir -p /etc/supervisor/conf.d
+COPY ./files/supervisord.conf /etc/supervisor/supervisord.conf
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
