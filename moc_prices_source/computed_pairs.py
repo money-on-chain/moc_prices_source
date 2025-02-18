@@ -10,10 +10,11 @@ bkpath   = sys.path[:]
 sys.path.insert(0, dirname(base_dir), )
 
 from moc_prices_source.engines.coins import \
-    RIF_USDT, BTC_USD, MOC_BTC, RIF_BTC, ETH_BTC, MOC_USD, RIF_USD, \
+    RIF_USDT, BTC_USD, RIF_BTC, ETH_BTC, MOC_USD_WM, RIF_USD, \
     RIF_USD_B, RIF_USD_T, ETH_USD, ETH_USD_B, USDT_USD_B, USDT_USD, \
     BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB, BTC_ARS, RIF_USD_TB, \
-    RIF_USD_WMTB, USD_COP_CCB, BTC_COP
+    RIF_USD_WMTB, USD_COP_CCB, BTC_COP, MOC_USD_SOV, MOC_BTC_SOV, \
+    MOC_USD_OKU, BPRO_BTC, BPRO_ARS, BPRO_COP, USD_BPRO
 from moc_prices_source.weighing import weighted_median
 from moc_prices_source.cli import tabulate
 
@@ -22,9 +23,25 @@ sys.path = bkpath
 
 
 computed_pairs = {
-    MOC_USD: {
-        'requirements': [MOC_BTC, BTC_USD],
+    USD_BPRO:{
+        'requirements': [BPRO_BTC, BTC_USD],
+        'formula': lambda bpro_btc, btc_usd: bpro_btc * btc_usd
+    },
+    BPRO_ARS:{
+        'requirements': [BPRO_BTC, BTC_ARS],
+        'formula': lambda bpro_btc, btc_ars: bpro_btc * btc_ars
+    },
+    BPRO_COP:{
+        'requirements': [BPRO_BTC, BTC_COP],
+        'formula': lambda bpro_btc, btc_cop: bpro_btc * btc_cop
+    },
+    MOC_USD_SOV: { # Passing through Bitcoin
+        'requirements': [MOC_BTC_SOV, BTC_USD],
         'formula': lambda moc_btc, btc_usd: moc_btc * btc_usd
+    },
+    MOC_USD_WM: {
+        'requirements': [MOC_USD_SOV, MOC_USD_OKU],
+        'formula': lambda moc_usd_sov, moc_usd_oku: weighted_median([moc_usd_sov, moc_usd_oku], [1,1])
     },
     RIF_USD_B: { # Passing through Bitcoin
         'requirements': [RIF_BTC, BTC_USD],

@@ -282,12 +282,16 @@ COINPAIRS_FILTER:
     values = data['values']
 
     table=[]
+    prices_count = {}
     for p in prices:
         row = []
         row.append(p["coinpair"].from_.name)
         row.append(p["coinpair"].to_.name)
         row.append(p["coinpair"].variant)
         row.append(p["description"])
+        if not p["coinpair"] in prices_count:
+            prices_count[p["coinpair"]] = 0
+        prices_count[p["coinpair"]] += 1
         if p["ok"]:
             unit = 'p'
             v = p['price'] * (1000**4)
@@ -330,7 +334,7 @@ COINPAIRS_FILTER:
         row.append(d['weighted_median_price'])
         if 'prices' in d:
             if 'ok_sources_count' in d:
-                row.append(f"{d['ok_sources_count']} of {len(d['prices'])}")
+                row.append(f"{d['ok_sources_count']} of {prices_count[coinpair]}")
             else:
                 row.append(len(d['prices']))
         else:
@@ -342,7 +346,7 @@ COINPAIRS_FILTER:
         print()
         print(tabulate(table, headers=[
             '', 'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources', 'Ok'
-        ]))
+        ], floatfmt=",.6f"))
 
     errors = []
     for p in prices:

@@ -6,4 +6,4 @@ make --directory=../ build
 TARFILE=$(ls -d ../dist/*.tar.gz)
 cp $TARFILE files/moneyonchain_prices_source.tar.gz
 make --directory=../ clean
-sudo docker build -t moc_prices_source -f Dockerfile .
+docker build -t moc_prices_source -f Dockerfile .

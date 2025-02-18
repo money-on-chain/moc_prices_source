@@ -1,13 +1,13 @@
 import requests, datetime, json
-from sys          import stderr
-from os.path      import basename, dirname, abspath, expanduser
-from decimal      import Decimal
+from sys import stderr
+from os.path import basename, dirname, abspath, expanduser
+from decimal import Decimal
 from json.decoder import JSONDecodeError
-from redis        import Redis, ConnectionError
-from coins        import *
-from bs4          import BeautifulSoup
-from web3         import Web3, HTTPProvider
-from os           import environ
+from redis import Redis
+from coins import *
+from bs4 import BeautifulSoup
+from web3 import Web3, HTTPProvider
+from os import environ
 
 
 class Base(object):
@@ -304,11 +304,13 @@ class Base(object):
                 self._error = "Empty response from server"
             return False
 
+        self._error = None
         try:
             info = self._map(response)
             self._price = Decimal(str(info['price']))
         except Exception:
-            self._error = "Engine error (bad mapping) trying to get 'price'"
+            if self._error is None:
+                self._error = "Engine error (bad mapping) trying to get 'price'"
             return False
         
         if not self._price:
