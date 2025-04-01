@@ -2,7 +2,6 @@ import sys, datetime, json
 from os.path import dirname, abspath, basename, expanduser
 from time import sleep
 from tabulate import tabulate
-from fnmatch import fnmatch as match
 from redis import Redis
 from json.decoder import JSONDecodeError
 from sys import stderr
@@ -13,7 +12,7 @@ base_dir = dirname(abspath(__file__))
 sys.path.insert(0, dirname(base_dir))
 
 from moc_prices_source import get_price
-from moc_prices_source import ALL
+from moc_prices_source import ALL, get_coin_pairs
 from moc_prices_source.cli import command, option, cli
 from moc_prices_source.database import make_db_conn
 from moc_prices_source.database import config_file as db_config_file
@@ -323,9 +322,7 @@ COINPAIRS_FILTER:
 """
     
     if coinpairs_filter:
-        coinpairs = list(filter(
-            lambda i: match(str(i).lower(), str(coinpairs_filter).lower()),
-            ALL))
+        coinpairs = get_coin_pairs(coinpairs_filter)
     else:
         coinpairs = ALL
     if not coinpairs:

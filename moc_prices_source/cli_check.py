@@ -1,6 +1,5 @@
 import json, sys
 from os.path import dirname, abspath
-from fnmatch import fnmatch as match
 
 
 bkpath   = sys.path[:]
@@ -10,7 +9,7 @@ sys.path.insert(0, dirname(base_dir))
 from moc_prices_source.cli            import command, option, tabulate, trim, cli
 from moc_prices_source.weighing       import weighing
 from moc_prices_source                import version
-from moc_prices_source                import get_price, ALL
+from moc_prices_source                import get_price, ALL, get_coin_pairs
 from moc_prices_source.engines        import all_engines
 from moc_prices_source.computed_pairs import show_computed_pairs_fromula, computed_pairs
 
@@ -246,10 +245,8 @@ COINPAIRS_FILTER:
         show_computed_pairs_fromula()
         return 
 
-
     if coinpairs_filter:
-        coinpairs = list(filter(
-            lambda i: match(str(i).lower(), str(coinpairs_filter).lower()), ALL))
+        coinpairs = get_coin_pairs(coinpairs_filter)
     else:
         coinpairs = ALL
     if not coinpairs:

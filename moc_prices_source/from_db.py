@@ -2,7 +2,6 @@ import sys, json
 from datetime import datetime, timedelta
 from os.path import dirname, abspath, basename, expanduser
 from tabulate import tabulate
-from fnmatch import fnmatch as match
 from redis import Redis
 from json.decoder import JSONDecodeError
 from sys import stderr
@@ -13,7 +12,7 @@ bkpath   = sys.path[:]
 base_dir = dirname(abspath(__file__))
 sys.path.insert(0, dirname(base_dir))
 
-from moc_prices_source import ALL, BTC_USD
+from moc_prices_source import ALL, BTC_USD, get_coin_pairs
 from moc_prices_source.cli import command, cli
 
 sys.path = bkpath
@@ -148,9 +147,7 @@ COINPAIRS_FILTER:
 """
     from_db = FromDB()
     if coinpairs_filter:
-        coinpairs = list(filter(
-            lambda i: match(str(i).lower(), str(coinpairs_filter).lower()),
-            ALL))
+        coinpairs = get_coin_pairs(coinpairs_filter)
     else:
         coinpairs = ALL
     if not coinpairs:
