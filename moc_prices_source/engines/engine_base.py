@@ -8,6 +8,47 @@ from coins import *
 from bs4 import BeautifulSoup
 from web3 import Web3, HTTPProvider
 from os import environ
+from requests import Response
+
+
+
+app_dir  = dirname(dirname(abspath(__file__)))
+app_name = basename(app_dir)
+
+def get_redis_conf():   
+    redis_conf_files = [expanduser("~") + '/.' + app_name + '/redis.json',
+                        expanduser("~") + '/.' + app_name + '/redis_default.json',
+                        app_dir + '/data/redis.json',
+                        app_dir + '/data/redis_default.json']
+    redis_conf = {}
+    for file_ in redis_conf_files:
+        try:
+            with open(file_, 'r') as f:
+                redis_conf = json.load(f)
+        except JSONDecodeError as e:
+            print(f'Error in "{file_}", {str(e)}', file=stderr)
+            exit(1)
+        except Exception as e:
+            redis_conf = {}
+        if redis_conf:
+            break
+    redis_conf['file'] = file_
+    connection_parameters = {}
+    for key, type_ in [('host', str),
+                       ('port', int),
+                       ('db', int),
+                       ('unix_socket_path', str)]:
+        if key in redis_conf:
+            try:
+                connection_parameters[key] = type_(redis_conf[key])
+            except Exception as e:
+                print(f'Error in "{file_}", {str(e)}',
+                      file=stderr)
+                exit(1)
+    redis_conf['connection_parameters'] = connection_parameters
+    return redis_conf
+
+redis_conf = get_redis_conf()
 
 
 class Base(object):
@@ -63,50 +104,19 @@ class Base(object):
 
     def __init__(self, session=None, session_storage=None):
 
-        app_dir  = dirname(dirname(abspath(__file__)))
-        app_name = basename(app_dir)
-        redis_conf_files = [expanduser("~") + '/.' + app_name + '/redis.json',
-                            expanduser("~") + '/.' + app_name + '/redis_default.json',
-                            app_dir + '/data/redis.json',
-                            app_dir + '/data/redis_default.json']
-
-        redis_conf = {}
-        for file_ in redis_conf_files:
-            try:
-                with open(file_, 'r') as f:
-                    redis_conf = json.load(f)
-            except JSONDecodeError as e:
-                print(f'Error in "{file_}", {str(e)}', file=stderr)
-                exit(1)
-            except Exception as e:
-                redis_conf = {}
-            if redis_conf:
-                break
-
         self._redis_enable = redis_conf.get('enable', False)
-
         self._engine_session_id = app_name + '/' + self._name
 
         if self._redis_enable:
 
-            redis_connection = {}
-
-            for key, type_ in [('host',             str),
-                               ('port',             int),
-                               ('db',               int),
-                               ('unix_socket_path', str)]:
-                if key in redis_conf:
-                    try:
-                        redis_connection[key] = type_(redis_conf[key])
-                    except Exception as e:
-                        print(f'Error in "{file_}", {str(e)}', file=stderr)
-                        exit(1)
+            redis_connection = redis_conf['connection_parameters']
 
             try:
                 self._redis = Redis(**redis_connection)
                 self._redis.ping()
             except Exception as e:
-                print(f'Error in "{file_}", {str(e)}', file=stderr)
+                print(f'Error in "{redis_conf["file"]}", {str(e)}',
+                      file=stderr)
                 exit(1)
 
         self._session_storage = session_storage
@@ -252,36 +262,73 @@ class Base(object):
 
         self._clean_output_values()
 
-        try:
-            response = getter(**kargs)
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            self._error = e
-            return None
-        except Exception as e:
-            self._error = e
-            return None
+        response = None
 
-        if not response:
-            self._error = "No response from server"
-            return None
+        if self._redis_enable:
 
-        if response.status_code != 200:
-            self._error = "Response error (code {})".format(
-                response.status_code)
-            return None
+            cache_key_dict = kargs.copy()
+            cache_key_dict['method'] = method
+            cache_key = \
+                f"RQCACHE({json.dumps(cache_key_dict, sort_keys=True)})"
+            
+            try:
+                cached_response = json.loads(self._redis.get(cache_key))
+            except Exception as e:
+                cached_response = None
+            
+            if cached_response:
+                response = Response()
+                try:
+                    response.status_code = cached_response["status_code"]
+                    response._content = cached_response["content"].encode()
+                    response.headers = cached_response["headers"]
+                    response.url = cached_response["url"]
+                except Exception as e:
+                    response = None
 
-        try:
-            self._age = int(response.headers['age'])
-        except ValueError:
-            self._age = None
-        except KeyError:
-            self._age = None
+        if response is None:
 
-        if self._age!=None and self._age > self._max_age:
-            self._error = str(f"Response age error (age > {self._max_age})")
-            return None
+            try:
+                response = getter(**kargs)
+                response.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                self._error = e
+                return None
+            except Exception as e:
+                self._error = e
+                return None
 
+            if not response:
+                self._error = "No response from server"
+                return None
+
+            if response.status_code != 200:
+                self._error = "Response error (code {})".format(
+                    response.status_code)
+                return None
+
+            try:
+                self._age = int(response.headers['age'])
+            except ValueError:
+                self._age = None
+            except KeyError:
+                self._age = None
+
+            if self._age!=None and self._age > self._max_age:
+                self._error = str(f"Response age error (age > {self._max_age})")
+                return None
+            
+            if self._redis_enable:
+
+                response_to_cache_str = json.dumps({
+                    "status_code": response.status_code,
+                    "headers": dict(response.headers),
+                    "content": response.text,
+                    "url": response.url}, indent=4)
+                
+                time = datetime.timedelta(seconds=10)
+                self._redis.setex(cache_key, time, response_to_cache_str)
+        
         response = self._json(response)
 
         if not response:
@@ -476,13 +523,34 @@ class BaseOnChain(Base):
 
         if start_time is None:
             start_time = datetime.datetime.now()
-        
-        price = self._get_price()
- 
-        if not price:
-            if not self._error:
-                self._error = "Engine error trying to get 'price'"
-            return False
+
+        price = None
+
+        if self._redis_enable:
+
+            cache_key = f"RQ_ONCHAIN_CACHE({self._name})"
+
+            price = self._redis.get(cache_key)
+
+            try:
+                price = self._redis.get(cache_key)
+            except Exception as e:
+                price = None
+            
+            price = None if price is None else price.decode('utf-8')
+
+        if price is None:
+
+            price = self._get_price()
+    
+            if not price:
+                if not self._error:
+                    self._error = "Engine error trying to get 'price'"
+                return False
+            
+            if self._redis_enable:
+                time = datetime.timedelta(seconds=10)
+                self._redis.setex(cache_key, time, str(price))
 
         try:
             self._price = Decimal(str(price))
