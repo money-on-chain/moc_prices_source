@@ -65,6 +65,8 @@ class Base(object):
     _max_time_without_price_change = 180 # zero means infinity
     _redis_expiration              = 3600
     _ssl_verify                    = True
+    _rq_side_cache_time            = 3    
+
 
 
     @property
@@ -326,7 +328,7 @@ class Base(object):
                     "content": response.text,
                     "url": response.url}, indent=4)
                 
-                time = datetime.timedelta(seconds=10)
+                time = datetime.timedelta(seconds=self._rq_side_cache_time)
                 self._redis.setex(cache_key, time, response_to_cache_str)
         
         response = self._json(response)
@@ -549,7 +551,7 @@ class BaseOnChain(Base):
                 return False
             
             if self._redis_enable:
-                time = datetime.timedelta(seconds=10)
+                time = datetime.timedelta(seconds=self._rq_side_cache_time)
                 self._redis.setex(cache_key, time, str(price))
 
         try:
