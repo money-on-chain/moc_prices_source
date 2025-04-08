@@ -1,9 +1,7 @@
 import sys, json
 from datetime import datetime, timedelta
-from os.path import dirname, abspath, basename, expanduser
+from os.path import dirname, abspath
 from tabulate import tabulate
-from redis import Redis
-from json.decoder import JSONDecodeError
 from sys import stderr
 from collections import namedtuple
 
@@ -13,6 +11,7 @@ base_dir = dirname(abspath(__file__))
 sys.path.insert(0, dirname(base_dir))
 
 from moc_prices_source import ALL, BTC_USD, get_coin_pairs
+from moc_prices_source.redis_conn import get_redis, redis_conf_file
 from moc_prices_source.cli import command, cli
 
 sys.path = bkpath
@@ -35,49 +34,11 @@ class FromDB(object):
 
         self._default_max_age = max_age
         
-        app_dir  = dirname(abspath(__file__))
-        app_name = basename(app_dir)
-        redis_conf_files = [
-            expanduser("~") + '/.' + app_name + '/redis.json',
-            expanduser("~") + '/.' + app_name + '/redis_default.json',
-            app_dir + '/data/redis.json',
-            app_dir + '/data/redis_default.json']
-        redis_conf = {}
-        for file_ in redis_conf_files:
-            try:
-                with open(file_, 'r') as f:
-                    redis_conf = json.load(f)
-            except JSONDecodeError as e:
-                print(f'Error in "{file_}", {str(e)}', file=stderr)
-                exit(1)
-            except Exception as e:
-                redis_conf = {}
-            if redis_conf:
-                break
+        self._redis = get_redis()
 
-        if not redis_conf.get('enable', False):
-            print(f'Error, Redis not enabled in config (File: {file_})',
+        if self._redis is None:
+            print(f'Error, Redis not enabled in config (File: {redis_conf_file})',
                   file=stderr)
-            exit(1)
-
-        redis_connection = {}
-
-        for key, type_ in [('host', str),
-                           ('port', int),
-                           ('db', int),
-                           ('unix_socket_path', str)]:
-            if key in redis_conf:
-                try:
-                    redis_connection[key] = type_(redis_conf[key])
-                except Exception as e:
-                    print(f'Error in "{file_}", {str(e)}', file=stderr)
-                    exit(1)
-
-        try:
-            self._redis = Redis(**redis_connection)
-            self._redis.ping()
-        except Exception as e:
-            print(f'Error in "{file_}", {str(e)}', file=stderr)
             exit(1)
 
     def __call__(self, *coinpairs, max_age=None):

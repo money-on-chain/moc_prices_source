@@ -1,4 +1,4 @@
-import requests, datetime, json
+import requests, datetime, json, sys
 from sys import stderr
 from os.path import basename, dirname, abspath, expanduser
 from decimal import Decimal
@@ -10,45 +10,16 @@ from web3 import Web3, HTTPProvider
 from os import environ
 from requests import Response
 
+base_dir = dirname(dirname(abspath(__file__)))
+bkpath   = sys.path[:]
+sys.path.insert(0, dirname(base_dir))
 
+from moc_prices_source.redis_conn import get_redis
 
-app_dir  = dirname(dirname(abspath(__file__)))
-app_name = basename(app_dir)
+sys.path = bkpath
 
-def get_redis_conf():   
-    redis_conf_files = [expanduser("~") + '/.' + app_name + '/redis.json',
-                        expanduser("~") + '/.' + app_name + '/redis_default.json',
-                        app_dir + '/data/redis.json',
-                        app_dir + '/data/redis_default.json']
-    redis_conf = {}
-    for file_ in redis_conf_files:
-        try:
-            with open(file_, 'r') as f:
-                redis_conf = json.load(f)
-        except JSONDecodeError as e:
-            print(f'Error in "{file_}", {str(e)}', file=stderr)
-            exit(1)
-        except Exception as e:
-            redis_conf = {}
-        if redis_conf:
-            break
-    redis_conf['file'] = file_
-    connection_parameters = {}
-    for key, type_ in [('host', str),
-                       ('port', int),
-                       ('db', int),
-                       ('unix_socket_path', str)]:
-        if key in redis_conf:
-            try:
-                connection_parameters[key] = type_(redis_conf[key])
-            except Exception as e:
-                print(f'Error in "{file_}", {str(e)}',
-                      file=stderr)
-                exit(1)
-    redis_conf['connection_parameters'] = connection_parameters
-    return redis_conf
+app_name = basename(base_dir)
 
-redis_conf = get_redis_conf()
 
 
 class Base(object):
@@ -105,24 +76,9 @@ class Base(object):
 
 
     def __init__(self, session=None, session_storage=None):
-
-        self._redis_enable = redis_conf.get('enable', False)
+        self._redis = get_redis()
         self._engine_session_id = app_name + '/' + self._name
-
-        if self._redis_enable:
-
-            redis_connection = redis_conf['connection_parameters']
-
-            try:
-                self._redis = Redis(**redis_connection)
-                self._redis.ping()
-            except Exception as e:
-                print(f'Error in "{redis_conf["file"]}", {str(e)}',
-                      file=stderr)
-                exit(1)
-
         self._session_storage = session_storage
-
         self._session = session
         self._clean_output_values()
 
@@ -266,7 +222,7 @@ class Base(object):
 
         response = None
 
-        if self._redis_enable:
+        if self._redis is not None:
 
             cache_key_dict = kargs.copy()
             cache_key_dict['method'] = method
@@ -320,7 +276,7 @@ class Base(object):
                 self._error = str(f"Response age error (age > {self._max_age})")
                 return None
             
-            if self._redis_enable:
+            if self._redis is not None:
 
                 response_to_cache_str = json.dumps({
                     "status_code": response.status_code,
@@ -387,13 +343,13 @@ class Base(object):
 
         self._time = datetime.datetime.now() - start_time
 
-        if self._redis_enable or isinstance(self._session_storage, dict):
+        if self._redis is not None or isinstance(self._session_storage, dict):
 
             session_id = self._engine_session_id
 
             if self._max_time_without_price_change:
 
-                if self._redis_enable:
+                if self._redis is not None:
                     try:
                         pre_data = json.loads(self._redis.get(session_id))
                     except Exception:
@@ -427,7 +383,7 @@ class Base(object):
                     self._error = str(f"Too much time without price change (t > {max_time_without_price_change})")
                     return False
 
-            if self._redis_enable:
+            if self._redis is not None:
                 time = datetime.timedelta(seconds=self._redis_expiration)
                 self._redis.setex(session_id, time, self.as_json)
             elif isinstance(self._session_storage, dict):
@@ -528,7 +484,7 @@ class BaseOnChain(Base):
 
         price = None
 
-        if self._redis_enable:
+        if self._redis is not None:
 
             cache_key = f"RQ_ONCHAIN_CACHE({self._name})"
 
@@ -550,7 +506,7 @@ class BaseOnChain(Base):
                     self._error = "Engine error trying to get 'price'"
                 return False
             
-            if self._redis_enable:
+            if self._redis is not None:
                 time = datetime.timedelta(seconds=self._rq_side_cache_time)
                 self._redis.setex(cache_key, time, str(price))
 
