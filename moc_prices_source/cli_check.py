@@ -1,5 +1,6 @@
 import json, sys
 from os.path import dirname, abspath
+from decimal import Decimal
 
 
 bkpath   = sys.path[:]
@@ -341,9 +342,22 @@ COINPAIRS_FILTER:
     if table:
         table.sort(key=lambda x: str(x[1]))
         print()
-        print(tabulate(table, headers=[
-            '', 'Coin pair', 'Mediam', 'Mean', 'Weighted median', 'Sources', 'Ok'
-        ], floatfmt=",.6f"))
+        def dec_to_str(f):
+            if not isinstance(f, Decimal):
+                return f
+            out = f"{f:,.6f}"
+            if out=="0.000000":
+                out = f"{f}"
+                out = out.split('E-')
+                out[1] = ''.join(["⁰¹²³⁴⁵⁶⁷⁸⁹"[int(i)] for i in out[1]])
+                out = f"{float(out[0]):.3f} × 10⁻{out[1]}"                
+            return out
+        table = [[dec_to_str(f) for f in l] for l in table]
+        print(tabulate(table,
+            headers=['', 'Coin pair', 'Mediam', 'Mean',
+                     'Weighted median', 'Sources', 'Ok' ],
+            colalign=['center', 'left', 'right', 'right',
+                      'right', 'center', 'center']))
 
     errors = []
     for p in prices:
