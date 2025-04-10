@@ -174,7 +174,7 @@ GAS_BTC = CoinPair(GAS, BTC)
 BPRO_BTC = CoinPair(BPRO, BTC)
 BPRO_ARS = CoinPair(BPRO, ARS)
 BPRO_COP = CoinPair(BPRO, COP)
-BPRO_USD = CoinPair(BPRO, USD, description="offchain aporximation")
+BPRO_USD = CoinPair(BPRO, USD, description="Offchain")
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]
