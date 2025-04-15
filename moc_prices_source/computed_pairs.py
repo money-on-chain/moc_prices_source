@@ -37,11 +37,11 @@ computed_pairs = {
     },
     MOC_USD_SOV: { # Passing through Bitcoin
         'requirements': [MOC_BTC_SOV, BTC_USD],
-        'formula': lambda moc_btc, btc_usd: moc_btc * btc_usd
+        'formula': lambda moc_btc_sov, btc_usd: moc_btc_sov * btc_usd
     },
     MOC_USD_WM: {
-        'requirements': [MOC_USD_SOV, MOC_USD_OKU],
-        'formula': lambda moc_usd_sov, moc_usd_oku: weighted_median([moc_usd_sov, moc_usd_oku], [1,1])
+        'requirements': [MOC_BTC_SOV, BTC_USD, MOC_USD_OKU],
+        'formula': lambda moc_btc_sov, btc_usd, moc_usd_oku: weighted_median([moc_btc_sov * btc_usd, moc_usd_oku], [1,1])
     },
     RIF_USD_B: { # Passing through Bitcoin
         'requirements': [RIF_BTC, BTC_USD],
