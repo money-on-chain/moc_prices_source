@@ -1,10 +1,21 @@
-import json
+import json, sys
 from sys import stderr
 from os.path import basename, dirname, abspath, expanduser
 from json.decoder import JSONDecodeError
 from redis import Redis
+from time import sleep
+
+bkpath   = sys.path[:]
+base_dir = dirname(abspath(__file__))
+sys.path.insert(0, dirname(base_dir))
+
+from moc_prices_source.my_logging import make_log
+
+sys.path = bkpath
 
 
+
+log = make_log('RedisDB')
 
 def get_redis_conf():
     app_dir  = dirname(abspath(__file__))
@@ -49,16 +60,45 @@ redis_conf_file = redis_conf.get('file', 'unknown')
 
 redis_conn_parameters = redis_conf.get('connection_parameters', {})
 
-def get_redis():
+retry_count = redis_conf.get('retry_count', 0)
+retry_delay = redis_conf.get('retry_delay', 3)
+
+def get_redis(retry_count=retry_count, retry_delay=retry_delay, log=log):
     if not use_redis:
         return None
-    try:
-        redis = Redis(**redis_conn_parameters)
-        redis.ping()
-        return redis
-    except Exception as e:
-        print(f'Error in "{redis_conf_file}", {str(e)}', file=stderr)
+    redis = None
+    for i in range(retry_count + 1):
+        if i:
+            log.info(f"Connecting retry in {retry_delay}s...")
+            try:
+                sleep(retry_delay)
+            except KeyboardInterrupt as e:
+                log.info('Aborted! (keyboard interrupt).')
+                print(f"\nAborted!\n", file=stderr)
+                exit(1)
+            log.info(f"Connecting retry {i} of {retry_count}...")
+        error = None
+        try:
+            redis = Redis(**redis_conn_parameters) if redis is None else redis
+            redis.ping()
+        except KeyboardInterrupt as e:
+            if i:
+                log.info('Aborted! (keyboard interrupt).')
+            print(f"\nAborted!\n", file=stderr)
+            exit(1)            
+        except Exception as e:
+            error = e
+        if error is None:
+            break
+    if i and error is None:
+        log.info(f"Connected to RedisDB.")    
+    if error is not None:
+        msg = f'Error in "{redis_conf_file}", {str(error)}'
+        if i:
+            log.error(msg)
+        print(msg, file=stderr)
         exit(1)
+    return redis
 
 
 

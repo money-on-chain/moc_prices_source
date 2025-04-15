@@ -17,18 +17,6 @@ log() {
     echo -e "$timestamp\t$context\t$level: $*"
 }
 
-delay() {
-    local context="$1"
-    shift
-
-    local seconds=$1
-
-    for ((i=seconds; i>0; i--)); do
-        log "$context" "INFO" "Waiting $[i]s to start ..."
-        sleep 1
-    done
-}
-
 main() {
     local cmd_list=("moc_prices_source_api" "moc_prices_source_to_db")
     
@@ -38,7 +26,6 @@ main() {
     fi
     
     if [[ " ${cmd_list[@]} " =~ " $COMMAND " ]]; then
-        delay "$COMMAND" 10
         log "$COMMAND" "INFO" "Arguments: \"$MOC_PRICES_SOURCE_ARGS\""
         "/usr/local/bin/$COMMAND" $MOC_PRICES_SOURCE_ARGS
     else
