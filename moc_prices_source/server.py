@@ -12,6 +12,7 @@ sys.path.insert(0, dirname(base_dir))
 
 from moc_prices_source import get_price, ALL, version
 from moc_prices_source.cli import command, option
+from moc_prices_source.redis_conn import use_redis
 
 sys.path = bkpath
 
@@ -236,7 +237,8 @@ class Info(Resource):
         """Shows API info related"""
         return {
             'name:': title,
-            'version' : version
+            'version' : version,
+            'use_redis': use_redis
         }
 
 
