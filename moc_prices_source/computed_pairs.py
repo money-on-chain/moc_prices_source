@@ -2,7 +2,8 @@ import sys
 from os.path import dirname, abspath
 from inspect import getsource
 from types import LambdaType
-from decimal import Decimal
+
+
 
 base_dir = dirname(abspath(__file__))
 
@@ -14,7 +15,8 @@ from moc_prices_source.engines.coins import \
     RIF_USD_B, RIF_USD_T, ETH_USD, ETH_USD_B, USDT_USD_B, USDT_USD, \
     BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB, BTC_ARS, RIF_USD_TB, \
     RIF_USD_WMTB, USD_COP_CCB, BTC_COP, MOC_USD_SOV, MOC_BTC_SOV, \
-    MOC_USD_OKU, BPRO_BTC, BPRO_ARS, BPRO_COP, BPRO_USD
+    MOC_USD_OKU, BPRO_BTC, BPRO_ARS, BPRO_COP, BPRO_USD, MOC_USD, \
+    MOC_BTC
 from moc_prices_source.weighing import weighted_median
 from moc_prices_source.cli import tabulate
 
@@ -41,7 +43,20 @@ computed_pairs = {
     },
     MOC_USD_WM: {
         'requirements': [MOC_BTC_SOV, BTC_USD, MOC_USD_OKU],
-        'formula': lambda moc_btc_sov, btc_usd, moc_usd_oku: weighted_median([moc_btc_sov * btc_usd, moc_usd_oku], [1,1])
+        'formula': lambda moc_btc_sov, btc_usd, moc_usd_oku: weighted_median(
+            [moc_btc_sov * btc_usd, moc_usd_oku], [1,1])
+    },
+    MOC_USD: { # Default option, weighted median
+        'requirements': [MOC_BTC_SOV, BTC_USD, MOC_USD_OKU],
+        'formula': lambda moc_btc_sov, btc_usd, moc_usd_oku: weighted_median(
+            [moc_btc_sov * btc_usd, moc_usd_oku],
+            [1, 1])
+    },
+    MOC_BTC: { # Default option, weighted median
+        'requirements': [MOC_BTC_SOV, BTC_USD, MOC_USD_OKU],
+        'formula': lambda moc_btc_sov, btc_usd, moc_usd_oku: weighted_median(
+            [moc_btc_sov * btc_usd, moc_usd_oku],
+            [1, 1]) / btc_usd
     },
     RIF_USD_B: { # Passing through Bitcoin
         'requirements': [RIF_BTC, BTC_USD],

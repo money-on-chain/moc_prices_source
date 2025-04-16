@@ -136,45 +136,90 @@ class CoinPair(object):
         return hash(str(self))
 
 
+# BNB/USD
+BNB_USD = CoinPair(BNB, USD)
+
+# BNB/USDT
+BNB_USDT = CoinPair(BNB, USDT)
+
+# BPRO/ARS
+BPRO_ARS = CoinPair(BPRO, ARS)
+
+# BPRO/BTC
+BPRO_BTC = CoinPair(BPRO, BTC)
+
+# BPRO/COP
+BPRO_COP = CoinPair(BPRO, COP)
+
+# BPRO/USD
+BPRO_USD = CoinPair(BPRO, USD, description="Offchain")
+
+# BTC/ARS
+BTC_ARS = CoinPair(BTC, ARS, min_ok_sources_count=3)
+
+# BTC/COP
+BTC_COP = CoinPair(BTC, COP, min_ok_sources_count=2)
+
+# BTC/USD
 BTC_USD = CoinPair(BTC, USD)
 BTC_USD_OCH = CoinPair(BTC, USD, "och", "Obtained from the blockchain")
-BTC_ARS = CoinPair(BTC, ARS, min_ok_sources_count=3)
-BTC_COP = CoinPair(BTC, COP, min_ok_sources_count=2)
+
+# BTC/USDT
+BTC_USDT = CoinPair(BTC, USDT)
+
+# ETH/BTC
+ETH_BTC = CoinPair(ETH, BTC)
+
+# ETH/USD
+ETH_USD = CoinPair(ETH, USD)
+ETH_USD_B = CoinPair(ETH, USD, "B", "Passing through Bitcoin")
+
+# GAS/BTC Rootstock gas price from nodes
+GAS_BTC = CoinPair(GAS, BTC, description="Rootstock gas price from nodes")
+
+# MOC/BTC
+MOC_BTC = CoinPair(MOC, BTC)
+MOC_BTC_SOV = CoinPair(MOC, BTC, "Sovryn")
+
+# MOC/USD
+MOC_USD = CoinPair(MOC, USD, description="Default option, weighted median")
+MOC_USD_OKU = CoinPair(MOC, USD, "Oku")
+MOC_USD_SOV = CoinPair(MOC, USD, "Sovryn")
+MOC_USD_WM = CoinPair(MOC, USD, "WM", "Weighted median")
+
+# RIF/BTC
 RIF_BTC = CoinPair(RIF, BTC)
 RIF_BTC_MP1P = CoinPair(RIF, BTC, "mp1%", "To move the price 1 percent")
+
+# RIF/USD
 RIF_USD = CoinPair(RIF, USD, description="Leave this as legacy")
 RIF_USD_B = CoinPair(RIF, USD, "B", "Passing through Bitcoin")
 RIF_USD_T = CoinPair(RIF, USD, "T", "Passing through Tether")
 RIF_USD_TB = CoinPair(RIF, USD, "TB", "Passing through Tether & Bitcoin")
 RIF_USD_WMTB = CoinPair(RIF, USD, "WMTB", "Passing through Tether & Bitcoin usinng weighted_median")
+
+# RIF/USDT
 RIF_USDT = CoinPair(RIF, USDT)
 RIF_USDT_MA = CoinPair(RIF, USDT, "MA", "Using the magic average algorithm with orderbook depth")
 RIF_USDT_MA2 = CoinPair(RIF, USDT, "MA2")
 RIF_USDT_MA3 = CoinPair(RIF, USDT, "MA3")
 RIF_USDT_MP1P = CoinPair(RIF, USDT, "mp1%", "To move the price 1 percent")
-MOC_BTC_SOV = CoinPair(MOC, BTC, "Sovryn")
-MOC_USD_OKU = CoinPair(MOC, USD, "Oku")
-MOC_USD_SOV = CoinPair(MOC, USD, "Sovryn")
-MOC_USD_WM = CoinPair(MOC, USD, "WM", "Weighted median")
-ETH_BTC = CoinPair(ETH, BTC)
-ETH_USD = CoinPair(ETH, USD)
-ETH_USD_B = CoinPair(ETH, USD, "B", "Passing through Bitcoin")
-BTC_USDT = CoinPair(BTC, USDT)
+
+# USD/ARS
+USD_ARS = CoinPair(USD, ARS, description="Free, from the news portals")
+USD_ARS_CCB = CoinPair(USD, ARS, "CCB")
+USD_ARS_CCL = CoinPair(USD, ARS, "CCL")
+
+# USD/COP
+USD_COP = CoinPair(USD, COP, description="Free, from the news portals")
+USD_COP_CCB = CoinPair(USD, COP, "CCB")
+
+# USD/MXN
+USD_MXN = CoinPair(USD, MXN)
+
+# USDT/USD
 USDT_USD = CoinPair(USDT, USD)
 USDT_USD_B = CoinPair(USDT, USD, "B", "Passing through Bitcoin")
-BNB_USDT = CoinPair(BNB, USDT)
-BNB_USD = CoinPair(BNB, USD)
-USD_ARS = CoinPair(USD, ARS)
-USD_ARS_CCL = CoinPair(USD, ARS, "CCL")
-USD_ARS_CCB = CoinPair(USD, ARS, "CCB")
-USD_MXN = CoinPair(USD, MXN)
-USD_COP = CoinPair(USD, COP)
-USD_COP_CCB = CoinPair(USD, COP, "CCB")
-GAS_BTC = CoinPair(GAS, BTC)
-BPRO_BTC = CoinPair(BPRO, BTC)
-BPRO_ARS = CoinPair(BPRO, ARS)
-BPRO_COP = CoinPair(BPRO, COP)
-BPRO_USD = CoinPair(BPRO, USD, description="Offchain")
 
 
 CoinPairs = [ c for c in locals().values() if isinstance(c, CoinPair) ]
