@@ -16,7 +16,7 @@ from moc_prices_source.engines.coins import \
     BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB, BTC_ARS, RIF_USD_TB, \
     RIF_USD_WMTB, USD_COP_CCB, BTC_COP, MOC_USD_SOV, MOC_BTC_SOV, \
     MOC_USD_OKU, BPRO_BTC, BPRO_ARS, BPRO_COP, BPRO_USD, MOC_USD, \
-    MOC_BTC
+    MOC_BTC, MOC_BPRO
 from moc_prices_source.weighing import weighted_median
 from moc_prices_source.cli import tabulate
 
@@ -57,6 +57,12 @@ computed_pairs = {
         'formula': lambda moc_btc_sov, btc_usd, moc_usd_oku: weighted_median(
             [moc_btc_sov * btc_usd, moc_usd_oku],
             [1, 1]) / btc_usd
+    },
+    MOC_BPRO: { # Default option, weighted median
+        'requirements': [MOC_BTC_SOV, BTC_USD, MOC_USD_OKU, BPRO_BTC],
+        'formula': lambda moc_btc_sov, btc_usd, moc_usd_oku, bpro_btc: weighted_median(
+            [moc_btc_sov * btc_usd, moc_usd_oku],
+            [1, 1]) / btc_usd * bpro_btc
     },
     RIF_USD_B: { # Passing through Bitcoin
         'requirements': [RIF_BTC, BTC_USD],

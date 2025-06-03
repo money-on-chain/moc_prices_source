@@ -177,6 +177,9 @@ ETH_USD_B = CoinPair(ETH, USD, "B", "Passing through Bitcoin")
 # GAS/BTC Rootstock gas price from nodes
 GAS_BTC = CoinPair(GAS, BTC, description="Rootstock gas price from nodes")
 
+# MOC/BPRO
+MOC_BPRO = CoinPair(MOC, BPRO)
+
 # MOC/BTC
 MOC_BTC = CoinPair(MOC, BTC)
 MOC_BTC_SOV = CoinPair(MOC, BTC, "Sovryn")
