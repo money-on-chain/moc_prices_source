@@ -13,8 +13,10 @@ This package includes a CLI tool that allows you to query the coinpair values in
 |----------|-----------------|--------|
 | ARS      | Peso Argentino  | $      |
 | BNB      | Binance Coin    | Ƀ      |
+| BPRO     | Bpro            |        |
 | BTC      | Bitcoin         | ₿      |
 | COP      | Peso Colombiano | $      |
+| DOC      | DOC Token       |        |
 | ETH      | Ether           | ⟠      |
 | GAS      | Gas             |        |
 | MOC      | MOC Token       |        |
@@ -26,96 +28,132 @@ This package includes a CLI tool that allows you to query the coinpair values in
 
 ## Coinpairs
 
-| Name           | Coinpair   | Variant   | Method   |
-|----------------|------------|-----------|----------|
-| BNB/USD        | BNB/USD    |           | Computed |
-| BNB/USDT       | BNB/USDT   |           | Weighted |
-| BTC/ARS        | BTC/ARS    |           | Weighted |
-| BTC/COP        | BTC/COP    |           | Weighted |
-| BTC/USD        | BTC/USD    |           | Weighted |
-| BTC/USDT       | BTC/USDT   |           | Weighted |
-| ETH/BTC        | ETH/BTC    |           | Weighted |
-| ETH/USD        | ETH/USD    |           | Computed |
-| GAS/BTC        | GAS/BTC    |           | Weighted |
-| MOC/BTC        | MOC/BTC    |           | Weighted |
-| MOC/USD        | MOC/USD    |           | Computed |
-| RIF/BTC        | RIF/BTC    |           | Weighted |
-| RIF/BTC(mp1%)  | RIF/BTC    | mp1%      | Weighted |
-| RIF/USD        | RIF/USD    |           | Computed |
-| RIF/USD(B)     | RIF/USD    | B         | Computed |
-| RIF/USD(T)     | RIF/USD    | T         | Computed |
-| RIF/USD(TB)    | RIF/USD    | TB        | Computed |
-| RIF/USD(WMTB)  | RIF/USD    | WMTB      | Computed |
-| RIF/USDT       | RIF/USDT   |           | Weighted |
-| RIF/USDT(MA)   | RIF/USDT   | MA        | Weighted |
-| RIF/USDT(MA2)  | RIF/USDT   | MA2       | Weighted |
-| RIF/USDT(MA3)  | RIF/USDT   | MA3       | Weighted |
-| RIF/USDT(mp1%) | RIF/USDT   | mp1%      | Weighted |
-| USD/ARS        | USD/ARS    |           | Weighted |
-| USD/ARS(CCB)   | USD/ARS    | CCB       | Computed |
-| USD/ARS(CCL)   | USD/ARS    | CCL       | Weighted |
-| USD/COP        | USD/COP    |           | Weighted |
-| USD/COP(CCB)   | USD/COP    | CCB       | Computed |
-| USD/MXN        | USD/MXN    |           | Weighted |
-| USDT/USD       | USDT/USD   |           | Weighted |
-| USDT/USD(B)    | USDT/USD   | B         | Computed |
+| Name            | Coinpair   | Variant   | Method   |
+|-----------------|------------|-----------|----------|
+| BNB/USD         | BNB/USD    |           | Computed |
+| BNB/USDT        | BNB/USDT   |           | Weighted |
+| BPRO/ARS        | BPRO/ARS   |           | Computed |
+| BPRO/BTC        | BPRO/BTC   |           | Weighted |
+| BPRO/COP        | BPRO/COP   |           | Computed |
+| BPRO/USD        | BPRO/USD   |           | Computed |
+| BTC/ARS         | BTC/ARS    |           | Weighted |
+| BTC/COP         | BTC/COP    |           | Weighted |
+| BTC/USD         | BTC/USD    |           | Weighted |
+| BTC/USDT        | BTC/USDT   |           | Weighted |
+| DOC/USD         | DOC/USD    |           | Weighted |
+| ETH/BTC         | ETH/BTC    |           | Weighted |
+| ETH/USD         | ETH/USD    |           | Weighted |
+| ETH/USD(B)      | ETH/USD    | B         | Computed |
+| GAS/BTC         | GAS/BTC    |           | Weighted |
+| MOC/BPRO        | MOC/BPRO   |           | Computed |
+| MOC/BTC         | MOC/BTC    |           | Computed |
+| MOC/BTC(Sovryn) | MOC/BTC    | Sovryn    | Weighted |
+| MOC/USD         | MOC/USD    |           | Computed |
+| MOC/USD(Oku)    | MOC/USD    | Oku       | Weighted |
+| MOC/USD(Sovryn) | MOC/USD    | Sovryn    | Computed |
+| MOC/USD(WM)     | MOC/USD    | WM        | Computed |
+| RIF/BTC         | RIF/BTC    |           | Weighted |
+| RIF/BTC(mp1%)   | RIF/BTC    | mp1%      | Weighted |
+| RIF/USD         | RIF/USD    |           | Computed |
+| RIF/USD(B)      | RIF/USD    | B         | Computed |
+| RIF/USD(T)      | RIF/USD    | T         | Computed |
+| RIF/USD(TB)     | RIF/USD    | TB        | Computed |
+| RIF/USD(WMTB)   | RIF/USD    | WMTB      | Computed |
+| RIF/USDT        | RIF/USDT   |           | Weighted |
+| RIF/USDT(MA)    | RIF/USDT   | MA        | Weighted |
+| RIF/USDT(MA2)   | RIF/USDT   | MA2       | Weighted |
+| RIF/USDT(MA3)   | RIF/USDT   | MA3       | Weighted |
+| RIF/USDT(mp1%)  | RIF/USDT   | mp1%      | Weighted |
+| USD/ARS         | USD/ARS    |           | Weighted |
+| USD/ARS(CCB)    | USD/ARS    | CCB       | Computed |
+| USD/ARS(CCL)    | USD/ARS    | CCL       | Weighted |
+| USD/COP         | USD/COP    |           | Weighted |
+| USD/COP(CCB)    | USD/COP    | CCB       | Computed |
+| USD/MXN         | USD/MXN    |           | Weighted |
+| USDT/USD        | USDT/USD   |           | Weighted |
+| USDT/USD(B)     | USDT/USD   | B         | Computed |
 
-| Method   | Description                                              |
-|----------|----------------------------------------------------------|
+| Method   | Description                                                |
+|----------|------------------------------------------------------------|
 | Weighted | Weighted median of values ​​obtained from multiple sources |
-| Computed | Compute made with previously obtained coinpairs          |
+| Computed | Compute made with previously obtained coinpairs            |
 
-| Name           | Comment/Description                                     |
-|----------------|---------------------------------------------------------|
-| BNB/USD        |                                                         |
-| BNB/USDT       |                                                         |
-| BTC/ARS        |                                                         |
-| BTC/COP        |                                                         |
-| BTC/USD        |                                                         |
-| BTC/USDT       |                                                         |
-| ETH/BTC        |                                                         |
-| ETH/USD        |                                                         |
-| GAS/BTC        |                                                         |
-| MOC/BTC        |                                                         |
-| MOC/USD        |                                                         |
-| RIF/BTC        |                                                         |
-| RIF/BTC(mp1%)  | To move the price 1 percent                             |
-| RIF/USD        | Leave this as legacy                                    |
-| RIF/USD(B)     | Passing through Bitcoin                                 |
-| RIF/USD(T)     | Passing through Tether                                  |
-| RIF/USD(TB)    | Passing through Tether & Bitcoin                        |
-| RIF/USD(WMTB)  | Passing through Tether & Bitcoin usinng weighted_median |
-| RIF/USDT       |                                                         |
-| RIF/USDT(MA)   | Using the magic average algorithm with orderbook depth  |
-| RIF/USDT(MA2)  |                                                         |
-| RIF/USDT(MA3)  |                                                         |
-| RIF/USDT(mp1%) | To move the price 1 percent                             |
-| USD/ARS        |                                                         |
-| USD/ARS(CCB)   |                                                         |
-| USD/ARS(CCL)   |                                                         |
-| USD/COP        |                                                         |
-| USD/COP(CCB)   |                                                         |
-| USD/MXN        |                                                         |
-| USDT/USD       |                                                         |
-| USDT/USD(B)    | Passing through Bitcoin                                 |
+| Name            | Comment/Description                                     |
+|-----------------|---------------------------------------------------------|
+| BNB/USD         |                                                         |
+| BNB/USDT        |                                                         |
+| BPRO/ARS        |                                                         |
+| BPRO/BTC        |                                                         |
+| BPRO/COP        |                                                         |
+| BPRO/USD        | Offchain                                                |
+| BTC/ARS         |                                                         |
+| BTC/COP         |                                                         |
+| BTC/USD         |                                                         |
+| BTC/USDT        |                                                         |
+| DOC/USD         | Pegged 1:1 to USD                                       |
+| ETH/BTC         |                                                         |
+| ETH/USD         |                                                         |
+| ETH/USD(B)      | Passing through Bitcoin                                 |
+| GAS/BTC         | Rootstock gas price from nodes                          |
+| MOC/BPRO        |                                                         |
+| MOC/BTC         |                                                         |
+| MOC/BTC(Sovryn) |                                                         |
+| MOC/USD         | Default option, weighted median                         |
+| MOC/USD(Oku)    |                                                         |
+| MOC/USD(Sovryn) |                                                         |
+| MOC/USD(WM)     | Weighted median                                         |
+| RIF/BTC         |                                                         |
+| RIF/BTC(mp1%)   | To move the price 1 percent                             |
+| RIF/USD         | Leave this as legacy                                    |
+| RIF/USD(B)      | Passing through Bitcoin                                 |
+| RIF/USD(T)      | Passing through Tether                                  |
+| RIF/USD(TB)     | Passing through Tether & Bitcoin                        |
+| RIF/USD(WMTB)   | Passing through Tether & Bitcoin usinng weighted_median |
+| RIF/USDT        |                                                         |
+| RIF/USDT(MA)    | Using the magic average algorithm with orderbook depth  |
+| RIF/USDT(MA2)   |                                                         |
+| RIF/USDT(MA3)   |                                                         |
+| RIF/USDT(mp1%)  | To move the price 1 percent                             |
+| USD/ARS         | Free, from the news portals                             |
+| USD/ARS(CCB)    |                                                         |
+| USD/ARS(CCL)    |                                                         |
+| USD/COP         | Free, from the news portals                             |
+| USD/COP(CCB)    |                                                         |
+| USD/MXN         |                                                         |
+| USDT/USD        |                                                         |
+| USDT/USD(B)     | Passing through Bitcoin                                 |
 
 
 ## Formulas used in the computed coinpairs
 
 ```
-BNB/USD        =  bnb_usdt * btc_usd / btc_usdt
-ETH/USD        =  eth_btc * btc_usd
-MOC/USD        =  moc_btc * btc_usd
-RIF/USD        =  rif_btc * btc_usd
-RIF/USD(B)     =  rif_btc * btc_usd
-RIF/USD(T)     =  rif_usdt * usdt_usd
-RIF/USD(TB)    =  rif_usdt * btc_usd / btc_usdt
-RIF/USD(WMTB)  =  weighted_median(
-                  [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
-                  [0.75, 0.25])
-USD/ARS(CCB)   =  btc_ars / btc_usd
-USD/COP(CCB)   =  btc_cop / btc_usd
-USDT/USD(B)    =  btc_usd / btc_usdt
+BNB/USD          =  bnb_usdt * btc_usd / btc_usdt
+BPRO/ARS         =  bpro_btc * btc_ars
+BPRO/COP         =  bpro_btc * btc_cop
+BPRO/USD         =  bpro_btc * btc_usd
+ETH/USD(B)       =  eth_btc * btc_usd
+MOC/BPRO         =  weighted_median(
+                    [moc_btc_sov * btc_usd, moc_usd_oku],
+                    [1, 1]) / btc_usd * bpro_btc
+MOC/BTC          =  weighted_median(
+                    [moc_btc_sov * btc_usd, moc_usd_oku],
+                    [1, 1]) / btc_usd
+MOC/USD          =  weighted_median(
+                    [moc_btc_sov * btc_usd, moc_usd_oku],
+                    [1, 1])
+MOC/USD(Sovryn)  =  moc_btc_sov * btc_usd
+MOC/USD(WM)      =  weighted_median(
+                    [moc_btc_sov * btc_usd, moc_usd_oku], [1,1])
+RIF/USD          =  rif_btc * btc_usd
+RIF/USD(B)       =  rif_btc * btc_usd
+RIF/USD(T)       =  rif_usdt * usdt_usd
+RIF/USD(TB)      =  rif_usdt * btc_usd / btc_usdt
+RIF/USD(WMTB)    =  weighted_median(
+                    [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
+                    [0.75, 0.25])
+USD/ARS(CCB)     =  btc_ars / btc_usd
+USD/COP(CCB)     =  btc_cop / btc_usd
+USDT/USD(B)      =  btc_usd / btc_usdt
 ```
 
 
@@ -137,15 +175,15 @@ sources and if necessary we apply the changes to the parameterization.
 
 ### For coinpair BTC/ARS (from Bitcoin to Peso Argentino)
 
-| Source        |   Weight | URI                                                                    |
-|---------------|----------|------------------------------------------------------------------------|
-| ArgenBTC      |     0.14 | https://argenbtc.com/cotizacion                                        |
-| belo.app      |     0.14 | https://api.belo.app/public/price                                      |
-| Binance       |     0.14 | https://api.binance.com/api/v3/ticker/24hr?symbol=BTCARS               |
-| BuenBit       |     0.14 | https://be.buenbit.com/api/market/tickers                              |
-| cryptomkt.com |     0.14 | https://api.exchange.cryptomkt.com/api/3/public/ticker/BTCARS          |
-| Decrypto      |     0.14 | https://api.decrypto.la/1.0/frontend/trading/data/prices               |
-| Lemoncash     |     0.14 | https://api.lemoncash.com.ar/api/v1/exchange-rates-quotations-external |
+| Source        |   Weight | URI                                                                                 |
+|---------------|----------|-------------------------------------------------------------------------------------|
+| ArgenBTC      |     0.14 | https://argenbtc.com/cotizacion                                                     |
+| belo.app      |     0.14 | https://api.belo.app/public/price                                                   |
+| Binance       |     0.14 | https://api.binance.com/api/v3/ticker/24hr?symbol=BTCARS                            |
+| BuenBit       |     0.14 | http://91f83c67-4611-4562-ae66-421ac3d642eb.buenbit.com/public/market_price/btc/ars |
+| cryptomkt.com |     0.14 | https://api.exchange.cryptomkt.com/api/3/public/ticker/BTCARS                       |
+| Decrypto      |     0.14 | https://api.decrypto.la/1.0/frontend/trading/data/prices                            |
+| Lemoncash     |     0.14 | https://api.lemoncash.com.ar/api/v1/exchange-rates-quotations-external              |
 
 
 ### For coinpair BTC/USD (from Bitcoin to Dollar)
@@ -157,6 +195,17 @@ sources and if necessary we apply the changes to the parameterization.
 | Bitfinex |     0.18 | https://api-pub.bitfinex.com/v2/ticker/tBTCUSD       |
 | Kraken   |     0.18 | https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD |
 | Gemini   |     0.17 | https://api.gemini.com/v1/pubticker/BTCUSD           |
+
+
+### For coinpair ETH/USD (from Ether to Dollar)
+
+| Source   |   Weight | URI                                                  |
+|----------|----------|------------------------------------------------------|
+| Coinbase |     0.25 | https://api.coinbase.com/v2/prices/ETH-USD/spot      |
+| Bitstamp |     0.22 | https://www.bitstamp.net/api/v2/ticker/ethusd/       |
+| Bitfinex |     0.18 | https://api-pub.bitfinex.com/v2/ticker/tETHUSD       |
+| Kraken   |     0.18 | https://api.kraken.com/0/public/Ticker?pair=XETHZUSD |
+| Gemini   |     0.17 | https://api.gemini.com/v1/pubticker/ETHUSD           |
 
 
 ### For coinpair RIF/BTC (from RIF Token to Bitcoin)
@@ -261,9 +310,24 @@ Only Binance (URI: https://api.binance.com/api/v3/ticker/24hr?symbol=BNBUSDT)
 | Bitso.com             |     0.10 | https://api.bitso.com/v3/ticker/?book=usd_mxn                                                 |
 
 
-### For coinpair MOC/BTC (from MOC Token to Bitcoin)
+### For coinpair MOC/BTC(Sovryn) (from MOC Token to Bitcoin)
 
 Only Sovryn onchain (URI: https://public-node.rsk.co)
+
+
+### For coinpair MOC/USD(Oku) (from MOC Token to Dollar)
+
+Only Oku onchain (URI: https://public-node.rsk.co)
+
+
+### For coinpair BPRO/BTC (from Bpro to Bitcoin)
+
+Only MOC onchain (URI: https://public-node.rsk.co)
+
+
+### For coinpair DOC/USD (from DOC Token to Dollar)
+
+Only Dummy (URI: None)
 
 
 ### For coinpair GAS/BTC (from Gas to Bitcoin)
@@ -290,11 +354,11 @@ Only RSK onchain (URI: https://public-node.rsk.co)
 
 ### For coinpair BTC/COP (from Bitcoin to Peso Colombiano)
 
-| Source        |   Weight | URI                                                           |
-|---------------|----------|---------------------------------------------------------------|
-| bitso.com     |     0.20 | https://api.bitso.com/v3/ticker/?book=btc_cop                 |
-| BuenBit       |     0.20 | https://be.buenbit.com/api/market/tickers                     |
-| cryptomkt.com |     0.20 | https://api.exchange.cryptomkt.com/api/3/public/ticker/BTCCOP |
-| Coinbase      |     0.20 | https://api.coinbase.com/v2/prices/BTC-COP/spot               |
-| buda.com      |     0.20 | https://www.buda.com/api/v2/markets/BTC-COP/ticker            |
+| Source        |   Weight | URI                                                                                 |
+|---------------|----------|-------------------------------------------------------------------------------------|
+| bitso.com     |     0.20 | https://api.bitso.com/v3/ticker/?book=btc_cop                                       |
+| BuenBit       |     0.20 | http://91f83c67-4611-4562-ae66-421ac3d642eb.buenbit.com/public/market_price/btc/cop |
+| cryptomkt.com |     0.20 | https://api.exchange.cryptomkt.com/api/3/public/ticker/BTCCOP                       |
+| Coinbase      |     0.20 | https://api.coinbase.com/v2/prices/BTC-COP/spot                                     |
+| buda.com      |     0.20 | https://www.buda.com/api/v2/markets/BTC-COP/ticker                                  |
 

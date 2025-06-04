@@ -87,6 +87,8 @@
 
     "bpro_btc_onchain": 1,
 
+    "doc_usd_constant": 1,
+
     "gas_btc_rsk": 1,
 
     "usdt_usd_bitstamp": 0.15,

@@ -60,6 +60,7 @@ MXN = Coin('Peso Mexicano', 'mxn', '$')
 COP = Coin('Peso Colombiano','cop', '$')
 GAS = Coin('Gas', 'gas')
 BPRO = Coin('Bpro', 'bpro')
+DOC = Coin('DOC Token', 'doc')
 
 
 Coins = [ c for c in locals().values() if isinstance(c, Coin) ]
@@ -153,6 +154,9 @@ BPRO_COP = CoinPair(BPRO, COP)
 
 # BPRO/USD
 BPRO_USD = CoinPair(BPRO, USD, description="Offchain")
+
+# DOC/USD
+DOC_USD = CoinPair(DOC, USD, description="Pegged 1:1 to USD")
 
 # BTC/ARS
 BTC_ARS = CoinPair(BTC, ARS, min_ok_sources_count=3)
