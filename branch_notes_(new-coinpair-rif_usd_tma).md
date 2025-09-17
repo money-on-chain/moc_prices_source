@@ -62,3 +62,13 @@ Response time 0.78s
 
 user@workstation:~/code/moc_prices_source$ 
 ```
+
+
+### ToDo list
+
+- [x] Add `RIF/USD(TMA)` coinpair
+- [ ] Bump Beta version to 0.7.4b10
+- [ ] Put pair `RIF/USD(TMA)` under monitoring as soon as possible
+- [ ] Verify and validate price sources and their weights for pair `USDT/USD`
+- [ ] Verify and validate the depth used in the order book for pair `RIF/USDT(MA)`
+
