@@ -16,7 +16,7 @@ from moc_prices_source.engines.coins import \
     BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB, BTC_ARS, RIF_USD_TB, \
     RIF_USD_WMTB, USD_COP_CCB, BTC_COP, MOC_USD_SOV, MOC_BTC_SOV, \
     MOC_USD_OKU, BPRO_BTC, BPRO_ARS, BPRO_COP, BPRO_USD, MOC_USD, \
-    MOC_BTC, MOC_BPRO
+    MOC_BTC, MOC_BPRO, RIF_USD_TMA, RIF_USDT_MA
 from moc_prices_source.weighing import weighted_median
 from moc_prices_source.cli import tabulate
 
@@ -81,6 +81,10 @@ computed_pairs = {
     RIF_USD_T: { # Passing through Tether
         'requirements': [RIF_USDT, USDT_USD],
         'formula': lambda rif_usdt, usdt_usd: rif_usdt * usdt_usd
+    },
+    RIF_USD_TMA: { # Passing through Tether, using the magic average algorithm with orderbook depth
+        'requirements': [RIF_USDT_MA, USDT_USD],
+        'formula': lambda rif_usdt_ma, usdt_usd: rif_usdt_ma * usdt_usd
     },
     RIF_USD: { # Leave this as legacy
         'requirements': [RIF_BTC, BTC_USD],

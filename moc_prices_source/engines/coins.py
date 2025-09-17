@@ -203,6 +203,7 @@ RIF_USD = CoinPair(RIF, USD, description="Leave this as legacy")
 RIF_USD_B = CoinPair(RIF, USD, "B", "Passing through Bitcoin")
 RIF_USD_T = CoinPair(RIF, USD, "T", "Passing through Tether")
 RIF_USD_TB = CoinPair(RIF, USD, "TB", "Passing through Tether & Bitcoin")
+RIF_USD_TMA = CoinPair(RIF, USD, "TMA", "Passing through Tether, using the magic average algorithm with orderbook depth")
 RIF_USD_WMTB = CoinPair(RIF, USD, "WMTB", "Passing through Tether & Bitcoin usinng weighted_median")
 
 # RIF/USDT
