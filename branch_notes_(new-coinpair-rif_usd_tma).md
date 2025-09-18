@@ -68,7 +68,7 @@ user@workstation:~/code/moc_prices_source$
 
 - [x] Add `RIF/USD(TMA)` coinpair
 - [x] Bump Beta version to 0.7.4b10
-- [ ] Put pair `RIF/USD(TMA)` under monitoring as soon as possible
+- [x] Put pair `RIF/USD(TMA)` under monitoring as soon as possible
 - [ ] Verify and validate price sources and their weights for pair `USDT/USD`
 - [ ] Verify and validate the depth used in the order book for pair `RIF/USDT(MA)`
 - [ ] Delete this file (`branch_notes_(new-coinpair-rif_usd_tma).md`) before merging to develop
