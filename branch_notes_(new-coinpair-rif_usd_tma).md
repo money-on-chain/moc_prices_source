@@ -90,7 +90,7 @@ user@workstation:~/code/moc_prices_source$
 - [x] Put pair `RIF/USD(TMA)` under monitoring as soon as possible
 - [x] Add `RIF/USD(TBMA)` coinpair
 - [x] Bump Beta version to 0.7.4b11
-- [ ] Put pair `RIF/USD(TBMA)` under monitoring as soon as possible
+- [x] Put pair `RIF/USD(TBMA)` under monitoring as soon as possible
 - [ ] Decide whether to use `RIF/USD(TMA)` or `RIF/USD(TBMA)` coinpair as the final for `RIF/USD`
 - [ ] Verify and validate price sources and their weights for pair `USDT/USD` or `BTC/USDT` 
 depending on whether `RIF/USD(TMA)` or `RIF/USD(TBMA)` is to be used definitively
