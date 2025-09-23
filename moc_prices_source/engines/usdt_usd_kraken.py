@@ -1,4 +1,4 @@
-from engine_base import Base, USDT_USD
+from engine_base import Base, USDT_USD, Decimal
 
 
 class Engine(Base):
@@ -12,7 +12,9 @@ class Engine(Base):
         keys = list(data['result'].keys())
         if 1==len(keys):
             return {
-                'price':  data['result'][keys[0]]['c'][0],
+                'price': (Decimal(data['result'][keys[0]]['a'][0]) +
+                          Decimal(data['result'][keys[0]]['b'][0])
+                          ) / Decimal('2'),
                 'volume': data['result'][keys[0]]['v'][1] }
 
 
