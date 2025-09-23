@@ -4,13 +4,13 @@ from engine_base import Base, USDT_USD, Decimal
 class Engine(Base):
 
     _name        = Base._name_from_file(__file__)
-    _description = "Coinbase"
-    _uri         = "https://api.exchange.coinbase.com/products/USDT-USD/ticker"
+    _description = "Gemini"
+    _uri         = "https://api.gemini.com/v1/pubticker/usdtusd"
     _coinpair    = USDT_USD
 
     def _map(self, data):
         return {
-            'price': (Decimal(data['ask']) + Decimal(data['bid'])) / Decimal('2')
+            'price': (Decimal(data['ask']) + Decimal(data['bid'])) / Decimal('2'),
             }
 
 

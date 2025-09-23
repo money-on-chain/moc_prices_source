@@ -92,8 +92,9 @@
     "gas_btc_rsk": 1,
 
     "usdt_usd_bitstamp": 0.15,
-    "usdt_usd_coinbase": 0.45,
-    "usdt_usd_kraken":   0.40,
+    "usdt_usd_coinbase": 0.35,
+    "usdt_usd_gemini":   0.15,
+    "usdt_usd_kraken":   0.35,
 
     "usd_cop_banrep":   0.5,
     "usd_cop_dolarhoy": 0.5,

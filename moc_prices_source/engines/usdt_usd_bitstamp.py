@@ -1,4 +1,4 @@
-from engine_base import Base, USDT_USD
+from engine_base import Base, USDT_USD, Decimal
 
 
 class Engine(Base):
@@ -10,7 +10,7 @@ class Engine(Base):
 
     def _map(self, data):
         return {
-            'price':  data['last'],
+            'price': (Decimal(data['ask']) + Decimal(data['bid'])) / Decimal('2'),
             'volume': data['volume']}
 
 
