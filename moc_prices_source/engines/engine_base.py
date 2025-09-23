@@ -1,9 +1,6 @@
 import requests, datetime, json, sys
-from sys import stderr
-from os.path import basename, dirname, abspath, expanduser
+from os.path import basename, dirname, abspath
 from decimal import Decimal
-from json.decoder import JSONDecodeError
-from redis import Redis
 from coins import *
 from bs4 import BeautifulSoup
 from web3 import Web3, HTTPProvider
@@ -14,7 +11,12 @@ base_dir = dirname(dirname(abspath(__file__)))
 bkpath   = sys.path[:]
 sys.path.insert(0, dirname(base_dir))
 
-from moc_prices_source.redis_conn import get_redis
+#FIXME: this is a workaround for circular import, this is horrible, fix it later
+try: 
+    from moc_prices_source.redis_conn import get_redis
+except ImportError:
+    def get_redis():
+        return None
 
 sys.path = bkpath
 
@@ -523,6 +525,7 @@ class BaseOnChain(Base):
         self._time = datetime.datetime.now() - start_time
 
         return True
+
 
 def get_env(name, default):
     try:
