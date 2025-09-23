@@ -95,7 +95,7 @@ user@workstation:~/code/moc_prices_source$
 - [x] Bump Beta version to 0.7.4b12
 - [x] Update monitoring as soon as possible to see the impact of changing weights
 - [x] Verify and validate price sources and their weights for pair `BTC/USDT` 
-- [ ] Bump Beta version to 0.7.4b13
+- [x] Bump Beta version to 0.7.4b13
 - [ ] Update monitoring as soon as possible to see the impact of changing weights
 - [ ] Verify and validate the depth used in the order book for pair `RIF/USDT(MA)` 
 - [ ] Decide whether to use `RIF/USD(TMA)` or `RIF/USD(TBMA)` coinpair as the final for `RIF/USD`
