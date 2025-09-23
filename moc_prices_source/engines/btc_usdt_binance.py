@@ -1,4 +1,4 @@
-from engine_base import BaseWithFailover, BTC_USDT, Base, Decimal
+from engine_base import BaseWithFailover, BTC_USDT, Decimal
 
 base_uri = "https://{}/api/v3/ticker/bookTicker?symbol=BTCUSDT"
 
