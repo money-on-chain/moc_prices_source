@@ -261,12 +261,13 @@ Only Binance (URI: https://api.binance.com/api/v3/depth?symbol=RIFUSDT)
 
 ### For coinpair BTC/USDT (from Bitcoin to Tether)
 
-| Source   |   Weight | URI                                                       |
-|----------|----------|-----------------------------------------------------------|
-| Binance  |     0.80 | https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT |
-| Bitfinex |     0.05 | https://api-pub.bitfinex.com/v2/ticker/tBTCUST            |
-| Kraken   |     0.05 | https://api.kraken.com/0/public/Ticker?pair=XBTUSDT       |
-| Coinbase |     0.10 | https://api.coinbase.com/v2/exchange-rates?currency=BTC   |
+| Source   |   Weight | URI                                                                   |
+|----------|----------|-----------------------------------------------------------------------|
+| Binance  |     0.65 | https://api.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT       |
+| OKX      |     0.15 | https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT              |
+| Bybit    |     0.10 | https://api.bybit.com/v5/market/tickers?category=spot&symbol=BTCUSDT  |
+| Huobi    |     0.05 | https://api.huobi.pro/market/detail/merged?symbol=btcusdt             |
+| KuCoin   |     0.05 | https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=BTC-USDT |
 
 
 ### For coinpair BNB/USDT (from Binance Coin to Tether)
@@ -343,11 +344,12 @@ Only RSK onchain (URI: https://public-node.rsk.co)
 
 ### For coinpair USDT/USD (from Tether to Dollar)
 
-| Source   |   Weight | URI                                                      |
-|----------|----------|----------------------------------------------------------|
-| Bitstamp |     0.15 | https://www.bitstamp.net/api/v2/ticker/usdtusd/          |
-| Coinbase |     0.45 | https://api.coinbase.com/v2/exchange-rates?currency=USDT |
-| Kraken   |     0.40 | https://api.kraken.com/0/public/Ticker?pair=USDTZUSD     |
+| Source   |   Weight | URI                                                        |
+|----------|----------|------------------------------------------------------------|
+| Bitstamp |     0.15 | https://www.bitstamp.net/api/v2/ticker/usdtusd/            |
+| Coinbase |     0.35 | https://api.exchange.coinbase.com/products/USDT-USD/ticker |
+| Gemini   |     0.15 | https://api.gemini.com/v1/pubticker/usdtusd                |
+| Kraken   |     0.35 | https://api.kraken.com/0/public/Ticker?pair=USDTUSD        |
 
 
 ### For coinpair USD/COP (from Dollar to Peso Colombiano)
