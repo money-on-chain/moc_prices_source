@@ -91,11 +91,10 @@ user@workstation:~/code/moc_prices_source$
 - [x] Add `RIF/USD(TBMA)` coinpair
 - [x] Bump Beta version to 0.7.4b11
 - [x] Put pair `RIF/USD(TBMA)` under monitoring as soon as possible
-- [ ] Find a more elegant fix for circular import in `engine_base` for now it is patched
 - [x] Verify and validate price sources and their weights for pair `USDT/USD` 
 - [x] Bump Beta version to 0.7.4b12
 - [x] Update monitoring as soon as possible to see the impact of changing weights
-- [ ] Verify and validate price sources and their weights for pair `BTC/USDT` 
+- [x] Verify and validate price sources and their weights for pair `BTC/USDT` 
 - [ ] Bump Beta version to 0.7.4b13
 - [ ] Update monitoring as soon as possible to see the impact of changing weights
 - [ ] Verify and validate the depth used in the order book for pair `RIF/USDT(MA)` 

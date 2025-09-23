@@ -1,6 +1,6 @@
-from engine_base import BaseWithFailover, BTC_USDT
+from engine_base import BaseWithFailover, BTC_USDT, Base, Decimal
 
-base_uri = "https://{}/api/v3/ticker/24hr?symbol=BTCUSDT"
+base_uri = "https://{}/api/v3/ticker/bookTicker?symbol=BTCUSDT"
 
 class Engine(BaseWithFailover):
 
@@ -13,8 +13,9 @@ class Engine(BaseWithFailover):
 
     def _map(self, data):
         return {
-            'price':  data['lastPrice'],
-            'volume': data['volume']}
+            'price': (Decimal(data['askPrice']) +
+                      Decimal(data['bidPrice'])) / Decimal('2')
+        }
 
 
 if __name__ == '__main__':

@@ -47,10 +47,14 @@
     "eth_btc_binance":  0.25,
     "eth_btc_gemini":   0,
 
-    "btc_usdt_binance":  0.80,
-    "btc_usdt_bitfinex": 0.05,
-    "btc_usdt_kraken":   0.05,
-    "btc_usdt_coinbase": 0.10,
+    "btc_usdt_binance":  0.65,
+    "btc_usdt_okx":      0.15,
+    "btc_usdt_bybit":    0.10,
+    "btc_usdt_huobi":    0.05,
+    "btc_usdt_kucoin":   0.05,
+    "btc_usdt_bitfinex": 0.00,
+    "btc_usdt_kraken":   0.00,
+    "btc_usdt_coinbase": 0.00,
 
     "bnb_usdt_binance": 1,
 
