@@ -80,52 +80,52 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | Weighted | Weighted median of values ​​obtained from multiple sources |
 | Computed | Compute made with previously obtained coinpairs          |
 
-| Name            | Comment/Description                                                                      |
-|-----------------|------------------------------------------------------------------------------------------|
-| BNB/USD         |                                                                                          |
-| BNB/USDT        |                                                                                          |
-| BPRO/ARS        |                                                                                          |
-| BPRO/BTC        |                                                                                          |
-| BPRO/COP        |                                                                                          |
-| BPRO/USD        | Offchain                                                                                 |
-| BTC/ARS         |                                                                                          |
-| BTC/COP         |                                                                                          |
-| BTC/USD         |                                                                                          |
-| BTC/USDT        |                                                                                          |
-| DOC/USD         | Pegged 1:1 to USD                                                                        |
-| ETH/BTC         |                                                                                          |
-| ETH/USD         |                                                                                          |
-| ETH/USD(B)      | Passing through Bitcoin                                                                  |
-| GAS/BTC         | Rootstock gas price from nodes                                                           |
-| MOC/BPRO        |                                                                                          |
-| MOC/BTC         |                                                                                          |
-| MOC/BTC(Sovryn) |                                                                                          |
-| MOC/USD         | Default option, weighted median                                                          |
-| MOC/USD(Oku)    |                                                                                          |
-| MOC/USD(Sovryn) |                                                                                          |
-| MOC/USD(WM)     | Weighted median                                                                          |
-| RIF/BTC         |                                                                                          |
-| RIF/BTC(mp1%)   | To move the price 1 percent                                                              |
-| RIF/USD         | Leave this as legacy                                                                     |
-| RIF/USD(B)      | Passing through Bitcoin                                                                  |
-| RIF/USD(T)      | Passing through Tether                                                                   |
-| RIF/USD(TB)     | Passing through Tether & Bitcoin                                                         |
-| RIF/USD(TBMA)   | Passing through Tether & Bitcoin, using the magic average algorithm with orderbook depth |
-| RIF/USD(TMA)    | Passing through Tether, using the magic average algorithm with orderbook depth           |
-| RIF/USD(WMTB)   | Passing through Tether & Bitcoin usinng weighted_median                                  |
-| RIF/USDT        |                                                                                          |
-| RIF/USDT(MA)    | Using the magic average algorithm with orderbook depth                                   |
-| RIF/USDT(MA2)   |                                                                                          |
-| RIF/USDT(MA3)   |                                                                                          |
-| RIF/USDT(mp1%)  | To move the price 1 percent                                                              |
-| USD/ARS         | Free, from the news portals                                                              |
-| USD/ARS(CCB)    |                                                                                          |
-| USD/ARS(CCL)    |                                                                                          |
-| USD/COP         | Free, from the news portals                                                              |
-| USD/COP(CCB)    |                                                                                          |
-| USD/MXN         |                                                                                          |
-| USDT/USD        |                                                                                          |
-| USDT/USD(B)     | Passing through Bitcoin                                                                  |
+| Name            | Comment/Description                                                 |
+|-----------------|---------------------------------------------------------------------|
+| BNB/USD         |                                                                     |
+| BNB/USDT        |                                                                     |
+| BPRO/ARS        |                                                                     |
+| BPRO/BTC        |                                                                     |
+| BPRO/COP        |                                                                     |
+| BPRO/USD        | Offchain                                                            |
+| BTC/ARS         |                                                                     |
+| BTC/COP         |                                                                     |
+| BTC/USD         |                                                                     |
+| BTC/USDT        |                                                                     |
+| DOC/USD         | Pegged 1:1 to USD                                                   |
+| ETH/BTC         |                                                                     |
+| ETH/USD         |                                                                     |
+| ETH/USD(B)      | Passing through Bitcoin                                             |
+| GAS/BTC         | Rootstock gas price from nodes                                      |
+| MOC/BPRO        |                                                                     |
+| MOC/BTC         |                                                                     |
+| MOC/BTC(Sovryn) |                                                                     |
+| MOC/USD         | Default option, weighted median                                     |
+| MOC/USD(Oku)    |                                                                     |
+| MOC/USD(Sovryn) |                                                                     |
+| MOC/USD(WM)     | Weighted median                                                     |
+| RIF/BTC         |                                                                     |
+| RIF/BTC(mp1%)   | To move the price 1 percent                                         |
+| RIF/USD         | Leave this as legacy                                                |
+| RIF/USD(B)      | Passing through Bitcoin                                             |
+| RIF/USD(T)      | Passing through Tether                                              |
+| RIF/USD(TB)     | Passing through Tether & Bitcoin                                    |
+| RIF/USD(TBMA)   | Passing through Tether & Bitcoin, using [WDAP](fudamentals/wdap.md) |
+| RIF/USD(TMA)    | Passing through Tether, using [WDAP](fudamentals/wdap.md)           |
+| RIF/USD(WMTB)   | Passing through Tether & Bitcoin usinng weighted_median             |
+| RIF/USDT        |                                                                     |
+| RIF/USDT(MA)    | Using [WDAP](fudamentals/wdap.md)                                   |
+| RIF/USDT(MA2)   |                                                                     |
+| RIF/USDT(MA3)   |                                                                     |
+| RIF/USDT(mp1%)  | To move the price 1 percent                                         |
+| USD/ARS         | Free, from the news portals                                         |
+| USD/ARS(CCB)    |                                                                     |
+| USD/ARS(CCL)    |                                                                     |
+| USD/COP         | Free, from the news portals                                         |
+| USD/COP(CCB)    |                                                                     |
+| USD/MXN         |                                                                     |
+| USDT/USD        |                                                                     |
+| USDT/USD(B)     | Passing through Bitcoin                                             |
 
 
 ## Formulas used in the computed coinpairs

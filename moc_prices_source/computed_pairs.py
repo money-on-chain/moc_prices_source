@@ -82,11 +82,11 @@ computed_pairs = {
         'requirements': [RIF_USDT, USDT_USD],
         'formula': lambda rif_usdt, usdt_usd: rif_usdt * usdt_usd
     },
-    RIF_USD_TBMA: { # Passing through Tether & Bitcoin, using the magic average algorithm with orderbook depth
+    RIF_USD_TBMA: { # Passing through Tether & Bitcoin, using WDAP
         'requirements': [RIF_USDT_MA, BTC_USD, BTC_USDT],
         'formula': lambda rif_usdt_ma, btc_usd, btc_usdt: rif_usdt_ma * btc_usd / btc_usdt
     },
-    RIF_USD_TMA: { # Passing through Tether, using the magic average algorithm with orderbook depth
+    RIF_USD_TMA: { # Passing through Tether, using WDAP
         'requirements': [RIF_USDT_MA, USDT_USD],
         'formula': lambda rif_usdt_ma, usdt_usd: rif_usdt_ma * usdt_usd
     },
