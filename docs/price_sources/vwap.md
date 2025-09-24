@@ -12,9 +12,9 @@ $$
 \sum_{i=1}^{n} q_i = Q
 $$
 
-- \(p_i\) = ask price at level \(i\)  
-- \(q_i\) = quantity taken at level \(i\)  
-- Keep summing levels until you fill exactly \(Q\).
+- 𝑝𝑖 = ask price at level 𝑖  
+- 𝒒𝑖 = quantity taken at level 𝑖  
+- Keep summing levels until you fill exactly 𝐐.
 
 This is your **average execution cost per unit** when buying `Q`.
 
@@ -32,8 +32,8 @@ $$
 \sum_{i=1}^{m} q_i = Q
 $$
 
-- \(p_i\) = bid price at level \(i\)  
-- \(q_i\) = quantity sold into level \(i\)
+- 𝑝𝑖 = bid price at level 𝑖
+- 𝒒𝑖 = quantity sold into level 𝑖
 
 This is your **average revenue per unit** for selling `Q`.
 
@@ -51,7 +51,7 @@ $$
 
 ### Why use Mid VWAP?
 
-- Symmetric between buy-cost and sell-proceeds for the **same quantity \(Q\)**.  
+- Symmetric between buy-cost and sell-proceeds for the **same quantity 𝐐**.  
 - Less sensitive to short-term order-book imbalances or spoofing.  
 - A **single robust reference price**, harder to manipulate than the last trade or top-of-book alone.
 
