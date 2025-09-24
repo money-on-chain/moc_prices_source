@@ -71,5 +71,4 @@ In practice, **Mid VWAP** is closer to a *consensus price* reflecting both sides
 
 - [Investopedia – Volume Weighted Average Price (VWAP)](https://www.investopedia.com/terms/v/vwap.asp)  
 - [Binance Futures – Mark Price and Funding Rate](https://www.binance.com/en/support/faq/binance-futures-how-is-mark-price-calculated-360033525031)  
-- [Pyth Network Docs – Price Feeds](https://docs.pyth.network/documentation/pythnet-price-feeds/about)  
-- [CFA Institute – VWAP definition](https://www.cfainstitute.org/en/research/foundation/2019/vwap)  
+- [Wikipedia – Volume-weighted average price](https://en.wikipedia.org/wiki/Volume-weighted_average_price)
