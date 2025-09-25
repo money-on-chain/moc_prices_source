@@ -99,7 +99,7 @@ user@workstation:~/code/moc_prices_source$
 - [x] Update monitoring as soon as possible to see the impact of changing weights
 - [x] Verify and validate the depth used in the order book for pair `RIF/USDT(MA)` 
 - [x] Fix Bybit API ban from U.S.A.
-- [x] Bump Beta version to 0.7.4b14
+- [x] Bump Beta version to 0.7.4b15
 - [ ] Update monitoring as soon as possible to see the impact of Bybit API ban fix
 - [ ] Decide whether to use `RIF/USD(TMA)` or `RIF/USD(TBMA)` coinpair as the final for `RIF/USD`
 - [ ] Delete this file (`branch_notes_(new-coinpair-rif_usd_tma).md`) before merging to develop
