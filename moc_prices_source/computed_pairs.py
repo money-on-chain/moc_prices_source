@@ -72,7 +72,7 @@ computed_pairs = {
         'requirements': [RIF_USDT, BTC_USD, BTC_USDT],
         'formula': lambda rif_usdt, btc_usd, btc_usdt: rif_usdt * btc_usd / btc_usdt
     },
-    RIF_USD_WMTB: { # Passing through Tether & Bitcoin usinng weighted_median
+    RIF_USD_WMTB: { # Passing through Tether & Bitcoin usinng weighted median
         'requirements': [RIF_USDT, BTC_USD, BTC_USDT, RIF_BTC],
         'formula': lambda rif_usdt, btc_usd, btc_usdt, rif_btc: weighted_median(
                 [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],

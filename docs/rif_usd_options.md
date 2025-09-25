@@ -80,7 +80,7 @@ Currently there are **8** options:
 | RIF/USD(TB)    | Passing through Tether & Bitcoin                                     |
 | RIF/USD(TBMA)  | Passing through Tether & Bitcoin, using [WDAP](fundamentals/wdap.md) |
 | RIF/USD(TMA)   | Passing through Tether, using [WDAP](fundamentals/wdap.md)           |
-| RIF/USD(WMTB)  | Passing through Tether & Bitcoin usinng weighted_median              |
+| RIF/USD(WMTB)  | Passing through Tether & Bitcoin usinng weighted median              |
 | RIF/USDT       |                                                                      |
 | RIF/USDT(MA)   | Using [WDAP](fundamentals/wdap.md)                                   |
 | RIF/USDT(MA2)  |                                                                      |
