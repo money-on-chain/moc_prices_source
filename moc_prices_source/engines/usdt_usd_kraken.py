@@ -7,6 +7,7 @@ class Engine(Base):
     _description = "Kraken"
     _uri         = "https://api.kraken.com/0/public/Ticker?pair=USDTUSD"
     _coinpair    = USDT_USD
+    _max_time_without_price_change = 3600 # 1h, zero means infinity
 
     def _map(self, data):
         keys = list(data['result'].keys())

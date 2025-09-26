@@ -101,6 +101,9 @@ user@workstation:~/code/moc_prices_source$
 - [x] Fix Bybit API ban from U.S.A.
 - [x] Bump Beta version to 0.7.4b15
 - [x] Update monitoring as soon as possible to see the impact of Bybit API ban fix
+- [x] Update param _max time without price change_ for `USDT/USD` Bitstamp, Coinbase, Gemini, and Kraken engines
+- [x] Bump Beta version to 0.7.4b16
+- [ ] Update monitoring as soon as possible to see the impact of last update param
 - [ ] Decide whether to use `RIF/USD(TMA)` or `RIF/USD(TBMA)` coinpair as the final for `RIF/USD`
 - [ ] Delete this file (`branch_notes_(new-coinpair-rif_usd_tma).md`) before merging to develop
 
