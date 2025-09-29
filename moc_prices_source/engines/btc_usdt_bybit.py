@@ -9,7 +9,7 @@ class Engine(BaseWithFailover):
     _uri          = base_uri.format("api.bybit.com")
     _uri_failover = base_uri.format("moc-proxy-api-bybit.moneyonchain.com")
     _coinpair     = BTC_USDT
-    _max_time_without_price_change = 0 # zero means infinity
+    _max_time_without_price_change = 600 # 10m, zero means infinity
 
     def _map(self, data):
         data = data['result']['list'][0]        
