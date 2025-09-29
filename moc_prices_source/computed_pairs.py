@@ -16,7 +16,7 @@ from moc_prices_source.engines.coins import \
     BTC_USDT, BNB_USD, BNB_USDT, USD_ARS_CCB, BTC_ARS, RIF_USD_TB, \
     RIF_USD_WMTB, USD_COP_CCB, BTC_COP, MOC_USD_SOV, MOC_BTC_SOV, \
     MOC_USD_OKU, BPRO_BTC, BPRO_ARS, BPRO_COP, BPRO_USD, MOC_USD, \
-    MOC_BTC, MOC_BPRO
+    MOC_BTC, MOC_BPRO, RIF_USD_TMA, RIF_USDT_MA, RIF_USD_TBMA
 from moc_prices_source.weighing import weighted_median
 from moc_prices_source.cli import tabulate
 
@@ -72,7 +72,7 @@ computed_pairs = {
         'requirements': [RIF_USDT, BTC_USD, BTC_USDT],
         'formula': lambda rif_usdt, btc_usd, btc_usdt: rif_usdt * btc_usd / btc_usdt
     },
-    RIF_USD_WMTB: { # Passing through Tether & Bitcoin usinng weighted_median
+    RIF_USD_WMTB: { # Passing through Tether & Bitcoin usinng weighted median
         'requirements': [RIF_USDT, BTC_USD, BTC_USDT, RIF_BTC],
         'formula': lambda rif_usdt, btc_usd, btc_usdt, rif_btc: weighted_median(
                 [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
@@ -81,6 +81,14 @@ computed_pairs = {
     RIF_USD_T: { # Passing through Tether
         'requirements': [RIF_USDT, USDT_USD],
         'formula': lambda rif_usdt, usdt_usd: rif_usdt * usdt_usd
+    },
+    RIF_USD_TBMA: { # Passing through Tether & Bitcoin, using WDAP
+        'requirements': [RIF_USDT_MA, BTC_USD, BTC_USDT],
+        'formula': lambda rif_usdt_ma, btc_usd, btc_usdt: rif_usdt_ma * btc_usd / btc_usdt
+    },
+    RIF_USD_TMA: { # Passing through Tether, using WDAP
+        'requirements': [RIF_USDT_MA, USDT_USD],
+        'formula': lambda rif_usdt_ma, usdt_usd: rif_usdt_ma * usdt_usd
     },
     RIF_USD: { # Leave this as legacy
         'requirements': [RIF_BTC, BTC_USD],

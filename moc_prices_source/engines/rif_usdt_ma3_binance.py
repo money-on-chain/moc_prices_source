@@ -15,6 +15,7 @@ if __name__ == '__main__':
     engine = Engine()
     engine()
     print(f"URI = {repr(engine.uri)}")
+    print(f"MAX_QUANTITY = {max_quantity}")
     print()
     print(engine)
     print()
