@@ -46,26 +46,29 @@ class Engine(BaseOnChain):
                 self._oracle_addr.lower().strip()
             )
         )
-
+    
+        str_error = None
+        value = None
+    
         try:            
 
             w3 = self.make_web3_obj_with_uri()
-
             oracle = w3.eth.contract(address=oracle_addr, abi=oracle_simplified_abi)
+            raw_value, ok = oracle.functions.peek().call()
 
-            value, ok = oracle.functions.peek().call()
-
-            if not ok:
-                self._error = 'invalid or expired price'
-                return None
-
-            value = Decimal(int(value.hex(), 16))/Decimal(10**18)
-            
-            return value
+            if ok:
+                value = Decimal(int(raw_value.hex(), 16))/Decimal(10**18)
+            else:
+                str_error = 'invalid or expired price'
 
         except Exception as e:
-            self._error = str(e)
-            return None
+            str_error = str(e)
+
+        if value is None:
+            self._error = str_error
+        
+        return value
+
 
 
 if __name__ == '__main__':

@@ -18,6 +18,9 @@ class Engine(BaseOnChain):
         wrbtc_tk_addr = self.to_checksum_address(self._wrbtc_tk_addr)
         moc_tk_addr = self.to_checksum_address(self._moc_tk_addr)
 
+        str_error = None
+        value = None
+
         try:
             
             w3 = self.make_web3_obj_with_uri()
@@ -28,13 +31,15 @@ class Engine(BaseOnChain):
             moc_reserve = moc_token.functions.balanceOf(pool_sc_addr).call()
             btc_reserve = wrbtc_token.functions.balanceOf(pool_sc_addr).call()
 
-            return btc_reserve/moc_reserve
+            value = btc_reserve/moc_reserve
 
         except Exception as e:
-            self._error = str(e)
-            return None
+            str_error = str(e)
 
-
+        if value is None:
+            self._error = str_error
+        
+        return value
 
 
 

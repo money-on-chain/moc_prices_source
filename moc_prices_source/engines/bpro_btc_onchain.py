@@ -44,21 +44,20 @@ class Engine(BaseOnChain):
             )
         )
 
+        str_error = None
+        value = None
         try:            
-
             w3 = self.make_web3_obj_with_uri()
-
             sc = w3.eth.contract(address=sc_addr, abi=simplified_abi)
-
-            value = sc.functions.bproTecPrice().call()
-
-            value = Decimal(int(value))/Decimal(10**18)
-            
-            return value
-
+            value = Decimal(int(sc.functions.bproTecPrice().call())
+                            )/Decimal(10**18)
         except Exception as e:
-            self._error = str(e)
-            return None
+            str_error = str(e)
+
+        if value is None:
+            self._error = str_error
+        
+        return value
 
 
 if __name__ == '__main__':
