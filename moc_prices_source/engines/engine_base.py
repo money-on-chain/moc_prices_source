@@ -431,6 +431,16 @@ class BaseWithFailover(Base):
         return ok
 
 
+class OneShotHTTPProvider(HTTPProvider):
+    def make_request(self, method, params):
+        payload = {"jsonrpc": "2.0", "method": method, "params": params, "id": 1}
+        headers = {"Content-Type": "application/json", "Connection": "close"}
+        with requests.Session() as s:
+            resp = s.post(self.endpoint_uri, headers=headers, data=json.dumps(payload))
+            resp.raise_for_status()
+            return resp.json()
+
+
 class BaseOnChain(Base):
 
     erc20_simplified_abi = """
@@ -458,6 +468,7 @@ class BaseOnChain(Base):
 """
     Web3 = Web3
     HTTPProvider = HTTPProvider
+    OneShotHTTPProvider = OneShotHTTPProvider
 
     def to_checksum_address(self, value):
         try:
@@ -465,8 +476,13 @@ class BaseOnChain(Base):
         except:
             return self.Web3.toChecksumAddress(value)
     
-    def make_web3_obj_with_uri(self):
-        return self.Web3(self.HTTPProvider(self._uri))
+
+    def make_web3_obj_with_uri(self, timeout=10):
+        return self.Web3(OneShotHTTPProvider(self._uri, request_kwargs={
+            'timeout': timeout,
+            'headers': {'Connection': 'close'}
+            }))
+
 
     def _get_price(self):
 
