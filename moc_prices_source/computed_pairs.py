@@ -3,14 +3,23 @@ from .cli import tabulate
 
 
 
-ComputedCoinPairs = [ c for c in CoinPairs.values() if c.is_computed ]
+ComputedCoinPairs = dict(
+    [ (name, obj) for name, obj in CoinPairs.items() if obj.is_computed ])
+
+
 computed_pairs = {}
-for c in ComputedCoinPairs:
+for c in ComputedCoinPairs.values():
     computed_pairs[c] = {
         'requirements': c.requirements,
         'formula': c.formula,
         'formula_desc': c.formula_desc
     }
+
+
+for name, coinpair in ComputedCoinPairs.items():
+    locals()[name] = coinpair
+del name, coinpair
+
 
 def show_computed_pairs_fromula():
     print()
