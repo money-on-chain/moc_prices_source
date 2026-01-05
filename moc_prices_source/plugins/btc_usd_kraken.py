@@ -1,0 +1,17 @@
+from .pairs import BTC_USD
+from .base import Base, engine_register
+
+
+
+@engine_register()
+class Engine(Base):
+
+    _name        = Base._name_from_file(__file__)
+    _description = "Kraken"
+    _uri         = "https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD"
+    _coinpair    = BTC_USD
+
+    def _map(self, data):
+        return {
+            'price':  data['result']['XXBTZUSD']['c'][0],
+            'volume': data['result']['XXBTZUSD']['v'][1] }

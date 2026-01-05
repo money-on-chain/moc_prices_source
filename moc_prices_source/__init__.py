@@ -1,27 +1,23 @@
-import sys, json, datetime
+import datetime
 from os.path import dirname, abspath
 from decimal import Decimal
+from .coins import Coins
+from .pairs import CoinPairs, get_coin_pairs
+from .engines import get_coinpair_list, get_engines_names, get_prices, session_storage
+from .computed_pairs import computed_pairs
+from .weighing import weighing, weighted_median, median, mean
+
+
 
 base_dir = dirname(abspath(__file__))
+
 
 with open(base_dir + "/version.txt", "r") as file_:
     version = file_.read().split()[0]
 __version__ = version
 
-bkpath   = sys.path[:]
-sys.path.insert(0, dirname(base_dir))
-
-from moc_prices_source.engines        import get_coinpair_list, get_engines_names, get_prices, session_storage
-from moc_prices_source.computed_pairs import computed_pairs
-from moc_prices_source.weighing       import weighing, weighted_median, median, mean
-from moc_prices_source.coins          import *
-
-sys.path = bkpath
-
-
 
 ALL = CoinPairs
-
 
 
 def get_price(
@@ -204,15 +200,3 @@ def get_price(
         return None
 
     return out
-
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    print('Version: {}'.format(version))
-    detail = {}
-    output = get_price(ALL, detail=detail, serializable=True)
-    print()
-    print(json.dumps(detail, indent=4, sort_keys=True))
-    print()
-    print('output = {}'.format(repr(output)))

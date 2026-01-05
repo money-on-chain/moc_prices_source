@@ -1,17 +1,6 @@
-import sys
-from os.path import dirname, abspath
+from .plugins import CoinPairs
+from .cli import tabulate
 
-
-
-base_dir = dirname(abspath(__file__))
-
-bkpath   = sys.path[:]
-sys.path.insert(0, dirname(base_dir), )
-
-from moc_prices_source.engines.coins import CoinPairs
-from moc_prices_source.cli import tabulate
-
-sys.path = bkpath
 
 
 ComputedCoinPairs = [ c for c in CoinPairs if c.is_computed ]
@@ -32,9 +21,3 @@ def show_computed_pairs_fromula():
              data in computed_pairs.items()]
     print(tabulate(table, tablefmt='plain'))
     print("")
-
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    show_computed_pairs_fromula()
