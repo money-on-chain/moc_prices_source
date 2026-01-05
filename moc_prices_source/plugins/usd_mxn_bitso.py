@@ -8,7 +8,7 @@ class Engine(Base):
 
     _description = "Bitso.com"
     _uri = "https://api.bitso.com/v3/ticker/?book=usd_mxn"
-    _coinpair = USD_MX
+    _coinpair = USD_MXN
     _max_age = 3600 # 1hs.
     _max_time_without_price_change = 0 # zero means infinity
 
