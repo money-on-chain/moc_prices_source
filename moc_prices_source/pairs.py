@@ -3,6 +3,11 @@ from .plugins import CoinPairs
 
 
 
+for name, coinpair in CoinPairs.items():
+    locals()[name] = coinpair
+del name, coinpair
+
+
 def get_coin_pair(value):
     value = str(value).strip().lower()
     return dict([ (str(c).strip().lower(), c

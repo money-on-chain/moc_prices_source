@@ -2,6 +2,11 @@ from .plugins import Coins
 
 
 
+for name, coin in Coins.items():
+    locals()[name] = coin
+del name, coin
+
+
 def get_coin(value):
     value = str(value).strip().lower()
     try:
