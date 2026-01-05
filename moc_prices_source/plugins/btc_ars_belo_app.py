@@ -6,12 +6,10 @@ from .base import Base, engine_register, Decimal
 @engine_register()
 class Engine(Base):
 
-    _name        = Base._name_from_file(__file__)
     _description = "belo.app"
-    _uri         = "https://api.belo.app/public/price"
-    _coinpair    = BTC_ARS
-    
-    _max_age                       = 3600 # 1hs.
+    _uri = "https://api.belo.app/public/price"
+    _coinpair = BTC_ARS   
+    _max_age = 3600 # 1hs.
     _max_time_without_price_change = 0    # zero means infinity
 
     def _map(self, data):

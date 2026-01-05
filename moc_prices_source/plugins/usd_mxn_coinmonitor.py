@@ -6,13 +6,11 @@ from .base import Base, engine_register
 @engine_register()
 class Engine(Base):
 
-    _name        = Base._name_from_file(__file__)
     _description = "CoinMonitor.info"
-    _uri         = "https://mx.coinmonitor.info/data_ar_chart_DOLAR.json"
-    _coinpair    = USD_MXN
-    
-    _max_age                       = 3600 # 1hs.
-    _max_time_without_price_change = 0    # zero means infinity
+    _uri = "https://mx.coinmonitor.info/data_ar_chart_DOLAR.json"
+    _coinpair = USD_MXN
+    _max_age = 3600 # 1hs.
+    _max_time_without_price_change = 0 # zero means infinity
 
     # I couldn't get it to work without this
     _ssl_verify = False

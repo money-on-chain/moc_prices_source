@@ -6,13 +6,11 @@ from .base import EngineWebScraping, engine_register, Decimal
 @engine_register()
 class Engine(EngineWebScraping):
 
-    _name        = EngineWebScraping._name_from_file(__file__)
     _description = "DolarHoy.com"
-    _uri         = "https://dolarhoy.com/cotizaciondolarcontadoconliqui"
-    _coinpair    = USD_ARS_CCL
-
-    _max_age                       = 10800 # 3hs.
-    _max_time_without_price_change = 0     # zero means infinity
+    _uri = "https://dolarhoy.com/cotizaciondolarcontadoconliqui"
+    _coinpair = USD_ARS_CCL
+    _max_age = 10800 # 3hs.
+    _max_time_without_price_change = 0 # zero means infinity
 
     def _scraping(self, html):
         value = None

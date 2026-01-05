@@ -6,7 +6,6 @@ from .base import Base, engine_register, Decimal, NoLiquidity
 @engine_register()
 class Engine(Base):
 
-    _name        = Base._name_from_file(__file__)
     _description = "cryptomkt.com"
     _uri = "https://api.exchange.cryptomkt.com/api/3/public/ticker/BTCCOP"
     _coinpair = BTC_COP

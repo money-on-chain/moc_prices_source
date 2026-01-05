@@ -6,13 +6,11 @@ from .base import Base, engine_register, Decimal
 @engine_register()
 class Engine(Base):
 
-    _name        = Base._name_from_file(__file__)
     _description = "Wise.com"
-    _uri         = "https://wise.com/rates/history+live?source=USD&target=MXN&length=1&resolution=hourly&unit=day"
-    _coinpair    = USD_MXN
-
-    _max_age                       = 3600 # 1hs.
-    _max_time_without_price_change = 0    # zero means infinity
+    _uri = "https://wise.com/rates/history+live?source=USD&target=MXN&length=1&resolution=hourly&unit=day"
+    _coinpair = USD_MXN
+    _max_age = 3600 # 1hs.
+    _max_time_without_price_change = 0 # zero means infinity
 
     def _map(self, data):
         try:

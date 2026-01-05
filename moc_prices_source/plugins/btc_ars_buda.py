@@ -6,13 +6,11 @@ from .base import Base, engine_register, Decimal
 @engine_register()
 class Engine(Base):
 
-    _name        = Base._name_from_file(__file__)
     _description = "buda.com"
-    _uri         = "https://www.buda.com/api/v2/markets/BTC-ARS/ticker"
-    _coinpair    = BTC_ARS
-    
-    _max_age                       = 3600 # 1hs.
-    _max_time_without_price_change = 0    # zero means infinity
+    _uri = "https://www.buda.com/api/v2/markets/BTC-ARS/ticker"
+    _coinpair = BTC_ARS
+    _max_age = 3600 # 1hs.
+    _max_time_without_price_change = 0 # zero means infinity
 
     def _map(self, data):
         return {

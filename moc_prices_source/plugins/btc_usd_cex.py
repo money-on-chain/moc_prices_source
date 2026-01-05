@@ -6,10 +6,9 @@ from .base import Base, engine_register
 @engine_register()
 class Engine(Base):
 
-    _name        = Base._name_from_file(__file__)
     _description = "Cex"
-    _uri         = "https://cex.io/api/ticker/BTC/USD"
-    _coinpair    = BTC_USD
+    _uri = "https://cex.io/api/ticker/BTC/USD"
+    _coinpair = BTC_USD
 
     def _map(self, data):
         return {

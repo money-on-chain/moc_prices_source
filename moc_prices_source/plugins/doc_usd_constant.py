@@ -6,7 +6,7 @@ import datetime
 
 @engine_register()
 class Engine(Base):
-    _name = Base._name_from_file(__file__)
+
     _description = "Dummy"
     _coinpair = DOC_USD
     _uri = None

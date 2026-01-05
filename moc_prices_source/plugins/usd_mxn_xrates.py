@@ -6,13 +6,11 @@ from .base import EngineWebScraping, engine_register, Decimal
 @engine_register()
 class Engine(EngineWebScraping):
 
-    _name        = EngineWebScraping._name_from_file(__file__)
     _description = "X-rates.com"
-    _uri         = "https://www.x-rates.com/calculator/?from=USD&to=MXN&amount=1"
-    _coinpair    = USD_MXN
-
-    _max_age                       = 3600 # 1hs.
-    _max_time_without_price_change = 0    # zero means infinity
+    _uri = "https://www.x-rates.com/calculator/?from=USD&to=MXN&amount=1"
+    _coinpair = USD_MXN
+    _max_age = 3600 # 1hs.
+    _max_time_without_price_change = 0 # zero means infinity
 
     def _scraping(self, html):
         value = None

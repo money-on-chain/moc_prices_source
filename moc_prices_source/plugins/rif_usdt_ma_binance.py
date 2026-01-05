@@ -13,11 +13,10 @@ allow_degraded = bool(allow_degraded in ['1', 't', 'true', 'y', 'yes', 'ok'])
 @engine_register()
 class Engine(BaseWithFailover):
 
-    _name         = BaseWithFailover._name_from_file(__file__)
-    _description  = "Binance"
-    _uri          = base_uri.format("api.binance.com")
+    _description = "Binance"
+    _uri = base_uri.format("api.binance.com")
     _uri_failover = base_uri.format("moc-proxy-api-binance.moneyonchain.com")
-    _coinpair     = RIF_USDT_MA
+    _coinpair = RIF_USDT_MA
     _max_quantity = max_quantity
     _allow_degraded = allow_degraded
     _max_time_without_price_change = 0 # zero means infinity

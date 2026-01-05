@@ -9,6 +9,5 @@ max_quantity = Decimal(get_env('MA_MAX3_QUANTITY', '600000'))
 @engine_register()
 class Engine(Base):
 
-    _name         = Base._name_from_file(__file__)
-    _coinpair     = RIF_USDT_MA3
+    _coinpair = RIF_USDT_MA3
     _max_quantity = max_quantity

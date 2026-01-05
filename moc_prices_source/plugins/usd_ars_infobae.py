@@ -8,13 +8,11 @@ to_dec = lambda x: Decimal(str(x).replace('.', '').replace(',', '.'))
 @engine_register()
 class Engine(EngineWebScraping):
 
-    _name        = EngineWebScraping._name_from_file(__file__)
     _description = "Infobae"
-    _uri         = "https://www.infobae.com/economia/divisas/dolar-hoy/"
-    _coinpair    = USD_ARS
-
-    _max_age                       = 3600 # 1hs.
-    _max_time_without_price_change = 0    # zero means infinity
+    _uri = "https://www.infobae.com/economia/divisas/dolar-hoy/"
+    _coinpair = USD_ARS
+    _max_age = 3600 # 1hs.
+    _max_time_without_price_change = 0 # zero means infinity
 
     def _scraping(self, html):
         value = None

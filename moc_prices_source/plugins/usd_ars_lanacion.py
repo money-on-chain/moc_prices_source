@@ -6,13 +6,12 @@ from .base import Base, engine_register, Decimal
 @engine_register()
 class Engine(Base):
 
-    _name        = Base._name_from_file(__file__)
+
     _description = "LaNacion.com.ar"
-    _uri         = "https://api-contenidos.lanacion.com.ar/json/V3/economia/cotizacionblue/DBLUE"
-    _coinpair    = USD_ARS
-    
-    _max_age                       = 3600 # 1hs.
-    _max_time_without_price_change = 0    # zero means infinity
+    _uri = "https://api-contenidos.lanacion.com.ar/json/V3/economia/cotizacionblue/DBLUE"
+    _coinpair = USD_ARS
+    _max_age = 3600 # 1hs.
+    _max_time_without_price_change = 0 # zero means infinity
 
     def _map(self, data):
         values = [data['compra'], data['venta']]

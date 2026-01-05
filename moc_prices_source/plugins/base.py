@@ -228,19 +228,19 @@ class NoLiquidity(Exception):
 
 class Base(object):
 
-    _name                          = "base"
-    _description                   = "Base Engine"
-    _method                        = 'get'
-    _uri                           = "http://api.pricefetcher.com/BTCUSD"
-    _payload                       = {}
-    _headers                       = {}
-    _coinpair                      = None
-    _timeout                       = 10
-    _max_age                       = 30
+    _name = None
+    _description = "Base Engine"
+    _method = 'get'
+    _uri = "http://api.pricefetcher.com/BTCUSD"
+    _payload = {}
+    _headers = {}
+    _coinpair = None
+    _timeout = 10
+    _max_age = 30
     _max_time_without_price_change = 180 # zero means infinity
-    _redis_expiration              = 3600
-    _ssl_verify                    = True
-    _rq_side_cache_time            = 3    
+    _redis_expiration = 3600
+    _ssl_verify = True
+    _rq_side_cache_time = 3    
 
 
 
@@ -280,6 +280,9 @@ class Base(object):
 
 
     def __init__(self, session=None, session_storage=None):
+
+        if self._name is None:
+            self._name = Path(getfile(self.__class__)).stem
         self._redis = get_redis()
         self._engine_session_id = app_name + '/' + self._name
         self._session_storage = session_storage
@@ -311,6 +314,7 @@ class Base(object):
     def timestamp(self):
         return self._timestamp
 
+
     @property
     def last_change_timestamp(self):
         return self._last_change_timestamp
@@ -323,14 +327,6 @@ class Base(object):
     @property
     def time(self):
         return self._time
-
-
-    @staticmethod
-    def _name_from_file(_file):
-        name = basename(_file)
-        if name.endswith('.py'):
-            name = name[:-3]
-        return name
 
 
     @staticmethod

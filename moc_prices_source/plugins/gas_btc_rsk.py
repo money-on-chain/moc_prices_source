@@ -6,11 +6,10 @@ from .base import BaseOnChain, engine_register, get_env, Decimal
 @engine_register()
 class Engine(BaseOnChain):
 
-    _name          = BaseOnChain._name_from_file(__file__)
-    _description   = "RSK onchain"
-    _coinpair      = GAS_BTC
-    _uri           = get_env('RSK_NODE', 'https://public-node.rsk.co')
-    _max           = 2*(10**10) #20Gwei
+    _description = "RSK onchain"
+    _coinpair = GAS_BTC
+    _uri = get_env('RSK_NODE', 'https://public-node.rsk.co')
+    _max = 2*(10**10) #20Gwei
 
 
     def _get_price(self):

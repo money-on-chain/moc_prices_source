@@ -12,13 +12,12 @@ to_dec = lambda x: Decimal(
 @engine_register()
 class Engine(EngineWebScraping):
 
-    _name        = EngineWebScraping._name_from_file(__file__)
-    _description = "DolarHoy.co"
-    _uri         = "https://www.dolarhoy.co"
-    _coinpair    = USD_COP
 
-    _max_age                       = 3600 # 1hs.
-    _max_time_without_price_change = 0    # zero means infinity
+    _description = "DolarHoy.co"
+    _uri = "https://www.dolarhoy.co"
+    _coinpair = USD_COP
+    _max_age = 3600 # 1hs.
+    _max_time_without_price_change = 0 # zero means infinity
 
 
     def _scraping(self, html):

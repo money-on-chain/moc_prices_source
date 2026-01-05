@@ -6,10 +6,9 @@ from .base import Base, engine_register
 @engine_register()
 class Engine(Base):
 
-    _name        = Base._name_from_file(__file__)
     _description = "Kraken"
-    _uri         = "https://api.kraken.com/0/public/Ticker?pair=XBTUSDT"
-    _coinpair    = BTC_USDT
+    _uri = "https://api.kraken.com/0/public/Ticker?pair=XBTUSDT"
+    _coinpair = BTC_USDT
     _max_time_without_price_change = 600 # 10m, zero means infinity
 
     def _map(self, data):

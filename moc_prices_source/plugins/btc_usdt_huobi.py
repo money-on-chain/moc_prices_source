@@ -6,10 +6,9 @@ from .base import Base, engine_register, Decimal
 @engine_register()
 class Engine(Base):
 
-    _name        = Base._name_from_file(__file__)
     _description = "Huobi"
-    _uri         = "https://api.huobi.pro/market/detail/merged?symbol=btcusdt"
-    _coinpair    = BTC_USDT
+    _uri = "https://api.huobi.pro/market/detail/merged?symbol=btcusdt"
+    _coinpair = BTC_USDT
     _max_time_without_price_change = 600 # 10m, zero means infinity
 
     def _map(self, data):

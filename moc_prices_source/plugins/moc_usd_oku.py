@@ -33,11 +33,10 @@ oracle_simplified_abi = """
 @engine_register()
 class Engine(BaseOnChain):
 
-    _name          = BaseOnChain._name_from_file(__file__)
-    _description   = "Oku onchain"
-    _coinpair      = MOC_USD_OKU
-    _uri           = get_env('RSK_NODE', 'https://public-node.rsk.co')
-    _oracle_addr   = get_env('MOC_BTC_ORACLE_ADDR', 'mainnet')
+    _description = "Oku onchain"
+    _coinpair = MOC_USD_OKU
+    _uri = get_env('RSK_NODE', 'https://public-node.rsk.co')
+    _oracle_addr = get_env('MOC_BTC_ORACLE_ADDR', 'mainnet')
 
     def _get_price(self):
 

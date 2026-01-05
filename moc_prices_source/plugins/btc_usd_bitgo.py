@@ -6,13 +6,13 @@ from .base import Base, engine_register
 @engine_register()
 class Engine(Base):
 
-    _name        = Base._name_from_file(__file__)
     _description = "BitGO"
-    _uri         = "https://www.bitgo.com/api/v1/market/latest"
-    _coinpair    = BTC_USD
+    _uri = "https://www.bitgo.com/api/v1/market/latest"
+    _coinpair = BTC_USD
 
     def _map(self, data):
         return {
             'price':  data['latest']['currencies']['USD']['last'],
             'volume': data['latest']['currencies']['USD']['total_vol'],
-            'timestamp': self._utcfromtimestamp(data['latest']['currencies']['USD']['timestamp']) }
+            'timestamp': self._utcfromtimestamp(data[
+                'latest']['currencies']['USD']['timestamp']) }

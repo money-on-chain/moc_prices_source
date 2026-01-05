@@ -6,10 +6,9 @@ from .base import Base, engine_register
 @engine_register()
 class Engine(Base):
 
-    _name        = Base._name_from_file(__file__)
     _description = "Bitfinex"
-    _uri         = "https://api-pub.bitfinex.com/v2/ticker/tRIFBTC"
-    _coinpair    = RIF_BTC
+    _uri = "https://api-pub.bitfinex.com/v2/ticker/tRIFBTC"
+    _coinpair = RIF_BTC
     _max_time_without_price_change = 0 # zero means infinity
 
     def _map(self, data):
