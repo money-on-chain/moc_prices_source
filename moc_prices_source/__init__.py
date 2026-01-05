@@ -18,7 +18,7 @@ with open(base_dir + "/version.txt", "r") as file_:
 __version__ = version
 
 
-ALL = CoinPairs.values()
+ALL = [c for c in CoinPairs.values()]
 for name, coinpair in CoinPairs.items():
     locals()[name] = coinpair
 del name, coinpair
@@ -70,7 +70,7 @@ def get_price(
         engines_names = list(weighing.keys())
 
     prices = get_prices(
-        coinpairs     = coinpairs,
+        coinpairs = coinpairs,
         engines_names = engines_names)
 
     for value in prices:
