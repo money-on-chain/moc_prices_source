@@ -31,6 +31,7 @@ def trim(s, len_=30, end=' [...]'):
         out = out[:(len_-len(end))] + end
     return out 
 
+
 def print_list(items):
     if not items:
         return

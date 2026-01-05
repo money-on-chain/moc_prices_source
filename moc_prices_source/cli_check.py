@@ -219,7 +219,8 @@ COINPAIRS_FILTER:
 
     if md_summary and not show_summary:
         print(
-            f"Error: '-m', '--markdown' option only works with '-s', '--summary'",
+            "Error: '-m', '--markdown' option only works "
+            "with '-s', '--summary'",
             file=stderr)
         return 1
 
@@ -246,7 +247,8 @@ COINPAIRS_FILTER:
         coinpairs = ALL
     if not coinpairs:
         print(
-            f"The {repr(coinpairs_filter)} filter did not return any results.",
+            f"The {repr(coinpairs_filter)} filter did not return "
+            "any results.",
             file=stderr)
         return 1
     
@@ -326,7 +328,8 @@ COINPAIRS_FILTER:
         row.append(d['weighted_median_price'])
         if 'prices' in d:
             if 'ok_sources_count' in d:
-                row.append(f"{d['ok_sources_count']} of {prices_count[coinpair]}")
+                row.append(
+                    f"{d['ok_sources_count']} of {prices_count[coinpair]}")
             else:
                 row.append(len(d['prices']))
         else:

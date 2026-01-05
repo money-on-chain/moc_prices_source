@@ -16,5 +16,6 @@ class Engine(Base):
 
     def _map(self, data):
         value = {}
-        value['price'] = (Decimal(data['precio_compra']) + Decimal(data['precio_venta'])) / Decimal('2')
+        value['price'] = (Decimal(data['precio_compra']) +
+                          Decimal(data['precio_venta'])) / Decimal('2')
         return value

@@ -1,6 +1,5 @@
 import datetime, json
 from time import sleep
-from tabulate import tabulate
 from sys import stderr
 from decimal import Decimal
 from . import get_price, ALL, get_coin_pairs

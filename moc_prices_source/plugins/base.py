@@ -23,7 +23,8 @@ class Coin(object):
     def __init__(self, name: str, symbol: str, small_symbol=None):
         self._name = str(name).strip()
         self._symbol =str(symbol).strip().upper()
-        self._small_symbol = str(small_symbol).strip() if small_symbol else None
+        self._small_symbol = str(small_symbol
+                                 ).strip() if small_symbol else None
 
     @property
     def name(self):
@@ -411,9 +412,13 @@ class Base(object):
         else:
             getter = rq.get
 
-        kargs = {'url':self.uri, 'timeout': self.timeout, 'verify': self._ssl_verify}
+        kargs = {'url': self.uri,
+                 'timeout': self.timeout,
+                 'verify': self._ssl_verify}
+        
         if self._payload:
             kargs['data'] = self._payload
+        
         if self._headers:
             kargs['headers'] = self._headers
 
@@ -472,7 +477,8 @@ class Base(object):
                 self._age = None
 
             if self._age!=None and self._age > self._max_age:
-                self._error = str(f"Response age error (age > {self._max_age})")
+                self._error = str(
+                    f"Response age error (age > {self._max_age})")
                 return None
             
             if self._redis is not None:
@@ -514,7 +520,8 @@ class Base(object):
             self._price = Decimal(str(info['price']))
         except Exception:
             if self._error is None:
-                self._error = "Engine error (bad mapping) trying to get 'price'"
+                self._error = \
+                    "Engine error (bad mapping) trying to get 'price'"
             return False
         
         if not self._price:
@@ -525,7 +532,8 @@ class Base(object):
             if isinstance(info['timestamp'], datetime.datetime):
                 self._timestamp = info['timestamp']
             else:
-                self._error = "Engine error (bad mapping) trying to get 'timestamp'"
+                self._error = \
+                    "Engine error (bad mapping) trying to get 'timestamp'"
                 return False
         else:
             self._timestamp = self._now()
@@ -535,7 +543,8 @@ class Base(object):
             try:
                 self._volume = Decimal(str(info['volume']))
             except Exception:
-                self._error = "Engine error (bad mapping)  trying to get 'volume'"
+                self._error = \
+                    "Engine error (bad mapping)  trying to get 'volume'"
                 return False
         else:
             self._volume = 0.0
@@ -562,7 +571,9 @@ class Base(object):
                     pre_data = {}
 
                 try:
-                    pre_last_change_timestamp = datetime.datetime.fromtimestamp(pre_data['last_change_timestamp'])
+                    pre_last_change_timestamp = \
+                        datetime.datetime.fromtimestamp(
+                            pre_data['last_change_timestamp'])
                 except Exception:
                     pre_last_change_timestamp = None
 
@@ -573,13 +584,18 @@ class Base(object):
 
                 if pre_price!=None and pre_last_change_timestamp!=None:
                     if pre_price==self._price:
-                        self._last_change_timestamp = pre_last_change_timestamp
+                        self._last_change_timestamp = \
+                            pre_last_change_timestamp
 
-                max_time_without_price_change = datetime.timedelta(seconds=self._max_time_without_price_change)
-                time_without_price_change     = datetime.datetime.now()-self._last_change_timestamp
+                max_time_without_price_change = \
+                    datetime.timedelta(
+                        seconds=self._max_time_without_price_change)
+                time_without_price_change = \
+                    datetime.datetime.now()-self._last_change_timestamp
 
                 if time_without_price_change > max_time_without_price_change:
-                    self._error = str(f"Too much time without price change (t > {max_time_without_price_change})")
+                    self._error = str("Too much time without price change ("
+                                      f"t > {max_time_without_price_change})")
                     return False
 
             if self._redis is not None:
@@ -630,10 +646,16 @@ class BaseWithFailover(Base):
 
 class OneShotHTTPProvider(HTTPProvider):
     def make_request(self, method, params):
-        payload = {"jsonrpc": "2.0", "method": method, "params": params, "id": 1}
-        headers = {"Content-Type": "application/json", "Connection": "close"}
+        payload = {"jsonrpc": "2.0",
+                   "method": method,
+                   "params": params,
+                   "id": 1}
+        headers = {"Content-Type": "application/json",
+                   "Connection": "close"}
         with requests.Session() as s:
-            resp = s.post(self.endpoint_uri, headers=headers, data=json.dumps(payload))
+            resp = s.post(self.endpoint_uri,
+                          headers=headers,
+                          data=json.dumps(payload))
             resp.raise_for_status()
             return resp.json()
 

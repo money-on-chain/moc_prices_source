@@ -1,4 +1,4 @@
-import datetime, sys
+import datetime
 from influxdb import InfluxDBClient
 from os.path import dirname, abspath
 from .conf import get
@@ -39,7 +39,6 @@ kargs = dict(
     places       = dirname(abspath(__file__)))
 
 get(**kargs)
-
 
 
 class Database(object):
