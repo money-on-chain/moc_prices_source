@@ -222,6 +222,10 @@ def register_pairs():
                 CoinPairs[name] = obj
 
 
+class NoLiquidity(Exception):
+    pass
+
+
 class Base(object):
 
     _name                          = "base"
@@ -518,6 +522,11 @@ class Base(object):
         try:
             info = self._map(response)
             self._price = Decimal(str(info['price']))
+        except NoLiquidity:
+            if self._error is None:
+                self._error = \
+                    "No liquidity, no price"
+            return False
         except Exception:
             if self._error is None:
                 self._error = \
