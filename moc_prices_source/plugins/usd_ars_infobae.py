@@ -18,7 +18,7 @@ class Engine(EngineWebScraping):
         value = None
         for s in html.find_all ('div', attrs={'class':'exchange-dolar-item'}):
             d = list(map(lambda x: x.strip(), s.strings))
-            if len(d)==6 and d[0]=='Dólar Libre':
+            if len(d)==6 and d[0]=='Dólar blue':
                 try:
                     value = value = to_dec(d[2])
                 except:

@@ -1,6 +1,6 @@
 from .pairs import USD_MXN
 from .base import EngineWebScraping, engine_register, Decimal
-
+from json import loads as json_load
 
 
 @engine_register()
@@ -15,15 +15,13 @@ class Engine(EngineWebScraping):
 
     def _scraping(self, html):
         value = None
-        for s in html.find_all('span', class_="ultimo_21334 last-value" ):
-            d = s.string.strip().split()
-            if len(d)==2 and d[1]=="/$":
-                try:
-                    value = Decimal(d[0].replace(',', '.'))
-                except:
-                    value = None
-                if value:
-                    break
+        for s in html.find_all('script', type="application/ld+json" ):
+            try:
+                value = Decimal(json_load(s.string.strip()).get('price'))
+            except:
+                value = None
+            if value:
+                break
         if not value:
             self._error = "Response format error"
             return None
