@@ -1,22 +1,15 @@
-import sys, json
+import json
 from datetime import datetime, timedelta
-from os.path import dirname, abspath
 from tabulate import tabulate
 from sys import stderr
 from collections import namedtuple
+from . import ALL, get_coin_pairs
+from .redis_conn import get_redis, redis_conf_file
+from .cli import command, cli
 
 
-bkpath   = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
 
-from moc_prices_source import ALL, BTC_USD, get_coin_pairs
-from moc_prices_source.redis_conn import get_redis, redis_conf_file
-from moc_prices_source.cli import command, cli
-
-sys.path = bkpath
 app_name = 'moc_prices_source'
-
 
 
 Price = namedtuple('Price', 'value timestamp')
@@ -121,11 +114,3 @@ COINPAIRS_FILTER:
     table = [[str(c), p.value, p.timestamp] for (c, p) in data.items()]
     
     print(tabulate(table, headers=['CoinPair', 'Value', 'Last date/time']))
-
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    from_db = FromDB()
-    print(from_db(BTC_USD, max_age=None))
-    

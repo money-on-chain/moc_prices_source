@@ -1,17 +1,10 @@
-import json, sys
+import json
 from sys import stderr
 from os.path import basename, dirname, abspath, expanduser
 from json.decoder import JSONDecodeError
 from redis import Redis
 from time import sleep
-
-bkpath   = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
-
-from moc_prices_source.my_logging import make_log
-
-sys.path = bkpath
+from .my_logging import make_log
 
 
 
@@ -99,13 +92,3 @@ def get_redis(retry_count=retry_count, retry_delay=retry_delay, log=log):
         print(msg, file=stderr)
         exit(1)
     return redis
-
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    print()
-    print(f"{redis_conf_file=}")
-    print(f"{use_redis=}")
-    print(f"{redis_conn_parameters=}")
-

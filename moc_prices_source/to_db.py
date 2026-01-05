@@ -1,29 +1,21 @@
-import sys, datetime, json
-from os.path import dirname, abspath
+import datetime, json
 from time import sleep
 from tabulate import tabulate
 from sys import stderr
 from decimal import Decimal
+from . import get_price, ALL, get_coin_pairs
+from .cli import command, option, cli
+from .database import make_db_conn
+from .my_logging import make_log, INFO, DEBUG, VERBOSE
+from .redis_conn import get_redis, redis_conf_file
 
-bkpath = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
 
-from moc_prices_source import get_price
-from moc_prices_source import ALL, get_coin_pairs
-from moc_prices_source.cli import command, option, cli
-from moc_prices_source.database import make_db_conn
-from moc_prices_source.my_logging import make_log, INFO, DEBUG, VERBOSE
-from moc_prices_source.redis_conn import get_redis, redis_conf_file
 
-sys.path = bkpath
 app_name = 'moc_prices_source'
-
 
 
 class OutputClose(Exception):
     pass
-
 
 
 class OutputBase(object):
@@ -69,7 +61,6 @@ class OutputBase(object):
 
     def _end(self):
         pass
-
 
 
 class OutputDB(OutputBase):
@@ -138,7 +129,6 @@ class OutputDB(OutputBase):
                 into = f"redis@{kargs['time_'].strftime('%Y-%m-%dT%H:%M:%S')}"
                 self._info(
                     f"Insert into {into} {len(kargs['fields'])*2} fileds.")
-
 
 
 def get_values(log,
@@ -242,7 +232,6 @@ def get_values(log,
     return out
 
 
-
 @command()
 @option('-v', '--verbose', 'verbose', count=True,
     help='Verbose mode.')
@@ -329,13 +318,3 @@ COINPAIRS_FILTER:
 
     if not condition():
         log.info(f'Ends (interval {interval}m)')        
-
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    log = make_log(app_name, level = INFO)
-    values = get_values(log)
-    print()
-    print(tabulate(values, headers=['timestamp', 'key', 'value']))
-    print()

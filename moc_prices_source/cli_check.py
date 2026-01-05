@@ -1,20 +1,14 @@
-import json, sys
-from os.path import dirname, abspath
+import json
 from decimal import Decimal
+from sys import stderr
+from . import version
+from . import get_price, ALL, get_coin_pairs
+from .cli import command, option, tabulate, trim, cli
+from .weighing import weighing
+from .engines import all_engines
+from .computed_pairs import show_computed_pairs_fromula, computed_pairs
 
 
-bkpath   = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
-
-from moc_prices_source.cli            import command, option, tabulate, trim, cli
-from moc_prices_source.weighing       import weighing
-from moc_prices_source                import version
-from moc_prices_source                import get_price, ALL, get_coin_pairs
-from moc_prices_source.engines        import all_engines
-from moc_prices_source.computed_pairs import show_computed_pairs_fromula, computed_pairs
-
-sys.path = bkpath
 
 def summary(coinpairs, md=False):
 
@@ -226,7 +220,7 @@ COINPAIRS_FILTER:
     if md_summary and not show_summary:
         print(
             f"Error: '-m', '--markdown' option only works with '-s', '--summary'",
-            file=sys.stderr)
+            file=stderr)
         return 1
 
     if show_version:
@@ -253,7 +247,7 @@ COINPAIRS_FILTER:
     if not coinpairs:
         print(
             f"The {repr(coinpairs_filter)} filter did not return any results.",
-            file=sys.stderr)
+            file=stderr)
         return 1
     
     if show_summary:

@@ -81,16 +81,3 @@ def get_prices(coinpairs=None, engines_names=None, engines_list=None):
     ##########################################################################
 
     return [ engine.as_dict for engine in engines_list ]
-
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    for data in get_prices():
-        print()
-        print('{}:'.format(data['name']))
-        print()
-        for key, value in data.items():
-            if key!='name':
-                print('    {} = {}'.format(key, value))
-    print()

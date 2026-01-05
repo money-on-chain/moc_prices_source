@@ -21,8 +21,3 @@ def make_log(name, level = VERBOSE):
     logger.verbose = types.MethodType(verbose, logger)
 
     return logger
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    log = make_log(basename(__file__))
-    log.info('Hello world!')

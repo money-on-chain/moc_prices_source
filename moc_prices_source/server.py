@@ -1,6 +1,4 @@
-import sys
 from os import getenv
-from os.path  import dirname, abspath
 from decimal import Decimal
 from fnmatch import fnmatch as match
 from tabulate import tabulate
@@ -9,17 +7,11 @@ from flask import Flask, request, redirect, jsonify, make_response
 from flask_restx import Api, Resource, reqparse, abort
 from flask_cors import CORS
 from flask_caching import Cache
+from . import get_price, version
+from . import ALL as AllCoinPairs
+from .cli import command, option
+from .redis_conn import use_redis
 
-bkpath   = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
-
-from moc_prices_source import get_price, version
-from moc_prices_source import ALL as AllCoinPairs
-from moc_prices_source.cli import command, option
-from moc_prices_source.redis_conn import use_redis
-
-sys.path = bkpath
 
 
 title='MoC prices source API Rest webservice'

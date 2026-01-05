@@ -16,13 +16,3 @@ class Engine(Base):
         return {
             'price':  data['data']['latestPrice'],
             'volume': data['data']['volume24h'] }
-
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    engine = Engine()
-    engine()
-    print(engine)
-    if engine.error:
-        print(engine.error)

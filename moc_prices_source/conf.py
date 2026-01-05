@@ -135,7 +135,3 @@ def check_env(d, p = [], env_pre='ENV', env_dict={}):
                 if value != None:
                     d[key] = value
 
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))

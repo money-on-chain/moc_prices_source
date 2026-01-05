@@ -44,8 +44,3 @@ def print_list(items):
         if (i + 1) % cols == 0:
             print()
     print()
-
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
