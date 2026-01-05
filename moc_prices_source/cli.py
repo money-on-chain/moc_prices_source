@@ -35,6 +35,9 @@ def print_list(items):
     if not items:
         return
     
+    items = list(map(str, items))
+    items.sort()
+    
     width = shutil.get_terminal_size().columns
     col_width = max(len(s) for s in items) + 2
     cols = max(1, width // col_width)
