@@ -17,7 +17,13 @@ with open(base_dir + "/version.txt", "r") as file_:
 __version__ = version
 
 
-ALL = CoinPairs
+ALL = CoinPairs.values()
+for name, coinpair in CoinPairs.items():
+    locals()[name] = coinpair
+del name, coinpair
+for name, coin in Coins.items():
+    locals()[name] = coin
+del name, coin
 
 
 def get_price(

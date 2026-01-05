@@ -65,13 +65,13 @@ class Coin(object):
         return hash(str(self))
 
 
-Coins = []
+Coins = {}
 
 def register_coins():
-    for obj in currentframe().f_back.f_locals.values():
+    for name, obj in currentframe().f_back.f_locals.items():
         if isinstance(obj, Coin):
-            if not obj in Coins:
-                Coins.append(obj)
+            if not name in Coins:
+                Coins[name] = obj
 
 
 class CoinPair(object):
@@ -212,13 +212,13 @@ class CoinPair(object):
         return hash(str(self))
 
 
-CoinPairs = []
+CoinPairs = {}
 
 def register_pairs():
-    for obj in currentframe().f_back.f_locals.values():
+    for name, obj in currentframe().f_back.f_locals.items():
         if isinstance(obj, CoinPair):
-            if not obj in CoinPairs:
-                CoinPairs.append(obj)
+            if not name in CoinPairs:
+                CoinPairs[name] = obj
 
 
 class Base(object):

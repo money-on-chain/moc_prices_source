@@ -5,7 +5,8 @@ from .plugins import CoinPairs
 
 def get_coin_pair(value):
     value = str(value).strip().lower()
-    return dict([ (str(c).strip().lower(), c) for c in CoinPairs ])[value]
+    return dict([ (str(c).strip().lower(), c
+                   ) for c in CoinPairs.values() ])[value]
 
 
 def get_coin_pairs(
@@ -16,7 +17,7 @@ def get_coin_pairs(
     Get all coin pairs that match the wildcard.
     """
     if coinpairs_base is None:
-        coinpairs_base =  CoinPairs
+        coinpairs_base = CoinPairs.values()
     wildcards_base = str(wildcard).lower().replace(" ", ",").split(",")
     wildcards = list(set([w for w in wildcards_base if w]))
     coinpairs = []
@@ -26,4 +27,3 @@ def get_coin_pairs(
         coinpairs.extend(f)
     coinpairs = list(set(coinpairs))
     return coinpairs
-

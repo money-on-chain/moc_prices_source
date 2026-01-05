@@ -3,7 +3,7 @@ from .cli import tabulate
 
 
 
-ComputedCoinPairs = [ c for c in CoinPairs if c.is_computed ]
+ComputedCoinPairs = [ c for c in CoinPairs.values() if c.is_computed ]
 computed_pairs = {}
 for c in ComputedCoinPairs:
     computed_pairs[c] = {

@@ -1,6 +1,5 @@
 from .base import Engines, CoinPairs, Coins
-from ..cli import command_group, command, argument, BadParameter, tabulate, \
-    print_list
+from ..cli import command_group, command, argument, BadParameter, print_list
 
 
 
@@ -12,13 +11,13 @@ def cli():
 @command(cli)
 def coins():
     """ List available coins. """
-    print(tabulate([c.as_dict for c in Coins], headers="keys"))
+    print_list(Coins.keys())
 
 
 @command(cli)
 def pairs():
     """ List available coin pairs. """
-    print(tabulate([c.as_dict for c in CoinPairs], headers="keys"))
+    print_list(CoinPairs.keys())
 
 
 @command(cli)
