@@ -1,4 +1,4 @@
-from .base import CoinPair, register_pairs
+from .base import CoinPair, register_pairs, get_env
 from .coins import BTC, USD, RIF, MOC, ETH, USDT, BNB, ARS, MXN, COP, GAS, BPRO, DOC
 
 
@@ -15,10 +15,12 @@ BPRO_BTC = CoinPair(BPRO, BTC)
 DOC_USD = CoinPair(DOC, USD, description="Pegged 1:1 to USD")
 
 # BTC/ARS
-BTC_ARS = CoinPair(BTC, ARS, min_ok_sources_count=3)
+BTC_ARS = CoinPair(BTC, ARS,
+    min_ok_sources_count=get_env('BTC_ARS_MIN_OK_SOURCES_COUNT', 3, int))
 
 # BTC/COP
-BTC_COP = CoinPair(BTC, COP, min_ok_sources_count=2)
+BTC_COP = CoinPair(BTC, COP,
+    min_ok_sources_count=get_env('BTC_COP_MIN_OK_SOURCES_COUNT', 2, int))
 
 # BTC/USD
 BTC_USD = CoinPair(BTC, USD)
