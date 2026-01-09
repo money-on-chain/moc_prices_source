@@ -1,4 +1,4 @@
-import requests, datetime, json
+import requests, datetime, json, sys
 from typing import Optional, Callable
 from types import LambdaType
 from pathlib import Path
@@ -767,11 +767,20 @@ class BaseOnChain(Base):
         return True
 
 
-def get_env(name, default):
+def get_env(name, default, cast=str):
     try:
-        return str(environ[name])
-    except KeyError :
+        value = environ[name]
+    except KeyError:
         return default
+    try:
+        return cast(value)
+    except Exception as e:
+        print(
+            f"ERROR: invalid value for env var {name}: {value!r} "
+            f"(expected {cast.__name__})",
+            file=sys.stderr
+        )
+        sys.exit(1)
 
 
 Engines = {}
