@@ -1,34 +1,7 @@
 from .pairs import BTC_USD_OCH
-from .base import BaseOnChain, engine_register, get_env, Decimal
+from .base import BaseOnChain, engine_register, get_env, Decimal, Address
 
 
-
-btc_usd_oracle_addr_options = {
-    'mainnet': '0xe2927A0620b82A66D67F678FC9b826B0E01B1bFD', 
-}
-
-oracle_simplified_abi = """
-  [
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "peek",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        },
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    }
-  ]
-"""
 
 @engine_register()
 class Engine(BaseOnChain):
@@ -36,34 +9,25 @@ class Engine(BaseOnChain):
     _description = "MOC onchain"
     _coinpair = BTC_USD_OCH
     _uri = get_env('RSK_NODE', 'https://public-node.rsk.co')
-    _oracle_addr = get_env('BTC_USD_ORACLE_ADDR', 'mainnet')
+    _oracle_addr = get_env('BTC_USD_ORACLE_ADDR',
+                           '0xe2927A0620b82A66D67F678FC9b826B0E01B1bFD',
+                           cast=Address)
 
     def _get_price(self):
-
-        oracle_addr = self.to_checksum_address(
-            btc_usd_oracle_addr_options.get(
-                self._oracle_addr.lower().strip(),
-                self._oracle_addr.lower().strip()
-            )
-        )
 
         str_error = None
         value = None
 
         try:
-            
-            w3 = self.make_web3_obj_with_uri()
-            oracle = w3.eth.contract(address=oracle_addr, abi=oracle_simplified_abi)
-            raw_value, ok = oracle.functions.peek().call()
-
+            evm = self.make_evm_with_uri()
+            value_b, ok = evm.call(self._oracle_addr, 'peek()(bytes32,bool)')
             if ok:
-                value = Decimal(int(raw_value.hex(), 16))/Decimal(10**18)
+                value = Decimal(int(value_b.hex(), 16))/Decimal(10**18)
             else:
                 str_error = 'invalid or expired price'
-
         except Exception as e:
             str_error = str(e)
-        
+
         if value is None:
             self._error = str_error
         

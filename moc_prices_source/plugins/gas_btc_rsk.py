@@ -20,7 +20,7 @@ class Engine(BaseOnChain):
             self._error = str(e)
             return None
 
-        # Fix: backcompatibility with various we3 versions
+        # Fix: backcompatibility with various web3 versions
         value = None
         attributes = ['gas_price', 'gasPrice']
         not_get = True

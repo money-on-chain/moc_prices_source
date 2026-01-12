@@ -6,10 +6,10 @@ from inspect import getfile, currentframe, getsource
 from os.path import basename, dirname, abspath
 from decimal import Decimal, InvalidOperation
 from bs4 import BeautifulSoup
-from web3 import Web3, HTTPProvider
 from os import environ
 from requests import Response
 from ..redis_conn import get_redis
+from ..evm import OneShotHTTPProvider, HTTPProvider, Web3, EVM, Address
 
 
 
@@ -649,56 +649,16 @@ class BaseWithFailover(Base):
         return ok
 
 
-class OneShotHTTPProvider(HTTPProvider):
-    def make_request(self, method, params):
-        payload = {"jsonrpc": "2.0",
-                   "method": method,
-                   "params": params,
-                   "id": 1}
-        headers = {"Content-Type": "application/json",
-                   "Connection": "close"}
-        with requests.Session() as s:
-            resp = s.post(self.endpoint_uri,
-                          headers=headers,
-                          data=json.dumps(payload))
-            resp.raise_for_status()
-            return resp.json()
-
-
 class BaseOnChain(Base):
 
-    erc20_simplified_abi = """
-[
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "name": "_owner",
-                "type": "address"
-            }
-        ],
-        "name": "balanceOf",
-        "outputs": [
-            {
-                "name": "balance",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    }
-]
-"""
     Web3 = Web3
+    EVM = EVM
+    Address = Address
     HTTPProvider = HTTPProvider
     OneShotHTTPProvider = OneShotHTTPProvider
 
     def to_checksum_address(self, value):
-        try:
-            return self.Web3.to_checksum_address(value)
-        except:
-            return self.Web3.toChecksumAddress(value)
+        return self.Web3.to_checksum_address(value)
     
 
     def make_web3_obj_with_uri(self, timeout=10):
@@ -707,6 +667,8 @@ class BaseOnChain(Base):
             'headers': {'Connection': 'close'}
             }))
 
+    def make_evm_with_uri(self, timeout=10):
+        return EVM(self.make_web3_obj_with_uri(timeout=timeout))
 
     def _get_price(self):
 
