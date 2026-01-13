@@ -1,5 +1,5 @@
 from .pairs import GAS_BTC
-from .base import BaseOnChain, engine_register, get_env, Decimal
+from .base import BaseOnChain, engine_register, Decimal
 
 
 
@@ -8,7 +8,6 @@ class Engine(BaseOnChain):
 
     _description = "RSK onchain"
     _coinpair = GAS_BTC
-    _uri = get_env('RSK_NODE', 'https://public-node.rsk.co')
     _max = 2*(10**10) #20Gwei
 
 

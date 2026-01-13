@@ -1,15 +1,16 @@
-import requests, datetime, json, sys
-from typing import Optional, Callable
+import requests, datetime, json
+from typing import Optional, Callable, Tuple, Any
 from types import LambdaType
 from pathlib import Path
 from inspect import getfile, currentframe, getsource
 from os.path import basename, dirname, abspath
 from decimal import Decimal, InvalidOperation
 from bs4 import BeautifulSoup
-from os import environ
 from requests import Response
 from ..redis_conn import get_redis
-from ..evm import OneShotHTTPProvider, HTTPProvider, Web3, EVM, Address
+from ..evm import OneShotHTTPProvider, HTTPProvider, Web3, EVM, Address, \
+    URI, get_addr_env, get_uri_env, get_node_rpc_uri_env
+from ..cli import get_env
 
 
 
@@ -623,12 +624,14 @@ class EngineWebScraping(Base):
             'price':  value
         }
 
+
     def _json(self, response):
         html = BeautifulSoup(response.text, 'lxml')
         data = self._scraping(html)
         if self._error: 
             self._error += " (Web scraping)"
         return data
+
 
     def _map(self, data):
         return data
@@ -651,15 +654,17 @@ class BaseWithFailover(Base):
 
 class BaseOnChain(Base):
 
+    _uri = get_node_rpc_uri_env()
+
     Web3 = Web3
     EVM = EVM
     Address = Address
+    URI = URI
     HTTPProvider = HTTPProvider
     OneShotHTTPProvider = OneShotHTTPProvider
 
     def to_checksum_address(self, value):
         return self.Web3.to_checksum_address(value)
-    
 
     def make_web3_obj_with_uri(self, timeout=10):
         return self.Web3(OneShotHTTPProvider(self._uri, request_kwargs={
@@ -670,16 +675,26 @@ class BaseOnChain(Base):
     def make_evm_with_uri(self, timeout=10):
         return EVM(self.make_web3_obj_with_uri(timeout=timeout))
 
+    def _get_value_from_evm(self, evm: EVM
+                            ) -> Tuple[Optional[Decimal], Optional[str]]:
+        value, str_error = None, None
+        # evm.call()...
+        return value, str_error
+
     def _get_price(self):
 
+        value, str_error = None, None
+
         try:
-
-            return 0
-
+            evm = self.make_evm_with_uri()
+            value, str_error = self._get_value_from_evm(evm)
         except Exception as e:
-            self._error = str(e)
-            return None
+            str_error = str(e)
 
+        if value is None:
+            self._error = str_error
+        
+        return value
 
     def __call__(self, start_time=None):
 
@@ -727,22 +742,6 @@ class BaseOnChain(Base):
         self._time = datetime.datetime.now() - start_time
 
         return True
-
-
-def get_env(name, default, cast=str):
-    try:
-        value = environ[name]
-    except KeyError:
-        return default
-    try:
-        return cast(value)
-    except Exception as e:
-        print(
-            f"ERROR: invalid value for env var {name}: {value!r} "
-            f"(expected {cast.__name__})",
-            file=sys.stderr
-        )
-        sys.exit(1)
 
 
 Engines = {}

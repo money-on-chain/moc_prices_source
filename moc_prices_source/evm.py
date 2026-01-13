@@ -13,6 +13,9 @@ try:
     from eth_abi import encode as abi_encode
 except ImportError:
     from eth_abi.abi import encode_abi as abi_encode
+from urllib.parse import urlparse
+from .cli import get_env
+
 
 
 class Web3(Web3base):
@@ -237,39 +240,63 @@ class EVMCallError(RuntimeError):
 addr_zero = '0x0000000000000000000000000000000000000000'
 
 
-def Address(addr: str | int) -> str:
-    """ Address validator """
+class Address(str):
 
-    if addr is None:
-        raise ValueError('addr is None')
-    
-    if hasattr(addr, 'address'):
-        addr = addr.address
+    def __new__(cls, addr: str | int):
 
-    if isinstance(addr, int):
+        if addr is None:
+            raise ValueError('addr is None')
+        
+        if hasattr(addr, 'address'):
+            addr = addr.address
 
-        addr = hex(addr)[2:]
-        addr = addr[-40:]
-        addr = "0" * (40-len(addr)) + addr
+        if isinstance(addr, int):
 
-    else:
+            addr = hex(addr)[2:]
+            addr = addr[-40:]
+            addr = "0" * (40-len(addr)) + addr
 
-        addr = str(addr).strip()
+        else:
 
-        if addr.startswith('0x'):
-            addr = addr[2:]
+            addr = str(addr).strip()
 
+            if addr.startswith('0x'):
+                addr = addr[2:]
+
+            try:
+                int(addr, 16)
+            except:
+                raise ValueError('addr is not hexa')
+
+            if len(addr) != 40:
+                raise ValueError('addr has less o more than 40 digits')
+
+        addr = '0x' + addr.lower()
+
+        return super().__new__(cls, addr)
+
+
+class URI(str):
+
+    def __new__(cls, uri: str):
+
+        if uri is None:
+            raise ValueError('uri is None')
+        
+        ok = False
         try:
-            int(addr, 16)
-        except:
-            raise ValueError('addr is not hexa')
-
-        if len(addr) != 40:
-            raise ValueError('addr has less o more than 40 digits')
-
-    addr = '0x' + addr.lower()
-
-    return addr
+            data = urlparse(uri)
+            ok = all([
+                data.scheme,
+                data.netloc
+            ])
+        except Exception:
+            pass
+        
+        if ok:
+            return super().__new__(cls, uri)
+        else:
+            raise ValueError(f"{repr(uri)} is not a valid URI")
 
 
 class EVM():
@@ -353,3 +380,22 @@ class EVM():
             raise EVMCallError(f"eth_call failed: {e}") from e
 
         return fn_spec.decode_outputs(result)
+
+
+def get_addr_env(env_name: str, default_addr:str) -> str:
+    return get_env(env_name, Address(default_addr), cast=Address)
+
+
+def get_uri_env(env_name: str, default_addr: Optional[str] = '') -> str:
+    return get_env(env_name, default_addr, cast=URI)
+
+
+def get_node_rpc_uri_env(env_name: str = 'NODE_RPC_URI',
+                         default_addr: str = 'rootstock') -> str:
+    return get_env(env_name, default_addr,
+        cast=URI,
+        alias={
+            'rootstock': 'https://public-node.rsk.co',
+            'rsk': 'rootstock',
+            'rsk_mainnet': 'rootstock'
+            })
