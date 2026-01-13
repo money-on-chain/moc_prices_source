@@ -1,25 +1,17 @@
-import sys
-from os.path  import dirname, abspath
-
-bkpath   = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
-
-from moc_prices_source.engines.coins import *
-
-sys.path = bkpath
+from .plugins import Coins
 
 
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    print()
-    print('Coins:')
-    for c in Coins:
-        if c.small_symbol:
-            print(f'    {c.name} ({c.symbol} or {c.small_symbol})')
-        else:
-            print(f'    {c.name} ({c.symbol})')
-    print()
-    print('Coin pairs:')
-    for c in CoinPairs:
-        print(f'    {c} (from {c.from_.name} to {c.to_.name})')
+
+for name, coin in Coins.items():
+    locals()[name] = coin
+del name, coin
+
+
+def get_coin(value):
+    value = str(value).strip().lower()
+    try:
+        return dict([ (str(c.name).strip().lower(), c
+                       ) for c in Coins.values()])[value]
+    except KeyError:
+        return dict([ (str(c).strip().lower(), c
+                       ) for c in Coins.values()])[value]

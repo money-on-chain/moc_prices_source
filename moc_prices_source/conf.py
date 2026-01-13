@@ -1,26 +1,25 @@
 import json
-
-from os.path      import dirname, abspath, basename, expanduser, exists
+from os.path import dirname, abspath, basename, expanduser, exists
 from json.decoder import JSONDecodeError
-from sys          import stderr, argv
-from os           import environ, makedirs
-from errno        import EEXIST
-from shutil       import copyfile
+from sys import stderr, argv
+from os import environ, makedirs
+from errno import EEXIST
+from shutil import copyfile
+
 
 
 app_name = basename(__file__)
 
 
-
 def get(out = {},
-        call_back    = lambda x: {},
-        files        = ['main.json', 'main_default.json'],
-        name         = '',
-        env_pre      = 'ENV',
-        dir_         = '/',
-        app_name     = 'moc_prices_source',
+        call_back = lambda x: {},
+        files = ['main.json', 'main_default.json'],
+        name = '',
+        env_pre = 'ENV',
+        dir_ = '/',
+        app_name = 'moc_prices_source',
         copy_to_home = False,
-        places       = None):
+        places = None):
 
     config_options = None
     file_          = None
@@ -75,10 +74,12 @@ def get(out = {},
     try:
         data = call_back(config_options)
     except ValueError as e:
-        print('Error in "{}", Value error: {}'.format(file_, str(e)), file=stderr)
+        print('Error in "{}", Value error: {}'.format(
+            file_, str(e)), file=stderr)
         exit(1)
     except KeyError as e:
-        print('Error in "{}", Key error: {}'.format(file_, str(e)), file=stderr)
+        print('Error in "{}", Key error: {}'.format(
+            file_, str(e)), file=stderr)
         exit(1)
     except TypeError:
         if name:
@@ -88,7 +89,8 @@ def get(out = {},
         print(message, file=stderr)
         exit(1)
 
-    new_config_options_json = json.dumps(config_options, indent=4, sort_keys=True)
+    new_config_options_json = json.dumps(config_options,
+                                         indent=4, sort_keys=True)
 
     if  new_config_options_json!=config_options_json:
         with open(first_file, 'w') as f:
@@ -120,7 +122,8 @@ def check_env(d, p = [], env_pre='ENV', env_dict={}):
         if type(d[key])==dict:
             check_env(d[key], p + [key], env_pre, env_dict)
         else:
-            env_name = '_'.join('_'.join([env_pre] + p + [key]).upper().split())
+            env_name = '_'.join('_'.join([env_pre] + p + [key]
+                                         ).upper().split())
             env_fnc  = type(d[key])
             try:
                 raw = environ[env_name]
@@ -135,7 +138,3 @@ def check_env(d, p = [], env_pre='ENV', env_dict={}):
                 if value != None:
                     d[key] = value
 
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))

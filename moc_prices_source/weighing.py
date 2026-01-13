@@ -1,4 +1,4 @@
-import datetime, requests, sys
+import datetime, requests
 from os.path import dirname, abspath
 from json import load, dumps, loads
 from json.decoder import JSONDecodeError
@@ -7,17 +7,11 @@ from statistics import median, mean
 from tabulate import tabulate
 from decimal import Decimal
 from os import environ
+from .conf import get
 
-bkpath   = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
 
-from moc_prices_source.conf import get
-
-sys.path = bkpath
 
 env_pre = 'MOC_PRICES_SOURCE'
-
 on_remote_differences_options = ['halt', 'error', 'remote', 'local']
 
 enabled = None
@@ -264,14 +258,3 @@ def weighted_median_idx(values, weights):
         if cumulative_probability >= 0.5:
             return sorted_tuples[i][2]
     return sorted_tuples[-1][2]
-
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    print("Config file: {}".format(repr(filename)))
-    print()
-    print('weighing.as_dict = {}'.format(repr(weighing.as_dict)))
-    print()
-    print(weighing)
-    print()

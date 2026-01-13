@@ -1,22 +1,13 @@
-import datetime, sys
+import datetime
 from influxdb import InfluxDBClient
 from os.path import dirname, abspath
-
-bkpath   = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
-
-from moc_prices_source.conf import get
-from moc_prices_source.my_logging import make_log
-
-sys.path = bkpath
+from .conf import get
+from .my_logging import make_log
 
 
 
 DEBUG_MODE = False
 ENABLED_COIRRECTION_TO_GMT = True
-
-
 
 to_gmt=0
 if ENABLED_COIRRECTION_TO_GMT:
@@ -24,7 +15,6 @@ if ENABLED_COIRRECTION_TO_GMT:
                               datetime.datetime.now()).seconds)/3600))
     if to_gmt==24:
         to_gmt=0
-
 
 db_conf = None
 envs = {}
@@ -49,8 +39,6 @@ kargs = dict(
     places       = dirname(abspath(__file__)))
 
 get(**kargs)
-
-
 
 
 class Database(object):
@@ -235,14 +223,3 @@ class Database(object):
 
 def make_db_conn():
     return Database(**db_conf)
-
-
-
-if __name__ == '__main__':
-
-    print("File: {}, Ok!".format(repr(__file__)))
-    print("Config file: {}, Ok!".format(repr(config_file)))
-    try:
-        database = make_db_conn()
-    except Exception as e:
-        exit(0)

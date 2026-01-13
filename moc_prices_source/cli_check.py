@@ -1,20 +1,14 @@
-import json, sys
-from os.path import dirname, abspath
+import json
 from decimal import Decimal
+from sys import stderr
+from . import version
+from . import get_price, ALL, get_coin_pairs
+from .cli import command, option, tabulate, trim, cli
+from .weighing import weighing
+from .engines import all_engines
+from .computed_pairs import show_computed_pairs_fromula, computed_pairs
 
 
-bkpath   = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
-
-from moc_prices_source.cli            import command, option, tabulate, trim, cli
-from moc_prices_source.weighing       import weighing
-from moc_prices_source                import version
-from moc_prices_source                import get_price, ALL, get_coin_pairs
-from moc_prices_source.engines        import all_engines
-from moc_prices_source.computed_pairs import show_computed_pairs_fromula, computed_pairs
-
-sys.path = bkpath
 
 def summary(coinpairs, md=False):
 
@@ -225,8 +219,9 @@ COINPAIRS_FILTER:
 
     if md_summary and not show_summary:
         print(
-            f"Error: '-m', '--markdown' option only works with '-s', '--summary'",
-            file=sys.stderr)
+            "Error: '-m', '--markdown' option only works "
+            "with '-s', '--summary'",
+            file=stderr)
         return 1
 
     if show_version:
@@ -252,8 +247,9 @@ COINPAIRS_FILTER:
         coinpairs = ALL
     if not coinpairs:
         print(
-            f"The {repr(coinpairs_filter)} filter did not return any results.",
-            file=sys.stderr)
+            f"The {repr(coinpairs_filter)} filter did not return "
+            "any results.",
+            file=stderr)
         return 1
     
     if show_summary:
@@ -332,7 +328,8 @@ COINPAIRS_FILTER:
         row.append(d['weighted_median_price'])
         if 'prices' in d:
             if 'ok_sources_count' in d:
-                row.append(f"{d['ok_sources_count']} of {prices_count[coinpair]}")
+                row.append(
+                    f"{d['ok_sources_count']} of {prices_count[coinpair]}")
             else:
                 row.append(len(d['prices']))
         else:
