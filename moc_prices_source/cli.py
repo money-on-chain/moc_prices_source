@@ -1,5 +1,6 @@
-import click, shutil
+import click, shutil, sys
 from tabulate import tabulate
+from os import environ
 
 
 
@@ -48,3 +49,31 @@ def print_list(items):
         if (i + 1) % cols == 0:
             print()
     print()
+
+
+def get_env(name, default, cast=str, alias={}):
+    alias = dict(
+        [(str(k).strip().lower(),
+          str(v).strip()) for (k, v) in alias.items()])
+    try:
+        value = environ[name]
+    except KeyError:
+        value = default
+    while str(value).strip().lower() in alias:
+        value = alias[str(value).strip().lower()]
+    try:
+        return cast(str(value))
+    except Exception as e:
+        options = list(alias.keys())
+        options.sort()
+        if options:
+            options_str = ' or this options: ' + ', '.join(map(repr, options))
+        else:
+            options_str = ''
+
+        print(
+            f"ERROR: invalid value for env var {name}: {value!r} "
+            f"(expected valid {cast.__name__}{options_str})",
+            file=sys.stderr
+        )
+        sys.exit(1)
