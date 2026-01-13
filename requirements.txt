@@ -13,3 +13,5 @@ flask-restx
 flask_cors
 cachelib
 flask_caching
+eth-utils
+eth-abi
