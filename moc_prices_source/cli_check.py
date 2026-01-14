@@ -7,6 +7,7 @@ from .cli import command, option, tabulate, trim, cli
 from .weighing import weighing
 from .engines import all_engines
 from .computed_pairs import show_computed_pairs_fromula, computed_pairs
+from .dec_to_str import dec_to_str
 
 
 
@@ -339,16 +340,6 @@ COINPAIRS_FILTER:
     if table:
         table.sort(key=lambda x: str(x[1]))
         print()
-        def dec_to_str(f):
-            if not isinstance(f, Decimal):
-                return f
-            out = f"{f:,.6f}"
-            if out=="0.000000":
-                out = f"{f}"
-                out = out.split('E-')
-                out[1] = ''.join(["⁰¹²³⁴⁵⁶⁷⁸⁹"[int(i)] for i in out[1]])
-                out = f"{float(out[0]):.3f} × 10⁻{out[1]}"                
-            return out
         table = [[dec_to_str(f) for f in l] for l in table]
         print(tabulate(table,
             headers=['', 'Coin pair', 'Mediam', 'Mean',
