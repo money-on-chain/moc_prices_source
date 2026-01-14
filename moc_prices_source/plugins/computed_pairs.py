@@ -1,4 +1,5 @@
 from ..weighing import weighted_median
+from ..weighing import median as Median
 from .base import CoinPair, register_pairs
 from .coins import BTC, USD, RIF, MOC, ETH, USDT, BNB, ARS, COP, BPRO
 from .pairs import BNB_USDT, BPRO_BTC, BTC_ARS, BTC_COP, BTC_USD, BTC_USDT, \
@@ -12,7 +13,8 @@ from .pairs import BNB_USDT, BPRO_BTC, BTC_ARS, BTC_COP, BTC_USD, BTC_USDT, \
 # BNB/USD
 BNB_USD = CoinPair(BNB, USD,
     requirements = [BNB_USDT, BTC_USD, BTC_USDT],
-    formula = lambda bnb_usdt, btc_usd, btc_usdt: bnb_usdt*btc_usd/btc_usdt)
+    formula = lambda bnb_usdt, btc_usd, btc_usdt\
+        : bnb_usdt * btc_usd / btc_usdt)
 
 # BPRO/ARS
 BPRO_ARS = CoinPair(BPRO, ARS,
@@ -25,83 +27,105 @@ BPRO_COP = CoinPair(BPRO, COP,
     formula = lambda bpro_btc, btc_cop: bpro_btc * btc_cop)
 
 # BPRO/USD
-BPRO_USD = CoinPair(BPRO, USD, description="Offchain",
-    requirements=[BPRO_BTC, BTC_USD],
+BPRO_USD = CoinPair(BPRO, USD,
+    description = "Offchain",
+    requirements = [BPRO_BTC, BTC_USD],
     formula = lambda bpro_btc, btc_usd: bpro_btc * btc_usd)
 
 # ETH/USD
-ETH_USD_B = CoinPair(ETH, USD, "B", "Passing through Bitcoin",
+ETH_USD_B = CoinPair(ETH, USD, "B",
+    description = "Passing through Bitcoin",
     requirements = [ETH_BTC, BTC_USD],
     formula = lambda eth_btc, btc_usd: eth_btc * btc_usd)
 
 # MOC/BPRO
 MOC_BPRO = CoinPair(MOC, BPRO,
     requirements = [MOC_BTC_SOV, BTC_USD, MOC_USD_OKU, BPRO_BTC],
-    formula = lambda moc_btc_sov, btc_usd, moc_usd_oku, bpro_btc: weighted_median(
-        [moc_btc_sov * btc_usd, moc_usd_oku],
-        [1, 1]) / btc_usd * bpro_btc)
+    formula = lambda moc_btc_sov, btc_usd, moc_usd_oku, bpro_btc\
+        : Median((moc_btc_sov * btc_usd), moc_usd_oku) / btc_usd * bpro_btc)
 
 # MOC/BTC
 MOC_BTC = CoinPair(MOC, BTC,
     requirements = [MOC_BTC_SOV, BTC_USD, MOC_USD_OKU],
-    formula = lambda moc_btc_sov, btc_usd, moc_usd_oku: weighted_median(
-        [moc_btc_sov * btc_usd, moc_usd_oku],
-        [1, 1]) / btc_usd)
+    formula = lambda moc_btc_sov, btc_usd, moc_usd_oku\
+        : Median((moc_btc_sov * btc_usd), moc_usd_oku) / btc_usd)
 
 # MOC/USD
-MOC_USD = CoinPair(MOC, USD, description="Default option, weighted median",
+MOC_USD = CoinPair(MOC, USD,
+    description = "Default option, weighted median",
     requirements = [MOC_BTC_SOV, BTC_USD, MOC_USD_OKU],
-    formula = lambda moc_btc_sov, btc_usd, moc_usd_oku: weighted_median(
-        [moc_btc_sov * btc_usd, moc_usd_oku],
-        [1, 1]))
+    formula = lambda moc_btc_sov, btc_usd, moc_usd_oku\
+        : Median((moc_btc_sov * btc_usd), moc_usd_oku))
 
-MOC_USD_SOV = CoinPair(MOC, USD, "Sovryn",
+MOC_USD_SOV = CoinPair(MOC, USD, description = "Sovryn",
     requirements = [MOC_BTC_SOV, BTC_USD],
     formula = lambda moc_btc_sov, btc_usd: moc_btc_sov * btc_usd)
 
 MOC_USD_WM = CoinPair(MOC, USD, "WM", "Weighted median",
     requirements = [MOC_BTC_SOV, BTC_USD, MOC_USD_OKU],
-    formula = lambda moc_btc_sov, btc_usd, moc_usd_oku: weighted_median(
-        [moc_btc_sov * btc_usd, moc_usd_oku], [1, 1]))
+    formula = lambda moc_btc_sov, btc_usd, moc_usd_oku\
+        : Median((moc_btc_sov * btc_usd), moc_usd_oku))
 
 # RIF/USD
-RIF_USD = CoinPair(RIF, USD, description="Leave this as legacy",
+RIF_USD = CoinPair(RIF, USD,
+    description = "Leave this as legacy",
     requirements = [RIF_BTC, BTC_USD],
     formula = lambda rif_btc, btc_usd: rif_btc * btc_usd)
 
-RIF_USD_B = CoinPair(RIF, USD, "B", "Passing through Bitcoin",
+RIF_USD_B = CoinPair(RIF, USD, "B",
+    description = "Passing through Bitcoin",
     requirements = [RIF_BTC, BTC_USD],
     formula = lambda rif_btc, btc_usd: rif_btc * btc_usd)
 
-RIF_USD_T = CoinPair(RIF, USD, "T", "Passing through Tether",
+RIF_USD_T = CoinPair(RIF, USD, "T",
+    description = "Passing through Tether",
     requirements = [RIF_USDT, USDT_USD],
     formula = lambda rif_usdt, usdt_usd: rif_usdt * usdt_usd)
 
-RIF_USD_TB = CoinPair(RIF, USD, "TB", "Passing through Tether & Bitcoin",
+RIF_USD_TB = CoinPair(RIF, USD, "TB",
+    description = "Passing through Tether & Bitcoin",
     requirements = [RIF_USDT, BTC_USD, BTC_USDT],
-    formula = lambda rif_usdt, btc_usd, btc_usdt: rif_usdt * btc_usd / btc_usdt)
+    formula = lambda rif_usdt, btc_usd, btc_usdt\
+        : rif_usdt * btc_usd / btc_usdt)
 
-RIF_USD_TBMA = CoinPair(RIF, USD, "TBMA", "Passing through Tether & Bitcoin, using [WDAP](fundamentals/wdap.md)",
+RIF_USD_TBMA = CoinPair(RIF, USD, "TBMA",
+    description = "Passing through Tether & Bitcoin, "
+                  "using [WDAP](fundamentals/wdap.md)",
     requirements = [RIF_USDT_MA, BTC_USD, BTC_USDT],
-    formula = lambda rif_usdt_ma, btc_usd, btc_usdt: rif_usdt_ma * btc_usd / btc_usdt)
+    formula = lambda rif_usdt_ma, btc_usd, btc_usdt\
+        : rif_usdt_ma * btc_usd / btc_usdt)
 
-RIF_USD_TMA = CoinPair(RIF, USD, "TMA", "Passing through Tether, using [WDAP](fundamentals/wdap.md)",
+RIF_USD_TMA = CoinPair(RIF, USD, "TMA",
+    description = "Passing through Tether, "
+                  "using [WDAP](fundamentals/wdap.md)",
     requirements = [RIF_USDT_MA, USDT_USD],
     formula = lambda rif_usdt_ma, usdt_usd: rif_usdt_ma * usdt_usd)
 
-RIF_USD_WMTB = CoinPair(RIF, USD, "WMTB", "Passing through Tether & Bitcoin using weighted median",
+class rif_usd_wmtp_formula():
+    def __call__(self, rif_usdt, btc_usd, btc_usdt, rif_btc):
+        return weighted_median(
+            [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
+            [0.75, 0.25])
+    def __str__(self):
+        return ("Weighted(\n"
+                "  (rif_usdt × btc_usd / btc_usdt) at 75%,\n"
+                "  (rif_btc × btc_usd) at 25%\n"
+                ")")
+
+RIF_USD_WMTB = CoinPair(RIF, USD, "WMTB",
+    description = "Passing through Tether & Bitcoin using weighted median",
     requirements = [RIF_USDT, BTC_USD, BTC_USDT, RIF_BTC],
-    formula = lambda rif_usdt, btc_usd, btc_usdt, rif_btc: weighted_median(
-        [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
-        [0.75, 0.25]))
+    formula = rif_usd_wmtp_formula())
 
 # USD/ARS
 USD_ARS_CCB = CoinPair(USD, ARS, "CCB",
+    description = "Paid in Bitcoin",
     requirements = [BTC_ARS, BTC_USD],
     formula = lambda btc_ars, btc_usd: btc_ars / btc_usd)
 
 # USD/COP
 USD_COP_CCB = CoinPair(USD, COP, "CCB",
+    description = "Paid in Bitcoin",
     requirements = [BTC_COP, BTC_USD],
     formula = lambda btc_cop, btc_usd: btc_cop / btc_usd)
 

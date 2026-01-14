@@ -7,6 +7,7 @@ from .cli import command, option, tabulate, trim, cli
 from .weighing import weighing
 from .engines import all_engines
 from .computed_pairs import show_computed_pairs_fromula, computed_pairs
+from .dec_to_str import dec_to_str
 
 
 
@@ -203,7 +204,8 @@ def cli_check(
         coinpairs_filter=None,
         show_summary=False,
         md_summary=False,
-        not_ignore_zero_weighing=False
+        not_ignore_zero_weighing=False,
+        expand_values=False
     ):
     """\b
 Description:
@@ -323,8 +325,9 @@ COINPAIRS_FILTER:
         else:
             row.append('ƒ')
         row.append(coinpair)
-        row.append(d['median_price'])
-        row.append(d['mean_price'])
+        if expand_values:
+            row.append(d['median_price'] if 'median_price' in d else None)
+            row.append(d['mean_price'] if 'mean_price' in d else None)
         row.append(d['weighted_median_price'])
         if 'prices' in d:
             if 'ok_sources_count' in d:
@@ -339,22 +342,16 @@ COINPAIRS_FILTER:
     if table:
         table.sort(key=lambda x: str(x[1]))
         print()
-        def dec_to_str(f):
-            if not isinstance(f, Decimal):
-                return f
-            out = f"{f:,.6f}"
-            if out=="0.000000":
-                out = f"{f}"
-                out = out.split('E-')
-                out[1] = ''.join(["⁰¹²³⁴⁵⁶⁷⁸⁹"[int(i)] for i in out[1]])
-                out = f"{float(out[0]):.3f} × 10⁻{out[1]}"                
-            return out
         table = [[dec_to_str(f) for f in l] for l in table]
-        print(tabulate(table,
+        if expand_values:
             headers=['', 'Coin pair', 'Mediam', 'Mean',
-                     'Weighted median', 'Sources', 'Ok' ],
+                     'Weighted median', 'Sources', 'Ok' ]
             colalign=['center', 'left', 'right', 'right',
-                      'right', 'center', 'center']))
+                      'right', 'center', 'center']
+        else:
+            headers=['', 'Coin pair', 'Value', 'Sources count', 'Ok' ]
+            colalign=['center', 'left', 'right', 'center', 'center']
+        print(tabulate(table, headers=headers, colalign=colalign))
 
     errors = []
     for p in prices:

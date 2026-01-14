@@ -10,10 +10,7 @@ This package includes a CLI tool that allows you to query the coinpair values in
 A simple example, do some imports first
 
 ```python
-user@host:~$ python3
-Python 3.8.5 (default, Jul 28 2020, 12:59:40) 
-[GCC 9.3.0] on linux
-Type "help", "copyright", "credits" or "license" for more information.
+user@host:~$ python3 -q
 >>> from moc_prices_source import get_price, BTC_USD
 >>>
 ```
@@ -22,7 +19,7 @@ Get de `BTC/USD` coin pair
 
 ```python
 >>> get_price(BTC_USD)
-Decimal('29395.82')
+Decimal('97467.53')
 >>> 
 ```
 
@@ -41,17 +38,17 @@ user@host:~$ moc_prices_source_check "BTC/USD"
 
 From     To      V.    Exchnage    Response        Weight    %  Time
 -------  ------  ----  ----------  ------------  --------  ---  ------
-Bitcoin  Dollar        Bitfinex    $  67.10800K      0.18   18  1.64s
-Bitcoin  Dollar        Bitstamp    $  66.99300K      0.22   22  1.82s
-Bitcoin  Dollar        Coinbase    $  66.98946K      0.25   25  1.42s
-Bitcoin  Dollar        Gemini      $  67.01356K      0.17   17  2.05s
-Bitcoin  Dollar        Kraken      $  67.00500K      0.18   18  1.64s
+Bitcoin  Dollar        Bitfinex    $  97.53700K      0.18   18  0.09s
+Bitcoin  Dollar        Bitstamp    $  97.59100K      0.22   22  0.73s
+Bitcoin  Dollar        Coinbase    $  97.61604K      0.25   25  0.09s
+Bitcoin  Dollar        Gemini      $  97.58493K      0.17   17  0.79s
+Bitcoin  Dollar        Kraken      $  97.58630K      0.18   18  0.19s
 
-    Coin pair      Mediam     Mean    Weighted median  Sources    Ok
---  -----------  --------  -------  -----------------  ---------  ----
-↓   BTC/USD         67005  67021.8              67005  5 of 5     ✓
+    Coin pair            Value   Sources count    Ok
+--  -----------  -------------  ---------------  ----
+↓   BTC/USD      97,586.300000      5 of 5        ✓
 
-Response time 2.06s
+Response time 0.8s
 
 user@host:~$ 
 ```
