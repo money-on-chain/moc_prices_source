@@ -7,6 +7,7 @@ from .cli import command, option, cli
 from .database import make_db_conn
 from .my_logging import make_log, INFO, DEBUG, VERBOSE
 from .redis_conn import get_redis, redis_conf_file
+from .dec_to_str import dec_to_str
 
 
 
@@ -179,28 +180,33 @@ def get_values(log,
             'age': age,
             'error': error
         }
-        log.verbose(f'Exchange {name} {coinpair} value: {price}')
+        log.verbose(f'Exchange {name} {coinpair} value: {dec_to_str(price)}')
         data.append(row)
 
     for coinpair, v in d['values'].items():
-        median_price =          v['median_price']
-        mean_price =            v['mean_price']
-        weighted_median_price = v['weighted_median_price']
         row = {
             'timestamp': datetime.datetime.now().replace(microsecond=0),
-            'coinpair': coinpair,
-            'median_price': median_price,
-            'mean_price': mean_price,
-            'weighted_median_price': weighted_median_price
-        }
+            'coinpair': coinpair}
 
         for key in ['ok_sources_count',
                     'min_ok_sources_count',
                     'ok',
                     'error',
-                    'ok_value']:
+                    'ok_value',
+                    'mean_price',
+                    'median_price',
+                    'weighted_median_price']:
             if key in v:
                 row[key]=v[key]
+
+        value = None
+        for key in ['ok_value',
+                    'weighted_median_price',
+                    'median_price',
+                    'mean_price']:
+            if key in v:
+                value = v[key]
+                break
 
         if 'ok' in v:
             row['int_ok'] = 1 if v['ok'] else 0
@@ -208,7 +214,7 @@ def get_values(log,
         if coinpair in sources_count:
             row['sources_count'] = sources_count[coinpair]
 
-        log.verbose(f'{coinpair} weighted:{weighted_median_price}, median;{median_price}, mean:{mean_price}')
+        log.verbose(f'{coinpair} value: {dec_to_str(value)}')
         data.append(row)
 
     out = []
