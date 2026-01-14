@@ -3,7 +3,8 @@ from os.path import dirname, abspath
 from json import load, dumps, loads
 from json.decoder import JSONDecodeError
 from sys import stderr
-from statistics import median, mean
+from statistics import median as median_base
+from statistics import mean as mean_base
 from tabulate import tabulate
 from decimal import Decimal
 from os import environ
@@ -258,3 +259,13 @@ def weighted_median_idx(values, weights):
         if cumulative_probability >= 0.5:
             return sorted_tuples[i][2]
     return sorted_tuples[-1][2]
+
+
+def median(*args):
+    data = args[0] if len(args)==1 and isinstance(args[0], list) else args
+    return median_base(data)
+
+
+def mean(*args):
+    data = args[0] if len(args)==1 and isinstance(args[0], list) else args
+    return mean_base(data)
