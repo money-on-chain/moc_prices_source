@@ -145,17 +145,17 @@ def get_price(
                 coinpair_prices[r]['ok'] = all(
                     [ coinpair_prices[q]['ok'] for q in requirements ])
                 coinpair_prices[r]['requirements'] = requirements
-                formula = computed_pairs[r]['formula']
-                for k in ['median_price', 'mean_price',
-                          'weighted_median_price']:
-                    args = [ coinpair_prices[q][k] for q in requirements ]
-                    try:
-                        coinpair_prices[r][k] = formula(*args)
-                    except:
-                        coinpair_prices[r][k] = None
-                coinpair_prices[r]['ok_value'] = (
-                    coinpair_prices[r]['weighted_median_price'] if 
-                        coinpair_prices[r]['ok'] else None)
+                formula = computed_pairs[r]['formula']               
+                args = [coinpair_prices[q]['ok_value'] for q in requirements]
+                coinpair_prices[r]['error'] = ''
+                try:
+                    coinpair_prices[r]['ok_value'] = formula(*args)
+                except Exception as e:
+                    coinpair_prices[r]['error'] = str(e)
+                    coinpair_prices[r]['ok_value'] = None
+                    coinpair_prices[r]['ok'] = False
+                coinpair_prices[r]['weighted_median_price'] = \
+                    coinpair_prices[r]['ok_value'] 
 
     detail['values'] = coinpair_prices
 
@@ -164,11 +164,11 @@ def get_price(
     for key, value in coinpair_prices.items():
         if requested:
             if key in requested:
-                if value['weighted_median_price'] and value['ok']:
-                    out[key] = value['weighted_median_price']
+                if value['ok_value'] and value['ok']:
+                    out[key] = value['ok_value']
         else:
-            if value['weighted_median_price'] and value['ok']:
-                out[key] = value['weighted_median_price']
+            if value['ok_value'] and value['ok']:
+                out[key] = value['ok_value']
 
     if requested and len(requested)==1:
         if requested[0] in out:
@@ -202,7 +202,7 @@ def get_price(
                     d[k] = [ float(x) for x in d[k] if d[k] ]
             for k in ['median_price', 'mean_price', 'weighted_median_price',
                       'ok_value']:
-                if d[k]:
+                if k in d and d[k]:
                     d[k] = float(d[k])
         for k in list(coinpair_prices.keys()):
             v = coinpair_prices[k]

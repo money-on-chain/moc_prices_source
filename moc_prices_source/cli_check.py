@@ -323,8 +323,8 @@ COINPAIRS_FILTER:
         else:
             row.append('ƒ')
         row.append(coinpair)
-        row.append(d['median_price'])
-        row.append(d['mean_price'])
+        row.append(d['median_price'] if 'median_price' in d else None)
+        row.append(d['mean_price'] if 'mean_price' in d else None)
         row.append(d['weighted_median_price'])
         if 'prices' in d:
             if 'ok_sources_count' in d:
