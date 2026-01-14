@@ -124,7 +124,7 @@ class CoinPair(object):
                 if formula_desc[-1]==')': # why?
                     formula_desc = formula_desc[:-1].strip() # why?
             else:
-                formula_desc = repr(formula)
+                formula_desc = str(formula)
             formula_desc = '\n'.join(map(str.strip, formula_desc.split('\n')))
 
         self._formula_desc = formula_desc
