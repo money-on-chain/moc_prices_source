@@ -137,8 +137,10 @@ def get_price(
             d['ok_value'] = None
 
     if requested:
-        for r in [r for r in requested if (
-            (r in computed_pairs) and (not r in coinpair_prices)) ]:
+        requested_computed_pairs = [
+            r for r in requested if ((r in computed_pairs) and
+                                     (not r in coinpair_prices)) ]
+        for r in requested_computed_pairs:
             requirements = computed_pairs[r]['requirements']
             if set(requirements).issubset(set(coinpair_prices.keys())):
                 coinpair_prices[r] = {}
@@ -150,6 +152,18 @@ def get_price(
                 coinpair_prices[r]['error'] = ''
                 try:
                     coinpair_prices[r]['ok_value'] = formula(*args)
+                except Exception as e:
+                    coinpair_prices[r]['error'] = str(e)
+                    coinpair_prices[r]['ok_value'] = None
+                    coinpair_prices[r]['ok'] = False
+                coinpair_prices[r]['weighted_median_price'] = \
+                    coinpair_prices[r]['ok_value'] 
+        for r in requested_computed_pairs:
+            if (coinpair_prices[r]['ok'] and
+                callable(coinpair_prices[r]['ok_value'])):
+                try:
+                    coinpair_prices[r]['ok_value'] = \
+                        coinpair_prices[r]['ok_value']()
                 except Exception as e:
                     coinpair_prices[r]['error'] = str(e)
                     coinpair_prices[r]['ok_value'] = None

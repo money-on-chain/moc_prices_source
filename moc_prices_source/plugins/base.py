@@ -1,8 +1,7 @@
 import requests, datetime, json
 from typing import Optional, Callable, Tuple, Any
-from types import LambdaType
 from pathlib import Path
-from inspect import getfile, currentframe, getsource
+from inspect import getfile, currentframe, getsource, isclass
 from os.path import basename, dirname, abspath
 from decimal import Decimal, InvalidOperation
 from bs4 import BeautifulSoup
@@ -109,6 +108,10 @@ class CoinPair(object):
     def is_computed(self) -> bool:
         return self._formula is not None
 
+    @staticmethod
+    def _is_lambda(obj: Any) -> bool:
+        return callable(obj) and getattr(obj, "__name__", None) == "<lambda>"
+
     def set_computed(self,
                      requirements: Optional[list] = None,
                      formula: Optional[Callable] = None,
@@ -118,13 +121,24 @@ class CoinPair(object):
         self._formula = formula
 
         if formula is not None and formula_desc is None:
-            if isinstance(formula, LambdaType):
+            if self._is_lambda(formula):
                 formula_desc = ':'.join(getsource(formula).split('lambda'
                     )[-1].strip().split(':')[1:]).strip()
                 if formula_desc[-1]==')': # why?
                     formula_desc = formula_desc[:-1].strip() # why?
                 formula_desc = '\n'.join(map(str.strip, formula_desc.split('\n')))
                 formula_desc = formula_desc.replace('*', '×')
+            elif callable(formula) and formula.__doc__ is not None:
+                formula_desc = formula.__doc__
+                formula_desc = formula_desc.split('\n')
+                formula_desc = [l for l in formula_desc if l.strip()!='']
+                while all([l[0]==' ' for l in formula_desc]):
+                    formula_desc = [l[1:] for l in formula_desc]
+                formula_desc = '\n'.join(formula_desc)
+                if not '\n' in formula_desc:
+                    formula_desc = formula_desc.strip()
+            elif isclass(formula):
+                formula_desc = getsource(formula)
             else:
                 formula_desc = str(formula)
 
@@ -756,3 +770,20 @@ def engine_register(name_id: Optional[str] = None):
         return cls
     return engine_register_base
 
+
+class Formula():
+    
+    value = None
+
+    def __init__(self, *args):
+        self.value = self.formula(*args)
+    
+    @staticmethod
+    def formula(*args):
+        return None
+    
+    def return_value(self):
+        return self.value
+    
+    def __call__(self):
+        return self.return_value()
