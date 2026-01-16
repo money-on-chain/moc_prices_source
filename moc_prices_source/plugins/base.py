@@ -1,5 +1,5 @@
 import requests, datetime, json
-from typing import Optional, Callable, Tuple, Any
+from typing import Optional, Callable, Tuple, Any, Union
 from pathlib import Path
 from inspect import getfile, currentframe, getsource, isclass
 from os.path import basename, dirname, abspath
@@ -773,17 +773,32 @@ def engine_register(name_id: Optional[str] = None):
 
 class Formula():
     
-    value = None
+    value: Union[bool, float, Decimal, None] = None
+    max_steps: int = 1
+    _step: int = 0
 
-    def __init__(self, *args):
+    def __init__(self, *args) -> None:
         self.value = self.formula(*args)
     
     @staticmethod
-    def formula(*args):
+    def formula(*args) -> Union[bool, float, Decimal, None]:
         return None
     
-    def return_value(self):
+    def return_value(self) -> Union[bool, float, Decimal, None]:
         return self.value
-    
+
+    def step_run(self,
+                 value: Union[bool, float, Decimal, None],
+                 step: int
+                 ) -> Union[bool, float, Decimal, None]:
+        return None
+
     def __call__(self):
-        return self.return_value()
+        self._step += 1
+        new_value = self.step_run(self.value, self._step)
+        if new_value is not None:
+            self.value = new_value
+        if self._step==self.max_steps:
+            return self.return_value()
+        else:
+            return self

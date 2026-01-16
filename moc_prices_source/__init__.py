@@ -158,9 +158,14 @@ def get_price(
                     coinpair_prices[r]['ok'] = False
                 coinpair_prices[r]['weighted_median_price'] = \
                     coinpair_prices[r]['ok_value'] 
-        for r in requested_computed_pairs:
-            if (coinpair_prices[r]['ok'] and
-                callable(coinpair_prices[r]['ok_value'])):
+        
+        while True:
+            callable_pairs = [r for r in requested_computed_pairs
+                              if (coinpair_prices[r]['ok'] and
+                                  callable(coinpair_prices[r]['ok_value']))]
+            if not callable_pairs:
+                break
+            for r in callable_pairs:
                 try:
                     coinpair_prices[r]['ok_value'] = \
                         coinpair_prices[r]['ok_value']()
