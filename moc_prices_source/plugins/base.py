@@ -82,6 +82,7 @@ class CoinPair(object):
                  to_: Optional[Coin] = None,
                  variant: Optional[str] = None,
                  description: Optional[str] = None,
+                 short_description: Optional[str] = None,
                  min_ok_sources_count: int = 0,
                  name: Optional[str] = None,
                  requirements: Optional[list] = None,
@@ -99,6 +100,7 @@ class CoinPair(object):
         self._to = to_
         self._variant = to_str(variant)
         self._description = to_str(description)
+        self._short_description = to_str(short_description)
         self._name = to_str(name)
         self._min_ok_sources_count = \
             int(min_ok_sources_count) if min_ok_sources_count else 0
@@ -164,6 +166,8 @@ class CoinPair(object):
     
     @property
     def description(self):
+        if self._description is None and self._short_description is not None:
+            return self._short_description
         return self._description
     
     @property
@@ -190,17 +194,27 @@ class CoinPair(object):
         return f"{self}"
 
     @property
-    def name(self):
+    def name_base(self):
         if self._name is not None:
-            if self.variant is None:
-                return f"{self._name}"
-            else:
-                return f"{self._name}({self.variant})"
-        name = f"{self.from_.symbol}/{self.to_.symbol}"
-        if self.variant is None:
-            return f"{name}"
+            name = self._name
         else:
-            return f"{name}({self.variant})"
+            name = f"{self.from_.symbol}/{self.to_.symbol}"
+        return f"{name}"
+
+    @property
+    def name(self):
+        if self.variant is None:
+            return self.name_base
+        else:
+            return f"{self.name_base}({self.variant})"
+
+    @property
+    def short_description(self):
+        if self._short_description is None and self.from_ is not None \
+            and self.to_ is not None:
+            return f"{self.from_.name} to {self.to_.name}"
+        else:
+            return self._short_description
 
     @property
     def as_dict(self):
@@ -376,8 +390,8 @@ class Base(object):
 
 
     def __str__(self):
-        name  = '{} {}'.format(self.description, self.coinpair
-            ) if self.description else self.name
+        name  = (f"{self.description} {self.coinpair}" if self.description
+                 else self.name)
         if self.price is None:
             return name
         value = self.price if self else self.error
@@ -735,7 +749,7 @@ class BaseOnChain(Base):
 
             price = self._get_price()
     
-            if not price:
+            if price is None:
                 if not self._error:
                     self._error = "Engine error trying to get 'price'"
                 return False
@@ -744,11 +758,14 @@ class BaseOnChain(Base):
                 time = datetime.timedelta(seconds=self._rq_side_cache_time)
                 self._redis.setex(cache_key, time, str(price))
 
-        try:
-            self._price = Decimal(str(price))
-        except Exception:
-            self._error = "Engine error trying to get 'price'"
-            return False
+        if isinstance(price, (int, bool)):
+            self._price = price
+        else:
+            try:
+                self._price = Decimal(str(price))
+            except Exception:
+                self._error = "Engine error trying to get 'price'"
+                return False
 
         self._timestamp = self._now()
         self._last_change_timestamp = self._timestamp
