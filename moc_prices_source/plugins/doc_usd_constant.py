@@ -1,4 +1,4 @@
-from .pairs import DOC_USD
+from .special_pairs import DOC_USD
 from .base import Base, engine_register, Decimal
 import datetime
 

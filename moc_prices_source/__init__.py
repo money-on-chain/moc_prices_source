@@ -203,6 +203,10 @@ def get_price(
     if serializable:
         detail['time'] = detail['time'].seconds + detail['time'
             ].microseconds/1000000
+        def nomalize(x):
+            if x is True or x is False or isinstance(x, int):
+                return x
+            return float(x)
         for p in prices:
             p['coinpair'] = str(p['coinpair'])
             if p['time']:
@@ -214,15 +218,15 @@ def get_price(
                 p['error'] = str(p['error'])
             for k in ['price', 'weighing', 'percentual_weighing', 'volume']:
                 if p[k]!=None:
-                    p[k] = float(p[k])
+                    p[k] = nomalize(p[k])
         for d in coinpair_prices.values():
             for k in ['weighings', 'prices']:
                 if k in d:
-                    d[k] = [ float(x) for x in d[k] if d[k] ]
+                    d[k] = [ nomalize(x) for x in d[k] if d[k] ]
             for k in ['median_price', 'mean_price', 'weighted_median_price',
                       'ok_value']:
                 if k in d and d[k]:
-                    d[k] = float(d[k])
+                    d[k] = nomalize(d[k])
         for k in list(coinpair_prices.keys()):
             v = coinpair_prices[k]
             del coinpair_prices[k]

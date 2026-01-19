@@ -106,6 +106,7 @@
     "btc_cop_coinbase":  0.333,
     "btc_cop_buda":      0.333,
     "btc_cop_bitso":     0,
-    "btc_cop_cryptomkt": 0
+    "btc_cop_cryptomkt": 0,
 
+    "rsk_blocknumber_onchain": 1
 }

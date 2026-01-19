@@ -1,4 +1,4 @@
-from .pairs import RIF_BTC_MP1P
+from .special_pairs import RIF_BTC_MP1P
 from .base import BaseWithFailover, engine_register, Decimal
 from .rif_btc_binance import Engine as RifBtcEngine
 

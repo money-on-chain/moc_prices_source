@@ -1,5 +1,5 @@
 from .base import CoinPair, register_pairs, get_env
-from .coins import BTC, USD, RIF, MOC, ETH, USDT, BNB, ARS, MXN, COP, GAS, BPRO, DOC
+from .coins import BTC, USD, RIF, MOC, ETH, USDT, BNB, ARS, MXN, COP, BPRO
 
 
 
@@ -11,9 +11,6 @@ BNB_USDT = CoinPair(BNB, USDT)
 # BPRO/BTC
 BPRO_BTC = CoinPair(BPRO, BTC)
 
-# DOC/USD
-DOC_USD = CoinPair(DOC, USD, description="Pegged 1:1 to USD")
-
 # BTC/ARS
 BTC_ARS = CoinPair(BTC, ARS,
     min_ok_sources_count=get_env('BTC_ARS_MIN_OK_SOURCES_COUNT', 3, int))
@@ -24,7 +21,8 @@ BTC_COP = CoinPair(BTC, COP,
 
 # BTC/USD
 BTC_USD = CoinPair(BTC, USD)
-BTC_USD_OCH = CoinPair(BTC, USD, "och", "Obtained from the blockchain")
+BTC_USD_OCH = CoinPair(BTC, USD, "och",
+                       description = "Obtained from the blockchain")
 
 # BTC/USDT
 BTC_USDT = CoinPair(BTC, USDT)
@@ -35,25 +33,21 @@ ETH_BTC = CoinPair(ETH, BTC)
 # ETH/USD
 ETH_USD = CoinPair(ETH, USD)
 
-# GAS/BTC Rootstock gas price from nodes
-GAS_BTC = CoinPair(GAS, BTC, description="Rootstock gas price from nodes")
-
 # MOC/BTC
-MOC_BTC_SOV = CoinPair(MOC, BTC, "Sovryn")
+MOC_BTC_SOV = CoinPair(MOC, BTC, "sov",
+                       description = "Obtained from Sovryn onchain")
 
 # MOC/USD
 MOC_USD_OKU = CoinPair(MOC, USD, "Oku")
 
 # RIF/BTC
 RIF_BTC = CoinPair(RIF, BTC)
-RIF_BTC_MP1P = CoinPair(RIF, BTC, "mp1%", "To move the price 1 percent")
 
 # RIF/USDT
 RIF_USDT = CoinPair(RIF, USDT)
 RIF_USDT_MA = CoinPair(RIF, USDT, "MA", "Using [WDAP](fundamentals/wdap.md)")
 RIF_USDT_MA2 = CoinPair(RIF, USDT, "MA2")
 RIF_USDT_MA3 = CoinPair(RIF, USDT, "MA3")
-RIF_USDT_MP1P = CoinPair(RIF, USDT, "mp1%", "To move the price 1 percent")
 
 # USD/ARS
 USD_ARS = CoinPair(USD, ARS, description="Free, from the news portals")
