@@ -1,5 +1,6 @@
 from __future__ import annotations
 import requests, json
+from decimal import Decimal
 from dataclasses import dataclass
 from typing import Any, List, Optional, Tuple
 from eth_utils import keccak, to_checksum_address
@@ -338,6 +339,26 @@ class EVM():
     @property
     def latest(self) -> bool:
         return self._block_identifier=='latest'
+
+    @property
+    def latest_block_number(self) -> int:
+        self.connection_check()
+        # Fix: backcompatibility with various web3 versions
+        try:
+            value = self.web3.eth.block_number
+        except AttributeError:
+            value = self.web3.eth.blockNumber
+        return int(value)
+
+    @property
+    def gas_price(self) -> int:
+        self.connection_check()
+        # Fix: backcompatibility with various web3 versions
+        try:
+            value = self.web3.eth.gas_price
+        except AttributeError:
+            value = self.web3.eth.gasPrice
+        return Decimal(value) / (10**18)
 
     def connection_check(self):
         if not self.web3.is_connected():
