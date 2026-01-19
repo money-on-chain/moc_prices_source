@@ -168,9 +168,15 @@ class CoinPairsList(Resource):
         
         if 'text/plain' in accept:
             text = tabulate(
-                list([ (str(x), str(x.from_), str(x.to_), x.description
+                list([ (str(x),
+                        x.name_base,
+                        str(x.from_) if x.from_ else '',
+                        str(x.to_) if x.to_ else '',
+                        x.variant if x.variant else '',
+                        x.description or x.short_description
                         ) for x in AllCoinPairs]),
-                headers=['Name', 'From', 'To', 'Description'],
+                headers=['Name', 'Base', 'From', 'To', 'Variant',
+                         'Description'],
                 tablefmt="simple",
                 stralign="left",
                 numalign="right"
@@ -180,9 +186,11 @@ class CoinPairsList(Resource):
             return response
         else:
             return list([{'name': str(x),
-                          'from': str(x.from_),
-                          'to': str(x.to_),
-                          'description': x.description}
+                          'base': x.name_base,
+                          'from': str(x.from_) if x.from_ else None,
+                          'to': str(x.to_) if x.to_ else None,
+                          'variant': x.variant,
+                          'description': x.description or x.short_description}
                           for x in AllCoinPairs])
 
 coinpair_value_get = reqparse.RequestParser()
@@ -351,7 +359,7 @@ def get_set_of_prices(*args, detail: dict = {}):
         if values is None:
             values = {}
 
-        if isinstance(values, Decimal):
+        if isinstance(values, (Decimal, float, int, bool)):
             values = {coinpairs[0]: values}
 
         for cp in coinpairs:
