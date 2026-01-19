@@ -73,7 +73,7 @@ def get_prices(coinpairs=None, engines_names=None, engines_list=None):
         
         for engine in engines_list:
             d = engine.as_dict
-            if not(d['price']) and d['ok']:
+            if d['price'] not in [True, False] and not(d['price']) and d['ok']:
                 new_stack.append(engine)
         stack = new_stack
 
