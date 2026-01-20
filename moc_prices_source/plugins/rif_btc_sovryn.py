@@ -13,11 +13,22 @@ class Engine(BaseOnChain):
     _rif_tk_addr = '0x2acc95758f8b5f583470ba265eb685a8f45fc9d5'
 
     def _get_value_from_evm(self, evm: EVM):
-        rif_reserve = evm.call(self._rif_tk_addr,
-                               'balanceOf(address)(uint256)',
-                               self._pool_sc_addr)
-        btc_reserve = evm.call(self._wrbtc_tk_addr,
-                               'balanceOf(address)(uint256)',
-                               self._pool_sc_addr)
+
+        rif_reserve_call_id = evm.multicall.add_call(
+            self._rif_tk_addr,
+            evm.BALANCE_OF,
+            self._pool_sc_addr)
+        
+        btc_reserve_call_id = evm.multicall.add_call(
+            self._wrbtc_tk_addr,
+            evm.BALANCE_OF,
+            self._pool_sc_addr)
+        
+        evm.multicall.run()
+
+        rif_reserve = evm.multicall.get_call(rif_reserve_call_id)
+        btc_reserve = evm.multicall.get_call(btc_reserve_call_id)
+        
         value = Decimal(btc_reserve/rif_reserve)
+        
         return value, None # (value, str_error)

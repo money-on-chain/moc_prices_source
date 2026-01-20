@@ -36,19 +36,19 @@ Here you can see how the output of the `moc_prices_source_check` command looks l
 ```shell
 user@host:~$ moc_prices_source_check "BTC/USD"
 
-From     To      V.    Exchnage    Response        Weight    %  Time
--------  ------  ----  ----------  ------------  --------  ---  ------
-Bitcoin  Dollar        Bitfinex    $  97.53700K      0.18   18  0.09s
-Bitcoin  Dollar        Bitstamp    $  97.59100K      0.22   22  0.73s
-Bitcoin  Dollar        Coinbase    $  97.61604K      0.25   25  0.09s
-Bitcoin  Dollar        Gemini      $  97.58493K      0.17   17  0.79s
-Bitcoin  Dollar        Kraken      $  97.58630K      0.18   18  0.19s
+Coinpair    V.    Short description    Exchnage    Response        Weight    %  Time
+----------  ----  -------------------  ----------  ------------  --------  ---  ------
+BTC/USD           Bitcoin to Dollar    Bitfinex    $  93.07100K      0.18   18  0.59s
+BTC/USD           Bitcoin to Dollar    Bitstamp    $  93.05500K      0.22   22  0.8s
+BTC/USD           Bitcoin to Dollar    Coinbase    $  93.04720K      0.25   25  1.2s
+BTC/USD           Bitcoin to Dollar    Gemini      $  93.04565K      0.17   17  1.0s
+BTC/USD           Bitcoin to Dollar    Kraken      $  93.04330K      0.18   18  0.8s
 
-    Coin pair            Value   Sources count    Ok
---  -----------  -------------  ---------------  ----
-↓   BTC/USD      97,586.300000      5 of 5        ✓
+    Coinpair            Value   Sources count    Ok
+--  ----------  -------------  ---------------  ----
+↓   BTC/USD     93,047.205000      5 of 5        ✓
 
-Response time 0.8s
+Response time 1.21s
 
 user@host:~$ 
 ```

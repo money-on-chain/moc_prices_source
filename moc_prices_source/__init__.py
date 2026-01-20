@@ -137,8 +137,10 @@ def get_price(
             d['ok_value'] = None
 
     if requested:
-        for r in [r for r in requested if (
-            (r in computed_pairs) and (not r in coinpair_prices)) ]:
+        requested_computed_pairs = [
+            r for r in requested if ((r in computed_pairs) and
+                                     (not r in coinpair_prices)) ]
+        for r in requested_computed_pairs:
             requirements = computed_pairs[r]['requirements']
             if set(requirements).issubset(set(coinpair_prices.keys())):
                 coinpair_prices[r] = {}
@@ -150,6 +152,23 @@ def get_price(
                 coinpair_prices[r]['error'] = ''
                 try:
                     coinpair_prices[r]['ok_value'] = formula(*args)
+                except Exception as e:
+                    coinpair_prices[r]['error'] = str(e)
+                    coinpair_prices[r]['ok_value'] = None
+                    coinpair_prices[r]['ok'] = False
+                coinpair_prices[r]['weighted_median_price'] = \
+                    coinpair_prices[r]['ok_value'] 
+        
+        while True:
+            callable_pairs = [r for r in requested_computed_pairs
+                              if (coinpair_prices[r]['ok'] and
+                                  callable(coinpair_prices[r]['ok_value']))]
+            if not callable_pairs:
+                break
+            for r in callable_pairs:
+                try:
+                    coinpair_prices[r]['ok_value'] = \
+                        coinpair_prices[r]['ok_value']()
                 except Exception as e:
                     coinpair_prices[r]['error'] = str(e)
                     coinpair_prices[r]['ok_value'] = None
@@ -184,6 +203,10 @@ def get_price(
     if serializable:
         detail['time'] = detail['time'].seconds + detail['time'
             ].microseconds/1000000
+        def nomalize(x):
+            if x is True or x is False or isinstance(x, int):
+                return x
+            return float(x)
         for p in prices:
             p['coinpair'] = str(p['coinpair'])
             if p['time']:
@@ -195,15 +218,15 @@ def get_price(
                 p['error'] = str(p['error'])
             for k in ['price', 'weighing', 'percentual_weighing', 'volume']:
                 if p[k]!=None:
-                    p[k] = float(p[k])
+                    p[k] = nomalize(p[k])
         for d in coinpair_prices.values():
             for k in ['weighings', 'prices']:
                 if k in d:
-                    d[k] = [ float(x) for x in d[k] if d[k] ]
+                    d[k] = [ nomalize(x) for x in d[k] if d[k] ]
             for k in ['median_price', 'mean_price', 'weighted_median_price',
                       'ok_value']:
                 if k in d and d[k]:
-                    d[k] = float(d[k])
+                    d[k] = nomalize(d[k])
         for k in list(coinpair_prices.keys()):
             v = coinpair_prices[k]
             del coinpair_prices[k]

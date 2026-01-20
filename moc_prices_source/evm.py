@@ -1,5 +1,6 @@
 from __future__ import annotations
 import requests, json
+from decimal import Decimal
 from dataclasses import dataclass
 from typing import Any, List, Optional, Tuple
 from eth_utils import keccak, to_checksum_address
@@ -233,6 +234,10 @@ class EVMConnectionError(RuntimeError):
     pass
 
 
+class EVMNoMulticallDefined(RuntimeError):
+    pass
+
+
 class EVMCallError(RuntimeError):
     pass
 
@@ -301,9 +306,12 @@ class URI(str):
 
 class EVM():
 
+    BALANCE_OF = 'balanceOf(address)(uint256)'
+
     def __init__(self,
                  rpc_uri_or_web3_obj: str | Web3,
-                 block_identifier: str | int = 'latest'):
+                 block_identifier: str | int = 'latest',
+                 multicall_addr: Optional[Address] = None):
         if isinstance(rpc_uri_or_web3_obj, str):
             self.web3 = Web3(OneShotHTTPProvider(rpc_uri_or_web3_obj))
         elif isinstance(rpc_uri_or_web3_obj, Web3):
@@ -311,7 +319,28 @@ class EVM():
         else:
             raise ValueError('Invalid RPC URI or Web3 object')
         self.block_identifier = block_identifier
+        if multicall_addr is not None:
+            self.set_multicall(multicall_addr)
+
+    _multicall = None
+
+    @property
+    def multicall(self):
+        if self._multicall is None:
+            raise EVMNoMulticallDefined(
+                'no multicall address defined, use set_multicall')
+        return self._multicall
     
+    @multicall.setter
+    def multicall(self, value: Multicall):
+        if not isinstance(value, Multicall):
+            raise TypeError('is not a multicall instance')
+        self._multicall = value
+
+    def set_multicall(self, addr: Address):
+        self.multicall = Multicall(self, addr)
+        return self.multicall
+
     def is_connected(self) -> bool:
         return self.web3.is_connected()
     
@@ -339,18 +368,43 @@ class EVM():
     def latest(self) -> bool:
         return self._block_identifier=='latest'
 
+    @property
+    def latest_block_number(self) -> int:
+        self.connection_check()
+        # Fix: backcompatibility with various web3 versions
+        try:
+            value = self.web3.eth.block_number
+        except AttributeError:
+            value = self.web3.eth.blockNumber
+        return int(value)
+
+    @property
+    def gas_price(self) -> int:
+        self.connection_check()
+        # Fix: backcompatibility with various web3 versions
+        try:
+            value = self.web3.eth.gas_price
+        except AttributeError:
+            value = self.web3.eth.gasPrice
+        return Decimal(value) / (10**18)
+
     def connection_check(self):
         if not self.web3.is_connected():
             raise EVMConnectionError(f"Cannot connect to {self.web3.provider}")        
 
     def call(self,
-        contract_address: str,
+        contract_address: Address,
         fn_spec: str | FunctionSpec,
         *args: Any,
         block_identifier: Optional[str | int] = None,
-        from_address: Optional[str] = None,
+        from_address: Optional[Address] = None,
         gas: Optional[int] = None) -> Any:
         """Perform an eth_call"""
+
+        contract_address = to_checksum_address(Address(contract_address))
+        
+        if from_address:
+            from_address = to_checksum_address(Address(from_address))
 
         self.connection_check()
 
@@ -364,12 +418,12 @@ class EVM():
             raise ValueError("'fn_spec' is not str or FunctionSpec")
         
         tx = {
-            "to": to_checksum_address(Address(contract_address)),
+            "to": contract_address,
             "data": fn_spec.make_calldata(*args),
         }
 
         if from_address:
-            tx["from"] = to_checksum_address(Address(from_address))
+            tx["from"] = from_address
         
         if gas:
             tx["gas"] = gas
@@ -380,6 +434,495 @@ class EVM():
             raise EVMCallError(f"eth_call failed: {e}") from e
 
         return fn_spec.decode_outputs(result)
+
+
+@dataclass(frozen=True)
+class Call:
+    to: Address
+    data: bytes
+    
+    @property
+    def data_as_str(self):
+        return f"{self.data.hex()}"
+
+    @property
+    def to_as_str(self):
+        return f"{to_checksum_address(self.to)}"
+    
+    @property
+    def as_tuple(self):
+        return (self.to_as_str, self.data_as_str)
+
+    def __repr__(self):
+        return (f"Call(to={repr(self.to_as_str)}, "
+                f"data={repr(self.data_as_str)})")
+
+    def __str__(self):
+        return repr(self)
+
+
+class Multicall():
+
+    def __init__(self,
+                 uri_or_web3_or_evm: str | Web3 | EVM,
+                 address: Address):
+        if isinstance(uri_or_web3_or_evm, (str, Web3)):
+            self.evm = EVM(uri_or_web3_or_evm)
+        elif isinstance(uri_or_web3_or_evm, EVM):
+            self.evm = uri_or_web3_or_evm
+        else:
+            raise ValueError('Invalid RPC URI or Web3 object or EVM object')
+        self.web3: Web3 = self.evm.web3
+        self.address = Address(address)
+        self.clear_calls()
+
+    def clear_calls(self):
+        self._calls = {}
+        self._last_id = 0
+
+    def _raw_multicall(self, *args, block_identifier: Optional[str | int] = None):
+        
+        abi = [
+            {
+                "inputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "target",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "callData",
+                                "type": "bytes"
+                            }
+                        ],
+                        "internalType": "struct Multicall2.Call[]",
+                        "name": "calls",
+                        "type": "tuple[]"
+                    }
+                ],
+                "name": "aggregate",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "blockNumber",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bytes[]",
+                        "name": "returnData",
+                        "type": "bytes[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "target",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "callData",
+                                "type": "bytes"
+                            }
+                        ],
+                        "internalType": "struct Multicall2.Call[]",
+                        "name": "calls",
+                        "type": "tuple[]"
+                    }
+                ],
+                "name": "blockAndAggregate",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "blockNumber",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "blockHash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "bool",
+                                "name": "success",
+                                "type": "bool"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "returnData",
+                                "type": "bytes"
+                            }
+                        ],
+                        "internalType": "struct Multicall2.Result[]",
+                        "name": "returnData",
+                        "type": "tuple[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "blockNumber",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "getBlockHash",
+                "outputs": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "blockHash",
+                        "type": "bytes32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getBlockNumber",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "blockNumber",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getCurrentBlockCoinbase",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "coinbase",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getCurrentBlockDifficulty",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "difficulty",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getCurrentBlockGasLimit",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "gaslimit",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getCurrentBlockTimestamp",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "addr",
+                        "type": "address"
+                    }
+                ],
+                "name": "getEthBalance",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "balance",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getLastBlockHash",
+                "outputs": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "blockHash",
+                        "type": "bytes32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "requireSuccess",
+                        "type": "bool"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "target",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "callData",
+                                "type": "bytes"
+                            }
+                        ],
+                        "internalType": "struct Multicall2.Call[]",
+                        "name": "calls",
+                        "type": "tuple[]"
+                    }
+                ],
+                "name": "tryAggregate",
+                "outputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "bool",
+                                "name": "success",
+                                "type": "bool"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "returnData",
+                                "type": "bytes"
+                            }
+                        ],
+                        "internalType": "struct Multicall2.Result[]",
+                        "name": "returnData",
+                        "type": "tuple[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "requireSuccess",
+                        "type": "bool"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "target",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "callData",
+                                "type": "bytes"
+                            }
+                        ],
+                        "internalType": "struct Multicall2.Call[]",
+                        "name": "calls",
+                        "type": "tuple[]"
+                    }
+                ],
+                "name": "tryBlockAndAggregate",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "blockNumber",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "blockHash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "bool",
+                                "name": "success",
+                                "type": "bool"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "returnData",
+                                "type": "bytes"
+                            }
+                        ],
+                        "internalType": "struct Multicall2.Result[]",
+                        "name": "returnData",
+                        "type": "tuple[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ]
+        
+        fnc_name = 'tryBlockAndAggregate'
+
+        if block_identifier is None:
+            block_identifier = self.evm.block_identifier
+
+        contract = self.web3.eth.contract(
+            address = to_checksum_address(self.address),
+            abi = abi)
+        
+        fnc = getattr(contract.functions, fnc_name)
+
+        return fnc(False, args).call(block_identifier=block_identifier)[2]
+
+    def _make_call(self,
+        contract_address: Address,
+        fn_spec: str | FunctionSpec,
+        *args: Any) -> Call:
+
+        contract_address = to_checksum_address(Address(contract_address))
+
+        if isinstance(fn_spec, str):
+            fn_spec = FunctionSpec(fn_spec)
+        
+        if not isinstance(fn_spec, FunctionSpec):
+            raise ValueError("'fn_spec' is not str or FunctionSpec")
+        
+        return Call(to = contract_address,
+                    data = fn_spec.make_calldata(*args))
+
+    def _get_call_from_id(self, i: int) -> Call:
+        for key, value in self._calls.items():
+            if value['id']==i:
+                return key
+        raise IndexError()
+
+    def add_call(self,
+        contract_address: Address,
+        fn_spec: str | FunctionSpec,
+        *args: Any) -> int:
+
+        call = self._make_call(contract_address, fn_spec, *args)
+        
+        if call in self._calls:
+            id_ = self._calls[call]['id']
+        else:
+            self._last_id += 1
+            id_ = self._last_id
+            if isinstance(fn_spec, str):
+                fn_spec = FunctionSpec(fn_spec)
+            self._calls[call] = {
+                    'id': id_,
+                    'data': None,
+                    'fn_spec': fn_spec
+                }
+
+        return id_
+
+    def _get_call(self, *args: Any) -> Call:
+        if len(args)==1:
+            arg = args[0]
+            if isinstance(arg, int):
+                i = arg
+                return self._get_call(self._get_call_from_id(i))
+            if isinstance(arg, Call):
+                call = arg
+                if call not in self._calls:
+                    raise IndexError()
+                return call
+        contract_address: Address
+        fn_spec: str | FunctionSpec
+        contract_address, fn_spec, *args = args
+        call = self._make_call(contract_address, fn_spec, *args)
+        return self._get_call(call)
+        
+    def remove_call(self, *args: Any) -> None:
+        call = self._get_call(*args)
+        del self._calls[call]
+
+    def get_call(self, *args: Any) -> Any:
+        call = self._get_call(*args)
+        return self._calls[call]['data']
+
+    def _run(self, block_identifier: Optional[str | int] = None):
+
+        if block_identifier is None:
+            block_identifier = self.evm.block_identifier
+
+        calls_items = [ (k, v) for (k, v) in self._calls.items()]
+
+        args = [ k.as_tuple for (k, v) in calls_items]
+
+        raw = self._raw_multicall(*args, block_identifier=block_identifier)
+
+        for (call, extra), (ok, raw_result) in zip(calls_items, raw):
+            result = None
+            if ok:
+                fn_spec = extra['fn_spec']
+                result = fn_spec.decode_outputs(raw_result)
+            self._calls[call]['data'] = result
+
+    _already_been_executed_once = False
+
+    def __call__(self,
+                 only_first_time = False,
+                 block_identifier: Optional[str | int] = None):
+        if not(only_first_time and self._already_been_executed_once):
+            if block_identifier is None:
+                block_identifier = self.evm.block_identifier
+            self._run(block_identifier = block_identifier)
+            self._already_been_executed_once = True
+        return len(self)
+    
+    def run(self, block_identifier: Optional[str | int] = None):
+        return self(block_identifier = block_identifier)
+    
+    def run_only_first_time(self,
+                            block_identifier: Optional[str | int] = None):
+        return self(only_first_time = True,
+                    block_identifier = block_identifier)
+
+    def __len__(self):
+        return len(self._calls)
+
+    def __bool__(self):
+        if len(self)==0:
+            return False
+        return any([(v['data']is not None) for v in self._calls.values()])
 
 
 def get_addr_env(env_name: str, default_addr:str) -> str:
@@ -396,6 +939,17 @@ def get_node_rpc_uri_env(env_name: str = 'NODE_RPC_URI',
         cast=URI,
         alias={
             'rootstock': 'https://public-node.rsk.co',
+            'rsk': 'rootstock',
+            'rsk_mainnet': 'rootstock'
+            })
+
+
+def get_multicall_addr_env(env_name: str = 'MULTICALL_ADDR',
+                         default_addr: str = 'rootstock') -> str:
+    return get_env(env_name, default_addr,
+        cast=Address,
+        alias={
+            'rootstock': '0x8f344c3b2a02a801c24635f594c5652c8a2eb02a',
             'rsk': 'rootstock',
             'rsk_mainnet': 'rootstock'
             })

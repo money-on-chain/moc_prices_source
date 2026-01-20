@@ -1,4 +1,4 @@
-from .pairs import RIF_USDT_MP1P
+from .special_pairs import RIF_USDT_MP1P
 from .base import BaseWithFailover, Decimal, engine_register
 from .rif_usdt_binance import Engine as RifUsdtEngine
 

@@ -40,35 +40,35 @@ Get data from only coinpairs that start from `BTC`
 ```shell
 user@workstation:~$ moc_prices_source_check BTC/*
 
-From     To               V.    Exchnage    Response        Weight     %  Time
--------  ---------------  ----  ----------  ------------  --------  ----  ------
-Bitcoin  Dollar                 Bitfinex    $  97.60900K      0.18  18    0.14s
-Bitcoin  Dollar                 Bitstamp    $  97.62100K      0.22  22    0.13s
-Bitcoin  Dollar                 Coinbase    $  97.75202K      0.25  25    0.15s
-Bitcoin  Dollar                 Gemini      $  97.62253K      0.17  17    0.73s
-Bitcoin  Dollar                 Kraken      $  97.61320K      0.18  18    0.3s
-Bitcoin  Peso Argentino         Binance     $ 149.30197M      0.2   20    0.38s
-Bitcoin  Peso Argentino         BuenBit     $ 148.62379M      0.2   20    3.25s
-Bitcoin  Peso Argentino         Decrypto    $ 148.62021M      0.2   20    1.97s
-Bitcoin  Peso Argentino         Lemoncash   $ 146.03527M      0.2   20    0.66s
-Bitcoin  Peso Argentino         belo.app    $ 149.92490M      0.2   20    0.28s
-Bitcoin  Peso Colombiano        BuenBit     $ 355.27837M      0.33  33.3  1.24s
-Bitcoin  Peso Colombiano        Coinbase    $ 359.18179M      0.33  33.3  0.32s
-Bitcoin  Peso Colombiano        buda.com    $ 346.95004M      0.33  33.3  3.19s
-Bitcoin  Tether                 Binance     ₮  97.61932K      0.65  65    0.35s
-Bitcoin  Tether                 Bybit       ₮  97.61685K      0.1   10    0.42s
-Bitcoin  Tether                 Huobi       ₮  97.59964K      0.05   5    0.96s
-Bitcoin  Tether                 KuCoin      ₮  97.62255K      0.05   5    0.49s
-Bitcoin  Tether                 OKX         ₮  97.61125K      0.15  15    0.4s
+Coinpair    V.    Short description     Exchnage    Response        Weight     %  Time
+----------  ----  --------------------  ----------  ------------  --------  ----  ------
+BTC/ARS           Bitcoin to Peso Arg.  Binance     $ 141.33142M      0.2   20    0.52s
+BTC/ARS           Bitcoin to Peso Arg.  BuenBit     $ 140.53123M      0.2   20    0.53s
+BTC/ARS           Bitcoin to Peso Arg.  Decrypto    $ 141.24921M      0.2   20    2.36s
+BTC/ARS           Bitcoin to Peso Arg.  Lemoncash   $ 139.04959M      0.2   20    0.85s
+BTC/ARS           Bitcoin to Peso Arg.  belo.app    $ 141.97048M      0.2   20    1.47s
+BTC/COP           Bitcoin to Peso Col.  BuenBit     $ 337.09448M      0.33  33.3  0.77s
+BTC/COP           Bitcoin to Peso Col.  Coinbase    $ 342.05334M      0.33  33.3  0.94s
+BTC/COP           Bitcoin to Peso Col.  buda.com    $ 330.09554M      0.33  33.3  0.44s
+BTC/USD           Bitcoin to Dollar     Bitfinex    $  93.21900K      0.18  18    0.33s
+BTC/USD           Bitcoin to Dollar     Bitstamp    $  93.19100K      0.22  22    0.93s
+BTC/USD           Bitcoin to Dollar     Coinbase    $  93.18800K      0.25  25    0.93s
+BTC/USD           Bitcoin to Dollar     Gemini      $  93.18596K      0.17  17    1.23s
+BTC/USD           Bitcoin to Dollar     Kraken      $  93.19250K      0.18  18    0.54s
+BTC/USDT          Bitcoin to Tether     Binance     ₮  93.24244K      0.65  65    0.5s
+BTC/USDT          Bitcoin to Tether     Bybit       ₮  93.24105K      0.1   10    0.6s
+BTC/USDT          Bitcoin to Tether     Huobi       ₮  93.25393K      0.05   5    0.81s
+BTC/USDT          Bitcoin to Tether     KuCoin      ₮  93.24085K      0.05   5    1.02s
+BTC/USDT          Bitcoin to Tether     OKX         ₮  93.23385K      0.15  15    0.91s
 
-    Coin pair                 Value   Sources count    Ok
---  -----------  ------------------  ---------------  ----
-↓   BTC/ARS      148,623,790.420000      5 of 5        ✓
-↓   BTC/COP      355,278,370.898000      3 of 3        ✓
-↓   BTC/USD           97,621.000000      5 of 5        ✓
-↓   BTC/USDT          97,619.325000      5 of 5        ✓
+    Coinpair                 Value   Sources count    Ok
+--  ----------  ------------------  ---------------  ----
+↓   BTC/ARS     141,249,207.000000      5 of 5        ✓
+↓   BTC/COP     337,094,479.904000      3 of 3        ✓
+↓   BTC/USD          93,191.000000      5 of 5        ✓
+↓   BTC/USDT         93,242.445000      5 of 5        ✓
 
-Response time 3.26s
+Response time 2.37s
 
 user@workstation:~$
 ```
@@ -78,126 +78,128 @@ Get data from all supported coinpairs
 ```shell
 user@workstation:~$ moc_prices_source_check 
 
-From          To               V.      Exchnage               Response                Weight  %      Time
-------------  ---------------  ------  ---------------------  --------------------  --------  -----  ------
-Binance Coin  Tether                   Binance                ₮ 945.96000               1     100.0  0.38s
-Bitcoin       Dollar                   Bitfinex               $  97.60900K              0.18  18.0   0.11s
-Bitcoin       Dollar                   Bitstamp               $  97.62700K              0.22  22.0   0.3s
-Bitcoin       Dollar                   Coinbase               $  97.75202K              0.25  25.0   0.25s
-Bitcoin       Dollar                   Gemini                 $  97.62253K              0.17  17.0   0.93s
-Bitcoin       Dollar                   Kraken                 $  97.61650K              0.18  18.0   0.38s
-Bitcoin       Peso Argentino           Binance                $ 149.30197M              0.2   20.0   0.36s
-Bitcoin       Peso Argentino           BuenBit                $ 148.24363M              0.2   20.0   10.2s
-Bitcoin       Peso Argentino           Decrypto               $ 148.57088M              0.2   20.0   2.04s
-Bitcoin       Peso Argentino           Lemoncash              $ 146.04463M              0.2   20.0   0.68s
-Bitcoin       Peso Argentino           belo.app               $ 149.86164M              0.2   20.0   3.35s
-Bitcoin       Peso Colombiano          BuenBit                $ 355.27837M              0.33  33.3   1.21s
-Bitcoin       Peso Colombiano          Coinbase               $ 359.18179M              0.33  33.3   0.58s
-Bitcoin       Peso Colombiano          buda.com               $ 346.95004M              0.33  33.3   7.46s
-Bitcoin       Tether                   Binance                ₮  97.59000K              0.65  65.0   0.4s
-Bitcoin       Tether                   Bybit                  ₮  97.58565K              0.1   10.0   0.45s
-Bitcoin       Tether                   Huobi                  ₮  97.59597K              0.05  5.0    0.39s
-Bitcoin       Tether                   KuCoin                 ₮  97.59950K              0.05  5.0    0.42s
-Bitcoin       Tether                   OKX                    ₮  97.60995K              0.15  15.0   0.44s
-Bpro          Bitcoin                  MOC onchain            ₿   1.22221               1     100.0  1.85s
-DOC Token     Dollar                   Dummy                  $   1.00000               1     100.0  0.0s
-Dollar        Peso Argentino   CCL     Ambito.com             $   1.52253K              0.14  14.3   0.16s
-Dollar        Peso Argentino   CCL     CoinMonitor.info       $   1.52488K              0.14  14.3   0.74s
-Dollar        Peso Argentino   CCL     CriptoYa.com           $   1.50896K              0.14  14.3   0.19s
-Dollar        Peso Argentino   CCL     DolarHoy.com           $   1.52080K              0.14  14.3   0.61s
-Dollar        Peso Argentino   CCL     InfoDolar.com          $   1.52444K              0.14  14.3   0.84s
-Dollar        Peso Argentino   CCL     Infobae                $   1.52744K              0.14  14.3   0.54s
-Dollar        Peso Argentino   CCL     LaNacion.com.ar        $   1.52954K              0.14  14.3   0.18s
-Dollar        Peso Argentino           Ambito.com             $   1.50500K              0.14  14.3   1.34s
-Dollar        Peso Argentino           CoinMonitor.info       $   1.51500K              0.14  14.3   0.83s
-Dollar        Peso Argentino           CriptoYa.com           $   1.50500K              0.14  14.3   7.29s
-Dollar        Peso Argentino           DolarHoy.com           $   1.50500K              0.14  14.3   10.12s
-Dollar        Peso Argentino           InfoDolar.com          $   1.50500K              0.14  14.3   3.64s
-Dollar        Peso Argentino           Infobae                $   1.51500K              0.14  14.3   0.57s
-Dollar        Peso Argentino           LaNacion.com.ar        $   1.50500K              0.14  14.3   0.14s
-Dollar        Peso Colombiano          BanRep                 $   3.65501K              0.5   50.0   0.75s
-Dollar        Peso Colombiano          DolarHoy.co            $   3.70000K              0.5   50.0   1.0s
-Dollar        Peso Mexicano            Bitso.com              $  17.81400               0.1   10.0   3.38s
-Dollar        Peso Mexicano            CitiBanamex            $  20.04275               0.1   10.0   0.37s
-Dollar        Peso Mexicano            Currency.me.uk         $  17.81280               0.1   10.0   1.82s
-Dollar        Peso Mexicano            ElDolar.info           $  17.77450               0.1   10.0   0.98s
-Dollar        Peso Mexicano            ElEconomista.es        $  17.93300               0.1   10.0   0.92s
-Dollar        Peso Mexicano            InfoDolar.com.mx       $  17.73500               0.1   10.0   8.24s
-Dollar        Peso Mexicano            Intercam.com.mx        $  17.81305               0.1   10.0   1.11s
-Dollar        Peso Mexicano            TheMoneyConverter.com  $  17.81254               0.1   10.0   3.53s
-Dollar        Peso Mexicano            Wise.com               $  17.81310               0.1   10.0   0.44s
-Dollar        Peso Mexicano            X-rates.com            $  17.81279               0.1   10.0   0.85s
-Ether         Bitcoin                  Binance                ₿  34.63000m              0.25  25.0   0.4s
-Ether         Bitcoin                  Bitfinex               ₿  34.63100m              0.25  25.0   0.32s
-Ether         Bitcoin                  Bitstamp               ₿  34.60250m              0.25  25.0   0.35s
-Ether         Bitcoin                  Kraken                 ₿  34.64000m              0.25  25.0   0.54s
-Ether         Dollar                   Bitfinex               $   3.37850K              0.18  18.0   0.31s
-Ether         Dollar                   Bitstamp               $   3.37980K              0.22  22.0   0.34s
-Ether         Dollar                   Coinbase               $   3.38575K              0.25  25.0   0.62s
-Ether         Dollar                   Gemini                 $   3.37863K              0.17  17.0   0.84s
-Ether         Dollar                   Kraken                 $   3.37971K              0.18  18.0   0.45s
-Gas           Bitcoin                  RSK onchain            ₿  26.06560p              1     100.0  1.72s
-MOC Token     Bitcoin          Sovryn  Sovryn onchain         ₿ 371.22669p              1     100.0  3.31s
-MOC Token     Dollar           Oku     Oku onchain            $  36.58623m              1     100.0  1.7s
-RIF Token     Bitcoin          mp1%    Binance                ₿  50.73925m              1     100.0  2.71s
-RIF Token     Bitcoin                  Binance                ₿ 380.00000p              1     100.0  0.39s
-RIF Token     Tether           MA      Binance                ₮  37.45222m              1     100.0  0.39s
-RIF Token     Tether           MA2     Binance                ₮  37.47018m              1     100.0  0.37s
-RIF Token     Tether           MA3     Binance                ₮  37.47988m              1     100.0  0.39s
-RIF Token     Tether           mp1%    Binance                ₮  24.18568K              1     100.0  0.36s
-RIF Token     Tether                   Binance                ₮  37.60000m              1     100.0  0.39s
-Tether        Dollar                   Bitstamp               $ 999.87500m              0.15  15.0   0.83s
-Tether        Dollar                   Coinbase               $ 999.93500m              0.35  35.0   0.4s
-Tether        Dollar                   Gemini                 $ 999.89000m              0.15  15.0   0.92s
-Tether        Dollar                   Kraken                 $ 999.88500m              0.35  35.0   0.41s
+Coinpair    V.    Short description       Exchnage               Response                Weight  %      Time
+----------  ----  ----------------------  ---------------------  --------------------  --------  -----  ------
+BLOCK       RSK   Rootstock block number  RSK onchain            8438775                   1     100.0  2.41s
+BNB/USDT          BinanceCoin to Tether   Binance                ₮ 926.50000               1     100.0  0.68s
+BPRO/BTC          BPro to Bitcoin         MOC onchain            ₿   1.21772               1     100.0  2.57s
+BTC/ARS           Bitcoin to Peso Arg.    Binance                $ 141.33142M              0.2   20.0   0.68s
+BTC/ARS           Bitcoin to Peso Arg.    BuenBit                $ 140.53123M              0.2   20.0   0.87s
+BTC/ARS           Bitcoin to Peso Arg.    Decrypto               $ 141.24936M              0.2   20.0   2.34s
+BTC/ARS           Bitcoin to Peso Arg.    Lemoncash              $ 139.04959M              0.2   20.0   1.19s
+BTC/ARS           Bitcoin to Peso Arg.    belo.app               $ 141.97048M              0.2   20.0   3.68s
+BTC/COP           Bitcoin to Peso Col.    BuenBit                $ 337.09448M              0.33  33.3   0.67s
+BTC/COP           Bitcoin to Peso Col.    Coinbase               $ 342.05920M              0.33  33.3   1.15s
+BTC/COP           Bitcoin to Peso Col.    buda.com               $ 330.09554M              0.33  33.3   0.62s
+BTC/USD           Bitcoin to Dollar       Bitfinex               $  93.21900K              0.18  18.0   0.93s
+BTC/USD           Bitcoin to Dollar       Bitstamp               $  93.19100K              0.22  22.0   0.66s
+BTC/USD           Bitcoin to Dollar       Coinbase               $  93.18800K              0.25  25.0   1.31s
+BTC/USD           Bitcoin to Dollar       Gemini                 $  93.18596K              0.17  17.0   1.06s
+BTC/USD           Bitcoin to Dollar       Kraken                 $  93.19030K              0.18  18.0   1.13s
+BTC/USDT          Bitcoin to Tether       Binance                ₮  93.24244K              0.65  65.0   0.64s
+BTC/USDT          Bitcoin to Tether       Bybit                  ₮  93.24105K              0.1   10.0   0.64s
+BTC/USDT          Bitcoin to Tether       Huobi                  ₮  93.25393K              0.05  5.0    1.25s
+BTC/USDT          Bitcoin to Tether       KuCoin                 ₮  93.24085K              0.05  5.0    1.13s
+BTC/USDT          Bitcoin to Tether       OKX                    ₮  93.23385K              0.15  15.0   0.63s
+DOC/USD           Pegged 1:1 to USD       Dummy                  $   1.00000               1     100.0  0.0s
+ETH/BTC           Ether to Bitcoin        Binance                ₿  34.51000m              0.25  25.0   0.65s
+ETH/BTC           Ether to Bitcoin        Bitfinex               ₿  34.51600m              0.25  25.0   0.93s
+ETH/BTC           Ether to Bitcoin        Bitstamp               ₿  34.52314m              0.25  25.0   0.62s
+ETH/BTC           Ether to Bitcoin        Kraken                 ₿  34.51000m              0.25  25.0   1.47s
+ETH/USD           Ether to Dollar         Bitfinex               $   3.21690K              0.18  18.0   0.82s
+ETH/USD           Ether to Dollar         Bitstamp               $   3.21602K              0.22  22.0   0.9s
+ETH/USD           Ether to Dollar         Coinbase               $   3.21610K              0.25  25.0   1.25s
+ETH/USD           Ether to Dollar         Gemini                 $   3.21553K              0.17  17.0   1.22s
+ETH/USD           Ether to Dollar         Kraken                 $   3.21599K              0.18  18.0   1.43s
+GAS/BTC           Rootstock gas price     RSK onchain            ₿  26.06560p              1     100.0  2.46s
+MOC/BTC     sov   MOC to Bitcoin          Sovryn onchain         ₿ 371.18752p              1     100.0  4.47s
+MOC/USD     Oku   MOC to Dollar           Oku onchain            $  34.64034m              1     100.0  2.41s
+RIF/BTC     mp1%  To move the price 1%    Binance                ₿  50.73925m              1     100.0  2.71s
+RIF/BTC           RIF to Bitcoin          Binance                ₿ 380.00000p              1     100.0  1.06s
+RIF/USDT    MA    RIF to Tether           Binance                ₮  37.25000m              1     100.0  1.0s
+RIF/USDT    MA2   RIF to Tether           Binance                ₮  37.24607m              1     100.0  0.97s
+RIF/USDT    MA3   RIF to Tether           Binance                ₮  37.26527m              1     100.0  0.95s
+RIF/USDT    mp1%  To move the price 1%    Binance                ₮  40.15552K              1     100.0  0.81s
+RIF/USDT          RIF to Tether           Binance                ₮  37.20000m              1     100.0  1.01s
+USD/ARS     CCL   Dollar to Peso Arg.     Ambito.com             $   1.51263K              0.14  14.3   0.99s
+USD/ARS     CCL   Dollar to Peso Arg.     CoinMonitor.info       $   1.51286K              0.14  14.3   1.36s
+USD/ARS     CCL   Dollar to Peso Arg.     CriptoYa.com           $   1.50556K              0.14  14.3   0.57s
+USD/ARS     CCL   Dollar to Peso Arg.     DolarHoy.com           $   1.51325K              0.14  14.3   1.65s
+USD/ARS     CCL   Dollar to Peso Arg.     InfoDolar.com          $   1.51044K              0.14  14.3   1.45s
+USD/ARS     CCL   Dollar to Peso Arg.     Infobae                $   1.51060K              0.14  14.3   1.51s
+USD/ARS     CCL   Dollar to Peso Arg.     LaNacion.com.ar        $   1.51902K              0.14  14.3   0.82s
+USD/ARS           Dollar to Peso Arg.     Ambito.com             $   1.49500K              0.14  14.3   1.01s
+USD/ARS           Dollar to Peso Arg.     CoinMonitor.info       $   1.50500K              0.14  14.3   1.35s
+USD/ARS           Dollar to Peso Arg.     CriptoYa.com           $   1.49500K              0.14  14.3   1.0s
+USD/ARS           Dollar to Peso Arg.     DolarHoy.com           $   1.49500K              0.14  14.3   1.78s
+USD/ARS           Dollar to Peso Arg.     InfoDolar.com          $   1.49500K              0.14  14.3   1.68s
+USD/ARS           Dollar to Peso Arg.     Infobae                $   1.50500K              0.14  14.3   1.66s
+USD/ARS           Dollar to Peso Arg.     LaNacion.com.ar        $   1.49500K              0.14  14.3   0.95s
+USD/COP           Dollar to Peso Col.     BanRep                 $   3.66658K              0.5   50.0   1.35s
+USD/COP           Dollar to Peso Col.     DolarHoy.co            $   3.72500K              0.5   50.0   2.31s
+USD/MXN           Dollar to Peso Mex.     Bitso.com              $  17.58200               0.1   10.0   0.97s
+USD/MXN           Dollar to Peso Mex.     CitiBanamex            $  20.04275               0.1   10.0   1.15s
+USD/MXN           Dollar to Peso Mex.     Currency.me.uk         $  17.57650               0.1   10.0   2.3s
+USD/MXN           Dollar to Peso Mex.     ElDolar.info           $  17.57850               0.1   10.0   2.28s
+USD/MXN           Dollar to Peso Mex.     ElEconomista.es        $  17.93300               0.1   10.0   1.65s
+USD/MXN           Dollar to Peso Mex.     InfoDolar.com.mx       $  17.61500               0.1   10.0   2.0s
+USD/MXN           Dollar to Peso Mex.     Intercam.com.mx        $  17.57640               0.1   10.0   1.97s
+USD/MXN           Dollar to Peso Mex.     TheMoneyConverter.com  $  17.57995               0.1   10.0   1.64s
+USD/MXN           Dollar to Peso Mex.     Wise.com               $  17.57690               0.1   10.0   1.31s
+USD/MXN           Dollar to Peso Mex.     X-rates.com            $  17.57723               0.1   10.0   1.56s
+USDT/USD          Tether to Dollar        Bitstamp               $ 999.39500m              0.15  15.0   1.3s
+USDT/USD          Tether to Dollar        Coinbase               $ 999.48000m              0.35  35.0   1.5s
+USDT/USD          Tether to Dollar        Gemini                 $ 999.39500m              0.15  15.0   1.09s
+USDT/USD          Tether to Dollar        Kraken                 $ 999.42500m              0.35  35.0   1.33s
 
-    Coin pair                     Value   Sources count    Ok
---  ---------------  ------------------  ---------------  ----
-ƒ   BNB/USD                  946.275272        N/A         ✓
-↓   BNB/USDT                 945.960000      1 of 1        ✓
-ƒ   BPRO/ARS         181,584,944.254282        N/A         ✓
-↓   BPRO/BTC                   1.222211      1 of 1        ✓
-ƒ   BPRO/COP         434,225,089.849684        N/A         ✓
-ƒ   BPRO/USD             119,315.318164        N/A         ✓
-↓   BTC/ARS          148,570,878.750000      5 of 5        ✓
-↓   BTC/COP          355,278,370.898000      3 of 3        ✓
-↓   BTC/USD               97,622.530000      5 of 5        ✓
-↓   BTC/USDT              97,590.005000      5 of 5        ✓
-↓   DOC/USD                    1.000000      1 of 1        ✓
-↓   ETH/BTC                    0.034630      4 of 4        ✓
-↓   ETH/USD                3,379.710000      5 of 5        ✓
-ƒ   ETH/USD(B)             3,380.717025        N/A         ✓
-↓   GAS/BTC               2.607 × 10⁻¹¹      1 of 1        ✓
-ƒ   MOC/BPRO               4.559 × 10⁻⁷        N/A         ✓
-ƒ   MOC/BTC                3.730 × 10⁻⁷        N/A         ✓
-↓   MOC/BTC(Sovryn)        3.712 × 10⁻⁷      1 of 1        ✓
-ƒ   MOC/USD                    0.036240        N/A         ✓
-↓   MOC/USD(Oku)               0.036586      1 of 1        ✓
-ƒ   MOC/USD(WM)                0.036413        N/A         ✓
-↓   RIF/BTC                3.800 × 10⁻⁷      1 of 1        ✓
-↓   RIF/BTC(mp1%)              0.050739      1 of 1        ✓
-ƒ   RIF/USD                    0.037097        N/A         ✓
-ƒ   RIF/USD(B)                 0.037097        N/A         ✓
-ƒ   RIF/USD(T)                 0.037596        N/A         ✓
-ƒ   RIF/USD(TB)                0.037613        N/A         ✓
-ƒ   RIF/USD(TBMA)              0.037465        N/A         ✓
-ƒ   RIF/USD(TMA)               0.037448        N/A         ✓
-ƒ   RIF/USD(WMTB)              0.037484        N/A         ✓
-↓   RIF/USDT                   0.037600      1 of 1        ✓
-↓   RIF/USDT(MA)               0.037452      1 of 1        ✓
-↓   RIF/USDT(MA2)              0.037470      1 of 1        ✓
-↓   RIF/USDT(MA3)              0.037480      1 of 1        ✓
-↓   RIF/USDT(mp1%)        24,185.678300      1 of 1        ✓
-↓   USD/ARS                1,505.000000      7 of 7        ✓
-ƒ   USD/ARS(CCB)           1,521.891297        N/A         ✓
-↓   USD/ARS(CCL)           1,524.445000      7 of 7        ✓
-↓   USD/COP                3,677.506400      2 of 2        ✓
-ƒ   USD/COP(CCB)           3,639.307145        N/A         ✓
-↓   USD/MXN                   17.793650     10 of 10       ✓
-↓   USDT/USD                   0.999886      4 of 4        ✓
-ƒ   USDT/USD(B)                1.000333        N/A         ✓
+    Coinpair                     Value   Sources count    Ok
+--  --------------  ------------------  ---------------  ----
+↓   BLOCK(RSK)                 8438775      1 of 1        ✓
+ƒ   BNB/USD                 925.981863        N/A         ✓
+↓   BNB/USDT                926.500000      1 of 1        ✓
+ƒ   BPRO/ARS        172,002,614.139300        N/A         ✓
+↓   BPRO/BTC                  1.217723      1 of 1        ✓
+ƒ   BPRO/COP        410,487,752.802188        N/A         ✓
+ƒ   BPRO/USD            113,479.985910        N/A         ✓
+↓   BTC/ARS         141,249,358.500000      5 of 5        ✓
+↓   BTC/COP         337,094,479.904000      3 of 3        ✓
+↓   BTC/USD              93,190.300000      5 of 5        ✓
+↓   BTC/USDT             93,242.445000      5 of 5        ✓
+↓   DOC/USD                   1.000000      1 of 1        ✓
+↓   ETH/BTC                   0.034517      4 of 4        ✓
+↓   ETH/USD               3,216.020000      5 of 5        ✓
+ƒ   ETH/USD(B)            3,216.609513        N/A         ✓
+↓   GAS/BTC              2.607 × 10⁻¹¹      1 of 1        ✓
+ƒ   MOC/BPRO              4.523 × 10⁻⁷        N/A         ✓
+ƒ   MOC/BTC               3.715 × 10⁻⁷        N/A         ✓
+↓   MOC/BTC(sov)          3.712 × 10⁻⁷      1 of 1        ✓
+ƒ   MOC/USD                   0.034591        N/A         ✓
+↓   MOC/USD(Oku)              0.034640      1 of 1        ✓
+ƒ   MOC/USD(WM)               0.034616        N/A         ✓
+↓   RIF/BTC               3.800 × 10⁻⁷      1 of 1        ✓
+↓   RIF/BTC(mp1%)             0.050739      1 of 1        ✓
+ƒ   RIF/USD                   0.035412        N/A         ✓
+ƒ   RIF/USD(B)                0.035412        N/A         ✓
+ƒ   RIF/USD(T)                0.037178        N/A         ✓
+ƒ   RIF/USD(TB)               0.037179        N/A         ✓
+ƒ   RIF/USD(TBMA)             0.037229        N/A         ✓
+ƒ   RIF/USD(TMA)              0.037228        N/A         ✓
+ƒ   RIF/USD(WMTB)             0.036737        N/A         ✓
+↓   RIF/USDT                  0.037200      1 of 1        ✓
+↓   RIF/USDT(MA)              0.037250      1 of 1        ✓
+↓   RIF/USDT(MA2)             0.037246      1 of 1        ✓
+↓   RIF/USDT(MA3)             0.037265      1 of 1        ✓
+↓   RIF/USDT(mp1%)       40,155.515200      1 of 1        ✓
+↓   USD/ARS               1,495.000000      7 of 7        ✓
+ƒ   USD/ARS(CCB)          1,515.708808        N/A         ✓
+↓   USD/ARS(CCL)          1,512.630000      7 of 7        ✓
+↓   USD/COP               3,695.787800      2 of 2        ✓
+ƒ   USD/COP(CCB)          3,617.270037        N/A         ✓
+↓   USD/MXN                  17.755750     10 of 10       ✓
+↓   USDT/USD                  0.999416      4 of 4        ✓
+ƒ   USDT/USD(B)               0.999441        N/A         ✓
 
-Response time 10.97s
+Response time 12.41s
 
 user@workstation:~$
 ```

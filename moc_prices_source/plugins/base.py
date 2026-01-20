@@ -1,15 +1,15 @@
 import requests, datetime, json
-from typing import Optional, Callable, Tuple, Any
-from types import LambdaType
+from typing import Optional, Callable, Tuple, Any, Union
 from pathlib import Path
-from inspect import getfile, currentframe, getsource
+from inspect import getfile, currentframe, getsource, isclass
 from os.path import basename, dirname, abspath
 from decimal import Decimal, InvalidOperation
 from bs4 import BeautifulSoup
 from requests import Response
 from ..redis_conn import get_redis
 from ..evm import OneShotHTTPProvider, HTTPProvider, Web3, EVM, Address, \
-    URI, get_addr_env, get_uri_env, get_node_rpc_uri_env
+    URI, get_addr_env, get_uri_env, get_node_rpc_uri_env, \
+        get_multicall_addr_env
 from ..cli import get_env
 
 
@@ -83,6 +83,7 @@ class CoinPair(object):
                  to_: Optional[Coin] = None,
                  variant: Optional[str] = None,
                  description: Optional[str] = None,
+                 short_description: Optional[str] = None,
                  min_ok_sources_count: int = 0,
                  name: Optional[str] = None,
                  requirements: Optional[list] = None,
@@ -100,6 +101,7 @@ class CoinPair(object):
         self._to = to_
         self._variant = to_str(variant)
         self._description = to_str(description)
+        self._short_description = to_str(short_description)
         self._name = to_str(name)
         self._min_ok_sources_count = \
             int(min_ok_sources_count) if min_ok_sources_count else 0
@@ -108,6 +110,10 @@ class CoinPair(object):
     @property
     def is_computed(self) -> bool:
         return self._formula is not None
+
+    @staticmethod
+    def _is_lambda(obj: Any) -> bool:
+        return callable(obj) and getattr(obj, "__name__", None) == "<lambda>"
 
     def set_computed(self,
                      requirements: Optional[list] = None,
@@ -118,13 +124,24 @@ class CoinPair(object):
         self._formula = formula
 
         if formula is not None and formula_desc is None:
-            if isinstance(formula, LambdaType):
+            if self._is_lambda(formula):
                 formula_desc = ':'.join(getsource(formula).split('lambda'
                     )[-1].strip().split(':')[1:]).strip()
                 if formula_desc[-1]==')': # why?
                     formula_desc = formula_desc[:-1].strip() # why?
                 formula_desc = '\n'.join(map(str.strip, formula_desc.split('\n')))
                 formula_desc = formula_desc.replace('*', '×')
+            elif callable(formula) and formula.__doc__ is not None:
+                formula_desc = formula.__doc__
+                formula_desc = formula_desc.split('\n')
+                formula_desc = [l for l in formula_desc if l.strip()!='']
+                while all([l[0]==' ' for l in formula_desc]):
+                    formula_desc = [l[1:] for l in formula_desc]
+                formula_desc = '\n'.join(formula_desc)
+                if not '\n' in formula_desc:
+                    formula_desc = formula_desc.strip()
+            elif isclass(formula):
+                formula_desc = getsource(formula)
             else:
                 formula_desc = str(formula)
 
@@ -150,6 +167,8 @@ class CoinPair(object):
     
     @property
     def description(self):
+        if self._description is None and self._short_description is not None:
+            return self._short_description
         return self._description
     
     @property
@@ -176,17 +195,27 @@ class CoinPair(object):
         return f"{self}"
 
     @property
-    def name(self):
+    def name_base(self):
         if self._name is not None:
-            if self.variant is None:
-                return f"{self._name}"
-            else:
-                return f"{self._name}({self.variant})"
-        name = f"{self.from_.symbol}/{self.to_.symbol}"
-        if self.variant is None:
-            return f"{name}"
+            name = self._name
         else:
-            return f"{name}({self.variant})"
+            name = f"{self.from_.symbol}/{self.to_.symbol}"
+        return f"{name}"
+
+    @property
+    def name(self):
+        if self.variant is None:
+            return self.name_base
+        else:
+            return f"{self.name_base}({self.variant})"
+
+    @property
+    def short_description(self):
+        if self._short_description is None and self.from_ is not None \
+            and self.to_ is not None:
+            return f"{self.from_.name} to {self.to_.name}"
+        else:
+            return self._short_description
 
     @property
     def as_dict(self):
@@ -362,8 +391,8 @@ class Base(object):
 
 
     def __str__(self):
-        name  = '{} {}'.format(self.description, self.coinpair
-            ) if self.description else self.name
+        name  = (f"{self.description} {self.coinpair}" if self.description
+                 else self.name)
         if self.price is None:
             return name
         value = self.price if self else self.error
@@ -656,6 +685,7 @@ class BaseWithFailover(Base):
 class BaseOnChain(Base):
 
     _uri = get_node_rpc_uri_env()
+    _multicall_addr = get_multicall_addr_env()
 
     Web3 = Web3
     EVM = EVM
@@ -674,7 +704,8 @@ class BaseOnChain(Base):
             }))
 
     def make_evm_with_uri(self, timeout=10):
-        return EVM(self.make_web3_obj_with_uri(timeout=timeout))
+        return EVM(self.make_web3_obj_with_uri(timeout=timeout),
+                   multicall_addr = self._multicall_addr)
 
     def _get_value_from_evm(self, evm: EVM
                             ) -> Tuple[Optional[Decimal], Optional[str]]:
@@ -721,7 +752,7 @@ class BaseOnChain(Base):
 
             price = self._get_price()
     
-            if not price:
+            if price is None:
                 if not self._error:
                     self._error = "Engine error trying to get 'price'"
                 return False
@@ -730,11 +761,14 @@ class BaseOnChain(Base):
                 time = datetime.timedelta(seconds=self._rq_side_cache_time)
                 self._redis.setex(cache_key, time, str(price))
 
-        try:
-            self._price = Decimal(str(price))
-        except Exception:
-            self._error = "Engine error trying to get 'price'"
-            return False
+        if isinstance(price, (int, bool)):
+            self._price = price
+        else:
+            try:
+                self._price = Decimal(str(price))
+            except Exception:
+                self._error = "Engine error trying to get 'price'"
+                return False
 
         self._timestamp = self._now()
         self._last_change_timestamp = self._timestamp
@@ -756,3 +790,35 @@ def engine_register(name_id: Optional[str] = None):
         return cls
     return engine_register_base
 
+
+class Formula():
+    
+    value: Union[bool, float, Decimal, None] = None
+    max_steps: int = 1
+    _step: int = 0
+
+    def __init__(self, *args) -> None:
+        self.value = self.formula(*args)
+    
+    @staticmethod
+    def formula(*args) -> Union[bool, float, Decimal, None]:
+        return None
+    
+    def return_value(self) -> Union[bool, float, Decimal, None]:
+        return self.value
+
+    def step_run(self,
+                 value: Union[bool, float, Decimal, None],
+                 step: int
+                 ) -> Union[bool, float, Decimal, None]:
+        return None
+
+    def __call__(self):
+        self._step += 1
+        new_value = self.step_run(self.value, self._step)
+        if new_value is not None:
+            self.value = new_value
+        if self._step==self.max_steps:
+            return self.return_value()
+        else:
+            return self

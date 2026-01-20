@@ -197,6 +197,8 @@ weighing = Weighing()
 
 def weighted_median(values, weights):
 
+    is_bool = all([v in [True, False] for v in values])
+
     if not all(weights):
         non_zero = [(v, w) for (v, w) in zip(values, weights) if w]
         values = [v for (v, w) in non_zero]
@@ -224,7 +226,12 @@ def weighted_median(values, weights):
     if isinstance(b, Decimal) and not isinstance(q, Decimal):
         q = Decimal(q)      
     
-    return (a * p) + (b * q)
+    value = (a * p) + (b * q)
+    
+    if is_bool:
+        value = bool(value>Decimal('0.5'))
+
+    return value
 
 
 def weighted_median_idx(values, weights):
@@ -263,9 +270,15 @@ def weighted_median_idx(values, weights):
 
 def median(*args):
     data = args[0] if len(args)==1 and isinstance(args[0], list) else args
-    return median_base(data)
+    value = median_base(data)
+    if all([v in [True, False] for v in data]):
+        value = bool(value>0.5)
+    return value
 
 
 def mean(*args):
     data = args[0] if len(args)==1 and isinstance(args[0], list) else args
-    return mean_base(data)
+    value = mean_base(data)
+    if all([v in [True, False] for v in data]):
+        value = bool(value>0.5)
+    return value

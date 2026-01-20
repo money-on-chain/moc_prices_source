@@ -94,7 +94,7 @@ def summary(coinpairs, md=False):
     coins = []
     for pair in summary_data.keys():
         for c in [pair.from_, pair.to_]:
-            if not c in coins:
+            if c is not None and not c in coins:
                 coins.append(c)
     coins.sort()
     table = [[c.symbol, c.name, c.small_symbol] for c in coins]
@@ -112,7 +112,7 @@ def summary(coinpairs, md=False):
         'direct': 'Weighted',
         'computed': 'Computed'
     }
-    table = [[str(pair), pair.from_.symbol+'/'+pair.to_.symbol, pair.variant,
+    table = [[str(pair), pair.name_base, pair.variant,
              str_source[data['type']]] for pair, data in summary_data.items()]
     table.sort()
     headers=['Name', 'Coinpair', 'Variant', 'Method']
@@ -281,22 +281,25 @@ COINPAIRS_FILTER:
     prices_count = {}
     for p in prices:
         row = []
-        row.append(p["coinpair"].from_.name)
-        row.append(p["coinpair"].to_.name)
+        row.append(p["coinpair"].name_base)
         row.append(p["coinpair"].variant)
+        row.append(p["coinpair"].short_description)
         row.append(p["description"])
         if not p["coinpair"] in prices_count:
             prices_count[p["coinpair"]] = 0
         prices_count[p["coinpair"]] += 1
         if p["ok"]:
-            unit = 'p'
-            v = p['price'] * (1000**4)
-            if v > 1000:
-                for unit in ['p', 'µ', 'm', ' ', 'K', 'M', 'G']:
-                    v = v/1000
-                    if v<1000:
-                        break
-            row.append(f"{p['coinpair'].to_.small_symbol} {v:9.5f}{unit}")
+            if p['coinpair'].to_ is None:
+                row.append(f"{p['price']}")
+            else:
+                unit = 'p'
+                v = p['price'] * (1000**4)
+                if v > 1000:
+                    for unit in ['p', 'µ', 'm', ' ', 'K', 'M', 'G']:
+                        v = v/1000
+                        if v<1000:
+                            break
+                row.append(f"{p['coinpair'].to_.small_symbol} {v:9.5f}{unit}")
         else:
             row.append(trim(p["error"], 20))
         row.append(round(p["weighing"], 2))
@@ -314,7 +317,8 @@ COINPAIRS_FILTER:
         table.sort(key=str)
         print()
         print(tabulate(table, headers=[
-            'From', 'To', 'V.', 'Exchnage', 'Response', 'Weight', '%', 'Time'
+            'Coinpair', 'V.', 'Short description', 'Exchnage', 'Response',
+            'Weight', '%', 'Time'
         ]))
 
     table=[]
@@ -344,12 +348,12 @@ COINPAIRS_FILTER:
         print()
         table = [[dec_to_str(f) for f in l] for l in table]
         if expand_values:
-            headers=['', 'Coin pair', 'Mediam', 'Mean',
+            headers=['', 'Coinpair', 'Mediam', 'Mean',
                      'Weighted median', 'Sources', 'Ok' ]
             colalign=['center', 'left', 'right', 'right',
                       'right', 'center', 'center']
         else:
-            headers=['', 'Coin pair', 'Value', 'Sources count', 'Ok' ]
+            headers=['', 'Coinpair', 'Value', 'Sources count', 'Ok' ]
             colalign=['center', 'left', 'right', 'center', 'center']
         print(tabulate(table, headers=headers, colalign=colalign))
 

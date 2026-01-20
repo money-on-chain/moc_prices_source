@@ -13,11 +13,22 @@ class Engine(BaseOnChain):
     _moc_tk_addr = '0x9ac7fe28967b30e3a4e6e03286d715b42b453d10'
 
     def _get_value_from_evm(self, evm: EVM):
-        moc_reserve = evm.call(self._moc_tk_addr,
-                               'balanceOf(address)(uint256)',
-                               self._pool_sc_addr)
-        btc_reserve = evm.call(self._wrbtc_tk_addr,
-                               'balanceOf(address)(uint256)',
-                               self._pool_sc_addr)
+
+        moc_reserve_call_id = evm.multicall.add_call(
+            self._moc_tk_addr,
+            evm.BALANCE_OF,
+            self._pool_sc_addr)
+        
+        btc_reserve_call_id = evm.multicall.add_call(
+            self._wrbtc_tk_addr,
+            evm.BALANCE_OF,
+            self._pool_sc_addr)
+        
+        evm.multicall.run()
+
+        moc_reserve = evm.multicall.get_call(moc_reserve_call_id)
+        btc_reserve = evm.multicall.get_call(btc_reserve_call_id)
+        
         value = Decimal(btc_reserve/moc_reserve)
+
         return value, None # (value, str_error)

@@ -1,6 +1,6 @@
 from ..weighing import weighted_median
 from ..weighing import median as Median
-from .base import CoinPair, register_pairs
+from .base import CoinPair, Formula, register_pairs
 from .coins import BTC, USD, RIF, MOC, ETH, USDT, BNB, ARS, COP, BPRO
 from .pairs import BNB_USDT, BPRO_BTC, BTC_ARS, BTC_COP, BTC_USD, BTC_USDT, \
     ETH_BTC, MOC_BTC_SOV, MOC_USD_OKU, RIF_BTC, RIF_USDT, RIF_USDT_MA, \
@@ -101,21 +101,23 @@ RIF_USD_TMA = CoinPair(RIF, USD, "TMA",
     requirements = [RIF_USDT_MA, USDT_USD],
     formula = lambda rif_usdt_ma, usdt_usd: rif_usdt_ma * usdt_usd)
 
-class rif_usd_wmtp_formula():
-    def __call__(self, rif_usdt, btc_usd, btc_usdt, rif_btc):
+class RIF_USD_WMTB_Formula(Formula):
+    """
+    Weighted(
+      (rif_usdt × btc_usd / btc_usdt) at 75%,
+      (rif_btc × btc_usd) at 25%
+    )
+    """    
+    @staticmethod
+    def formula(rif_usdt, btc_usd, btc_usdt, rif_btc):
         return weighted_median(
             [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
             [0.75, 0.25])
-    def __str__(self):
-        return ("Weighted(\n"
-                "  (rif_usdt × btc_usd / btc_usdt) at 75%,\n"
-                "  (rif_btc × btc_usd) at 25%\n"
-                ")")
 
 RIF_USD_WMTB = CoinPair(RIF, USD, "WMTB",
     description = "Passing through Tether & Bitcoin using weighted median",
     requirements = [RIF_USDT, BTC_USD, BTC_USDT, RIF_BTC],
-    formula = rif_usd_wmtp_formula())
+    formula = RIF_USD_WMTB_Formula)
 
 # USD/ARS
 USD_ARS_CCB = CoinPair(USD, ARS, "CCB",
