@@ -66,15 +66,22 @@ class FunctionSpecData:
     def selector(self) -> bytes:
         return keccak(text=self.canonical_sig)[:4]
 
-    @staticmethod
-    def _normalize_arg(abi_type: str, value: Any) -> Any:
+    @property
+    def as_dict(self) -> dict:
+        return {'name': self.name,
+                'inputs': self.inputs,
+                'outputs': self.outputs,
+                'canonical_sig': self.canonical_sig,
+                'selector': self.selector}
+
+    def _normalize_arg(self, abi_type: str, value: Any) -> Any:
         t = abi_type.strip()
 
         if t.endswith("]"):
             if not isinstance(value, (list, tuple)):
                 raise TypeError(f"ABI type {t} expects list/tuple")
             base = t[: t.rfind("[")]
-            return [_normalize_arg(base, v) for v in value]
+            return [self._normalize_arg(base, v) for v in value]
 
         if t == "address":
             if not isinstance(value, str):
