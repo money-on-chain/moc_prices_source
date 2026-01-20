@@ -8,7 +8,8 @@ from bs4 import BeautifulSoup
 from requests import Response
 from ..redis_conn import get_redis
 from ..evm import OneShotHTTPProvider, HTTPProvider, Web3, EVM, Address, \
-    URI, get_addr_env, get_uri_env, get_node_rpc_uri_env
+    URI, get_addr_env, get_uri_env, get_node_rpc_uri_env, \
+        get_multicall_addr_env
 from ..cli import get_env
 
 
@@ -684,6 +685,7 @@ class BaseWithFailover(Base):
 class BaseOnChain(Base):
 
     _uri = get_node_rpc_uri_env()
+    _multicall_addr = get_multicall_addr_env()
 
     Web3 = Web3
     EVM = EVM
@@ -702,7 +704,8 @@ class BaseOnChain(Base):
             }))
 
     def make_evm_with_uri(self, timeout=10):
-        return EVM(self.make_web3_obj_with_uri(timeout=timeout))
+        return EVM(self.make_web3_obj_with_uri(timeout=timeout),
+                   multicall_addr = self._multicall_addr)
 
     def _get_value_from_evm(self, evm: EVM
                             ) -> Tuple[Optional[Decimal], Optional[str]]:
