@@ -854,7 +854,7 @@ class Multicall():
                 fn_spec = FunctionSpec(fn_spec)
             self._calls[call] = {
                     'id': id_,
-                    'data': None,
+                    'data': {None: None},
                     'fn_spec': fn_spec
                 }
 
@@ -881,11 +881,13 @@ class Multicall():
         call = self._get_call(*args)
         del self._calls[call]
 
-    def get_call(self, *args: Any) -> Any:
+    def get_call(self, *args: Any, namespace: Optional[str] = None) -> Any:
         call = self._get_call(*args)
-        return self._calls[call]['data']
+        return self._calls[call]['data'][namespace]
 
-    def _run(self, block_identifier: Optional[str | int] = None):
+    def _run(self,
+             block_identifier: Optional[str | int] = None,
+             namespace: Optional[str] = None):
 
         if block_identifier is None:
             block_identifier = self.evm.block_identifier
@@ -901,27 +903,35 @@ class Multicall():
             if ok:
                 fn_spec = extra['fn_spec']
                 result = fn_spec.decode_outputs(raw_result)
-            self._calls[call]['data'] = result
+            self._calls[call]['data'][namespace] = result
 
     _already_been_executed_once = False
 
     def __call__(self,
                  only_first_time = False,
-                 block_identifier: Optional[str | int] = None):
+                 block_identifier: Optional[str | int] = None,
+                 namespace: Optional[str] = None):
         if not(only_first_time and self._already_been_executed_once):
             if block_identifier is None:
                 block_identifier = self.evm.block_identifier
-            self._run(block_identifier = block_identifier)
-            self._already_been_executed_once = True
+            if len(self):
+                self._run(block_identifier = block_identifier,
+                          namespace = namespace)
+                self._already_been_executed_once = True
         return len(self)
     
-    def run(self, block_identifier: Optional[str | int] = None):
-        return self(block_identifier = block_identifier)
+    def run(self,
+            block_identifier: Optional[str | int] = None,
+            namespace: Optional[str] = None):
+        return self(block_identifier = block_identifier,
+                    namespace = namespace)
     
     def run_only_first_time(self,
-                            block_identifier: Optional[str | int] = None):
+                            block_identifier: Optional[str | int] = None,
+                            namespace: Optional[str] = None):
         return self(only_first_time = True,
-                    block_identifier = block_identifier)
+                    block_identifier = block_identifier,
+                    namespace = namespace)
 
     def __len__(self):
         return len(self._calls)
@@ -929,7 +939,7 @@ class Multicall():
     def __bool__(self):
         if len(self)==0:
             return False
-        return any([(v['data']is not None) for v in self._calls.values()])
+        return self._already_been_executed_once
 
 
 def get_addr_env(env_name: str, default_addr:str) -> str:
