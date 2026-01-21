@@ -1,4 +1,4 @@
-from .pairs import MOC_USD_OKU
+from .pairs_onchain import MOC_USD_OKU
 from .base import BaseOnChain, engine_register, get_addr_env, EVM, Decimal
 
 

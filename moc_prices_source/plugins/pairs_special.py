@@ -1,5 +1,5 @@
 from .base import CoinPair, register_pairs
-from .coins import BTC, USD, GAS, DOC, RIF, USDT
+from .coins import BTC, DOC, RIF, USD, USDT
 
 
 
@@ -11,11 +11,6 @@ BLOCK_RSK = CoinPair(name="BLOCK", variant="RSK",
 
 # DOC/USD
 DOC_USD = CoinPair(DOC, USD, short_description="Pegged 1:1 to USD")
-
-# GAS/BTC Rootstock gas price from nodes
-GAS_BTC = CoinPair(GAS, BTC,
-                   description = "Rootstock gas price from nodes",
-                   short_description = "Rootstock gas price")
 
 # RIF/BTC
 RIF_BTC_MP1P = CoinPair(RIF, BTC, "mp1%",

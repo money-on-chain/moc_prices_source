@@ -1,4 +1,4 @@
-from .pairs import BPRO_BTC
+from .pairs_onchain import BPRO_BTC
 from .base import BaseOnChain, engine_register, get_addr_env, EVM, Decimal
 
 

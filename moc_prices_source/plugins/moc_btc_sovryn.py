@@ -1,4 +1,4 @@
-from .pairs import MOC_BTC_SOV
+from .pairs_onchain import MOC_BTC_SOV
 from .base import BaseOnChain, engine_register, EVM, Decimal
 
 

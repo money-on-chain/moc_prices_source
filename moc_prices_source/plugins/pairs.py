@@ -1,5 +1,5 @@
 from .base import CoinPair, register_pairs, get_env
-from .coins import BTC, USD, RIF, MOC, ETH, USDT, BNB, ARS, MXN, COP, BPRO
+from .coins import ARS, BNB, BTC, COP, ETH, MXN, RIF, USD, USDT
 
 
 
@@ -7,9 +7,6 @@ from .coins import BTC, USD, RIF, MOC, ETH, USDT, BNB, ARS, MXN, COP, BPRO
 
 # BNB/USDT
 BNB_USDT = CoinPair(BNB, USDT)
-
-# BPRO/BTC
-BPRO_BTC = CoinPair(BPRO, BTC)
 
 # BTC/ARS
 BTC_ARS = CoinPair(BTC, ARS,
@@ -21,8 +18,6 @@ BTC_COP = CoinPair(BTC, COP,
 
 # BTC/USD
 BTC_USD = CoinPair(BTC, USD)
-BTC_USD_OCH = CoinPair(BTC, USD, "och",
-                       description = "Obtained from the blockchain")
 
 # BTC/USDT
 BTC_USDT = CoinPair(BTC, USDT)
@@ -32,13 +27,6 @@ ETH_BTC = CoinPair(ETH, BTC)
 
 # ETH/USD
 ETH_USD = CoinPair(ETH, USD)
-
-# MOC/BTC
-MOC_BTC_SOV = CoinPair(MOC, BTC, "sov",
-                       description = "Obtained from Sovryn onchain")
-
-# MOC/USD
-MOC_USD_OKU = CoinPair(MOC, USD, "Oku")
 
 # RIF/BTC
 RIF_BTC = CoinPair(RIF, BTC)

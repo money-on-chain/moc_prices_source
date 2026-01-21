@@ -1,4 +1,4 @@
-from .pairs import BTC_USD_OCH
+from .pairs_onchain import BTC_USD_OCH
 from .base import BaseOnChain, engine_register, get_addr_env, EVM, Decimal
 
 

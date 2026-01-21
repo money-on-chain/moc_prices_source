@@ -2,9 +2,9 @@ from ..weighing import weighted_median
 from ..weighing import median as Median
 from .base import CoinPair, Formula, register_pairs
 from .coins import BTC, USD, RIF, MOC, ETH, USDT, BNB, ARS, COP, BPRO
-from .pairs import BNB_USDT, BPRO_BTC, BTC_ARS, BTC_COP, BTC_USD, BTC_USDT, \
-    ETH_BTC, MOC_BTC_SOV, MOC_USD_OKU, RIF_BTC, RIF_USDT, RIF_USDT_MA, \
-    USDT_USD
+from .pairs import BNB_USDT,  BTC_ARS, BTC_COP, BTC_USD, BTC_USDT, \
+    ETH_BTC, RIF_USDT, RIF_USDT_MA, USDT_USD, RIF_BTC
+from .pairs_onchain import BPRO_BTC, MOC_BTC_SOV, MOC_USD_OKU
 
 
 
