@@ -1,4 +1,4 @@
-from .special_pairs import BLOCK_RSK
+from .pairs_special import BLOCK_RSK
 from .base import BaseOnChain, engine_register, EVM
 
 

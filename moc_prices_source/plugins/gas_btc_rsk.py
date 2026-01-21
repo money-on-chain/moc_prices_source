@@ -1,4 +1,4 @@
-from .special_pairs import GAS_BTC
+from .pairs_special import GAS_BTC
 from .base import BaseOnChain, engine_register, EVM, Decimal
 
 
