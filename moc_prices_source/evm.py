@@ -955,9 +955,15 @@ def get_node_rpc_uri_env(env_name: str = 'NODE_RPC_URI',
     return get_env(env_name, default_addr,
         cast=URI,
         alias={
+            'main': 'mainnet',
+            'mainnet': 'rootstock',
             'rootstock': 'https://public-node.rsk.co',
             'rsk': 'rootstock',
-            'rsk_mainnet': 'rootstock'
+            'rsk_mainnet': 'rootstock',
+            'test': 'testnet',
+            'testnet': 'rootstock_testnet',
+            'rootstock_testnet': 'https://public-node.testnet.rsk.co',
+            'rsk_testnet': 'rootstock_testnet'
             })
 
 
@@ -966,7 +972,13 @@ def get_multicall_addr_env(env_name: str = 'MULTICALL_ADDR',
     return get_env(env_name, default_addr,
         cast=Address,
         alias={
+            'main': 'mainnet',
+            'mainnet': 'rootstock',
             'rootstock': '0x8f344c3b2a02a801c24635f594c5652c8a2eb02a',
             'rsk': 'rootstock',
-            'rsk_mainnet': 'rootstock'
+            'rsk_mainnet': 'rootstock',
+            'test': 'testnet',
+            'testnet': 'rootstock_testnet',
+            'rootstock_testnet': '0xaf7be1ef9537018feda5397d9e3bb9a1e4e27ac8',
+            'rsk_testnet': 'rootstock_testnet'
             })
