@@ -951,8 +951,8 @@ def get_uri_env(env_name: str, default_addr: Optional[str] = '') -> str:
 
 
 def get_node_rpc_uri_env(env_name: str = 'NODE_RPC_URI',
-                         default_addr: str = 'rootstock') -> str:
-    return get_env(env_name, default_addr,
+                         default_uri: str = 'rootstock') -> str:
+    return get_env(env_name, default_uri,
         cast=URI,
         alias={
             'main': 'mainnet',
