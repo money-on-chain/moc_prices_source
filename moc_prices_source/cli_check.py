@@ -1,9 +1,9 @@
 import json
-from decimal import Decimal
 from sys import stderr
 from . import version
 from . import get_price, ALL, get_coin_pairs
 from .cli import command, option, tabulate, trim, cli
+from .cli import show_envs as show_envs_fnc
 from .weighing import weighing
 from .engines import all_engines
 from .computed_pairs import show_computed_pairs_fromula, computed_pairs
@@ -189,6 +189,8 @@ sources and if necessary we apply the changes to the parameterization.""")
         help='Show the default weighing and exit.')
 @option('-c', '--computed', 'show_computed_pairs', is_flag=True,
         help='Show the computed pairs formula and exit.')
+@option('-e', '--show-envs', 'show_envs', is_flag=True,
+        help='Show used ENV variables used and exit.')
 @option('-s', '--summary', 'show_summary', is_flag=True,
         help='Show the summary and exit.')
 @option('-m', '--markdown', 'md_summary', is_flag=True,
@@ -205,7 +207,8 @@ def cli_check(
         show_summary=False,
         md_summary=False,
         not_ignore_zero_weighing=False,
-        expand_values=False
+        expand_values=False,
+        show_envs=False
     ):
     """\b
 Description:
@@ -256,6 +259,10 @@ COINPAIRS_FILTER:
     
     if show_summary:
         summary(coinpairs, md_summary)
+        return
+
+    if show_envs:
+        show_envs_fnc()
         return
 
     data = {}

@@ -208,6 +208,7 @@ Options:
   -j, --json                      Show data in JSON format and exit.
   -w, --weighing                  Show the default weighing and exit.
   -c, --computed                  Show the computed pairs formula and exit.
+  -e, --show-envs                 Show used ENV variables used and exit.
   -s, --summary                   Show the summary and exit.
   -m, --markdown                  Set markdown for the summary format.
   -n, --not-ignore-zero-weighing  Not ignore sources with zero weighing.

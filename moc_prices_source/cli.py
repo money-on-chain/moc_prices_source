@@ -1,6 +1,7 @@
 import click, shutil, sys
 from tabulate import tabulate
 from os import environ
+from typing import Dict, Set, List, Tuple, Any
 
 
 
@@ -51,6 +52,9 @@ def print_list(items):
     print()
 
 
+envs: List[Tuple[str, Any]] = []
+
+
 def get_env(name, default, cast=str, alias={}):
     alias = dict(
         [(str(k).strip().lower(),
@@ -62,7 +66,7 @@ def get_env(name, default, cast=str, alias={}):
     while str(value).strip().lower() in alias:
         value = alias[str(value).strip().lower()]
     try:
-        return cast(str(value))
+        value =  cast(str(value))
     except Exception as e:
         options = list(alias.keys())
         options.sort()
@@ -77,3 +81,27 @@ def get_env(name, default, cast=str, alias={}):
             file=sys.stderr
         )
         sys.exit(1)
+    envs.append((name, value))
+    return value
+
+
+def show_envs():
+    envs.sort()
+    data: Dict[str, Set[int]] = {}
+    for name, value in envs:
+        if not name in data:
+            data[name] = set()
+        data[name].add(value)
+    names = list(data.keys())
+    names.sort()
+    table = []
+    for name in names:
+        c = len(data[name])
+        table.append([
+            f"{name} ({c})" if c>1 else name,
+            ', '.join([repr(x) for x in data[name]])
+        ])
+    if table:
+        print()
+        print(tabulate(table, headers=['Environment variable', 'Value']))
+        print()
