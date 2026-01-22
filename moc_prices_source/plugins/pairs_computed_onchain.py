@@ -27,19 +27,19 @@ class BTC_USD_24h_Formula(Formula):
             self.call_id = self.evm.multicall.add_call(
                 contract_address = self.oracle_addr,
                 fn_spec = 'peek()(bytes32,bool)')
+            self._namespace = f"{self.hours}h ago"
+            self.evm.multicall.reset_executed_once(self._namespace)
         else: # final step
-            namespace = f"{self.hours}h ago"
             self.evm.multicall.run_only_first_time(
                 block_identifier = self.block,
-                namespace = namespace)
+                namespace = self._namespace)
             value_b, ok = self.evm.multicall.get_call(
-                self.call_id, namespace = namespace)
+                self.call_id, namespace = self._namespace)
             if ok:
                 btc_usd_before = Decimal(int(value_b.hex(), 16)
                                          )/Decimal(10**18)
             else:
                 raise ValueError('invalid or expired price')
-            self.evm.multicall.reset_executed_once(namespace=None)
             return PercentageDecimal((btc_usd - btc_usd_before) / btc_usd_before)
 
 
