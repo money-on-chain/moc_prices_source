@@ -1,17 +1,24 @@
 import datetime, json
 from time import sleep
 from sys import stderr
-from decimal import Decimal
 from . import get_price, ALL, get_coin_pairs
 from .cli import command, option, cli
 from .database import make_db_conn
 from .my_logging import make_log, INFO, DEBUG, VERBOSE
 from .redis_conn import get_redis, redis_conf_file
-from .dec_to_str import dec_to_str
+from .types import FancyDecimal, Serializable, Decimal
 
 
 
 app_name = 'moc_prices_source'
+
+
+def obj_to_str(obj):
+    if obj is None:
+        return "(NONE)"
+    elif type(obj) is Decimal:
+        return str(FancyDecimal(obj))
+    return str(obj)
 
 
 class OutputClose(Exception):
@@ -167,7 +174,7 @@ def get_values(log,
         timestamp = p['timestamp'] if p['timestamp'] else datetime.datetime.now().replace(microsecond=0)
         coinpair =  p['coinpair']
         name =      p['description']
-        price =     p['price']
+        price =     None if p['price'] is None else Decimal(p['price']) 
         weighing =  None if p['percentual_weighing'] is None else float(p['percentual_weighing'])
         age =       None if p['age'] is None else int(p['age'])
         error =     None if p['error'] is None else str(p['error'])
@@ -180,7 +187,7 @@ def get_values(log,
             'age': age,
             'error': error
         }
-        log.verbose(f'Exchange {name} {coinpair} value: {dec_to_str(price)}')
+        log.verbose(f'Exchange {name} {coinpair} value: {obj_to_str(price)}')
         data.append(row)
 
     for coinpair, v in d['values'].items():
@@ -197,7 +204,14 @@ def get_values(log,
                     'median_price',
                     'weighted_median_price']:
             if key in v:
-                row[key]=v[key]
+                if type(v[key]) is FancyDecimal:
+                    row[key] = Decimal(v[key])
+                elif isinstance(v[key], Decimal):
+                    row[key] = Decimal(v[key])
+                elif isinstance(v[key], Serializable):
+                    row[key] = v[key].as_serializable
+                else:
+                    row[key] = v[key]
 
         value = None
         for key in ['ok_value',
@@ -214,7 +228,7 @@ def get_values(log,
         if coinpair in sources_count:
             row['sources_count'] = sources_count[coinpair]
 
-        log.verbose(f'{coinpair} value: {dec_to_str(value)}')
+        log.verbose(f'{coinpair} value: {obj_to_str(value)}')
         data.append(row)
 
     out = []

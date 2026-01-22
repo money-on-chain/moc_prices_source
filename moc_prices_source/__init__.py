@@ -7,6 +7,7 @@ from .engines import get_coinpair_list, get_engines_names, get_prices, \
     session_storage
 from .computed_pairs import computed_pairs
 from .weighing import weighing, weighted_median, median, mean
+from .types import FancyDecimal, normalize_obj, Serializable
 
 
 
@@ -28,12 +29,12 @@ del name, coin
 
 
 def get_price(
-    coinpairs            = None,
-    engines_names        = None,
-    detail               = {},
-    weighing             = weighing,
-    serializable         = False,
-    ignore_zero_weighing = True):
+    coinpairs = None,
+    engines_names = None,
+    detail = {},
+    weighing = weighing,
+    serializable = False,
+    ignore_zero_weighing = True): 
 
     start_time = datetime.datetime.now()
 
@@ -183,11 +184,15 @@ def get_price(
     for key, value in coinpair_prices.items():
         if requested:
             if key in requested:
-                if value['ok_value'] and value['ok']:
+                if value['ok']:
                     out[key] = value['ok_value']
         else:
-            if value['ok_value'] and value['ok']:
+            if value['ok']:
                 out[key] = value['ok_value']
+
+    for key in out.keys():
+        if type(out[key]) is Decimal:
+            out[key] = FancyDecimal(out[key])
 
     if requested and len(requested)==1:
         if requested[0] in out:
@@ -201,41 +206,10 @@ def get_price(
     detail['time'] = datetime.datetime.now() - start_time
 
     if serializable:
-        detail['time'] = detail['time'].seconds + detail['time'
-            ].microseconds/1000000
-        def nomalize(x):
-            if x is True or x is False or isinstance(x, int):
-                return x
-            return float(x)
-        for p in prices:
-            p['coinpair'] = str(p['coinpair'])
-            if p['time']:
-                p['time'] = p['time'].seconds + p['time'
-                                                  ].microseconds/1000000
-            p['timestamp'] = str(p['timestamp'])
-            p['last_change_timestamp'] = str(p['last_change_timestamp'])
-            if p['error']:
-                p['error'] = str(p['error'])
-            for k in ['price', 'weighing', 'percentual_weighing', 'volume']:
-                if p[k]!=None:
-                    p[k] = nomalize(p[k])
-        for d in coinpair_prices.values():
-            for k in ['weighings', 'prices']:
-                if k in d:
-                    d[k] = [ nomalize(x) for x in d[k] if d[k] ]
-            for k in ['median_price', 'mean_price', 'weighted_median_price',
-                      'ok_value']:
-                if k in d and d[k]:
-                    d[k] = nomalize(d[k])
-        for k in list(coinpair_prices.keys()):
-            v = coinpair_prices[k]
-            del coinpair_prices[k]
-            coinpair_prices[str(k)] = v
-            if 'requirements' in coinpair_prices[str(k)]:
-                coinpair_prices[str(k)]['requirements'] = list(
-                    map(str, coinpair_prices[str(k)]['requirements']))
+        for k, v in detail.items():
+            detail[k] = normalize_obj(v)
 
-    if not out:
+    if not out and not(isinstance(out, Serializable)):
         return None
 
     return out

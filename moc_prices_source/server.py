@@ -3,6 +3,7 @@ from decimal import Decimal
 from fnmatch import fnmatch as match
 from tabulate import tabulate
 from json import dumps, loads
+from .types import normalize_obj, Serializable
 from flask import Flask, request, redirect, jsonify, make_response
 from flask_restx import Api, Resource, reqparse, abort
 from flask_cors import CORS
@@ -235,11 +236,7 @@ class CoinPairValue(Resource):
             serializable=True,
             ignore_zero_weighing=True)
 
-        if isinstance(value, dict):
-            value = dict([(str(k), float(v)) for (k, v) in value.items()])
-
-        if isinstance(value, Decimal):
-            value = float(value)
+        value = normalize_obj(value)
 
         sources_count = {}
         sources_count_ok = {}
@@ -278,12 +275,11 @@ class CoinPairValue(Resource):
             else:
                 app.logger.info(f"Sources count for {sources_count_str}")
 
-        if value:
-            app.logger.info(f"Value for {coinpair}: {value}")
-        else:
+        if value is None:
             app.logger.error(f"Not value for {coinpair}")
             abort(*coinpair_value_not_found)
-            
+        else:
+            app.logger.info(f"Value for {coinpair}: {value}")
 
         out = {}
         out['required_coinpair'] = coinpair 
@@ -291,41 +287,6 @@ class CoinPairValue(Resource):
         out['detail'] = detail
 
         return out
-
-
-class DictWithAlternativeJson(dict):
-
-    _json = ""
-    _serializable_dict = {}
-
-    @property
-    def json(self):
-        if not self._json:
-            self._json = dumps(self, indent=2)
-        return self._json
-    
-    @json.setter
-    def json(self, value):
-        if isinstance(value, dict):
-            self._serializable_dict = value
-            value = dumps(value, indent=2)
-        elif not isinstance(value, str):
-            raise ValueError("Invalid type for JSON serialization")
-        else:
-            self._serializable_dict = loads(value)
-        self._json = value
-
-    @property
-    def table(self):
-        return tabulate(self.items(), tablefmt="plain",
-                        stralign="left", numalign="right")
-
-    @property
-    def serializable_dict(self):
-        return self._serializable_dict
-
-    def __str__(self):
-        return self.table
 
 
 def get_set_of_prices(*args, detail: dict = {}):
@@ -359,20 +320,17 @@ def get_set_of_prices(*args, detail: dict = {}):
         if values is None:
             values = {}
 
-        if isinstance(values, (Decimal, float, int, bool)):
+        if isinstance(values, (Serializable, Decimal, float, int, bool)):
             values = {coinpairs[0]: values}
 
         for cp in coinpairs:
             if cp not in values:
                 values[cp] = None
 
-        out = DictWithAlternativeJson(values)
-        out.json = {
-            'values': dict([(str(k),None if v is None else float(v)
-                             ) for (k,v) in values.items()]),
+        out = {
+            'values': normalize_obj(values),
             'detail': detail
         }
-
         return out
 
 
@@ -436,7 +394,7 @@ class CoinPairsValue(Resource):
         if not out:
             abort(*coinpairs_value_not_found)       
         
-        return out.serializable_dict
+        return out
 
     @staticmethod
     def _extra_log(coinpairs, detail):

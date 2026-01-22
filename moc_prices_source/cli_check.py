@@ -7,7 +7,7 @@ from .cli import show_envs as show_envs_fnc
 from .weighing import weighing
 from .engines import all_engines
 from .computed_pairs import show_computed_pairs_fromula, computed_pairs
-from .dec_to_str import dec_to_str
+from .types import FancyDecimal, Decimal
 
 
 
@@ -280,7 +280,7 @@ COINPAIRS_FILTER:
     def format_time(t):
         return '{}s'.format(round(t.seconds + t.microseconds/1000000, 2))
 
-    time   = data['time']
+    time = data['time']
     prices = data['prices']
     values = data['values']
 
@@ -353,7 +353,11 @@ COINPAIRS_FILTER:
     if table:
         table.sort(key=lambda x: str(x[1]))
         print()
-        table = [[dec_to_str(f) for f in l] for l in table]
+        def format_field(x):
+            if type(x) is Decimal:
+                x = FancyDecimal(x)
+            return str(x)
+        table = [[format_field(f) for f in l] for l in table]
         if expand_values:
             headers=['', 'Coinpair', 'Mediam', 'Mean',
                      'Weighted median', 'Sources', 'Ok' ]
