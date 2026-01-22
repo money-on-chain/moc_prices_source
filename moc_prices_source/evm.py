@@ -905,19 +905,23 @@ class Multicall():
                 result = fn_spec.decode_outputs(raw_result)
             self._calls[call]['data'][namespace] = result
 
-    _already_been_executed_once = False
+    _already_been_executed_once = {}
+
+    def reset_executed_once(self, namespace: Optional[str] = None):
+        self._already_been_executed_once[namespace] = False   
 
     def __call__(self,
                  only_first_time = False,
                  block_identifier: Optional[str | int] = None,
                  namespace: Optional[str] = None):
-        if not(only_first_time and self._already_been_executed_once):
+        if not(only_first_time and self._already_been_executed_once.get(
+            namespace, False)):
             if block_identifier is None:
                 block_identifier = self.evm.block_identifier
             if len(self):
                 self._run(block_identifier = block_identifier,
                           namespace = namespace)
-                self._already_been_executed_once = True
+                self._already_been_executed_once[namespace] = True
         return len(self)
     
     def run(self,
@@ -939,7 +943,7 @@ class Multicall():
     def __bool__(self):
         if len(self)==0:
             return False
-        return self._already_been_executed_once
+        return self._already_been_executed_once.get(None, False)
 
 
 def get_addr_env(env_name: str, default_addr:str) -> str:
