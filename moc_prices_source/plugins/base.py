@@ -796,8 +796,10 @@ class Formula():
     value: Union[bool, float, Decimal, None] = None
     max_steps: int = 1
     _step: int = 0
+    _args = []
 
     def __init__(self, *args) -> None:
+        self._args = args
         self.value = self.formula(*args)
     
     @staticmethod
@@ -809,13 +811,14 @@ class Formula():
 
     def step_run(self,
                  value: Union[bool, float, Decimal, None],
-                 step: int
+                 step: int,
+                 *args
                  ) -> Union[bool, float, Decimal, None]:
         return None
 
     def __call__(self):
         self._step += 1
-        new_value = self.step_run(self.value, self._step)
+        new_value = self.step_run(self.value, self._step, *self._args)
         if new_value is not None:
             self.value = new_value
         if self._step==self.max_steps:
