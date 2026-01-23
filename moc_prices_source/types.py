@@ -35,6 +35,59 @@ class SerializableDecimal(Decimal, Serializable):
     serializable_class = float
 
 
+class FancyTimedelta(timedelta, Serializable):
+    
+    serializable_class = float
+    
+    def __new__(cls, *args, **kwargs):
+        if len(args) == 1 and isinstance(args[0], timedelta):
+            td = args[0]
+            return super().__new__(
+                cls,
+                days=td.days,
+                seconds=td.seconds,
+                microseconds=td.microseconds
+            )
+        return super().__new__(cls, *args, **kwargs)
+
+   
+    def __float__(self):
+        return float(self.days * 24 * 3600
+                     + self.seconds
+                     + (self.microseconds/1000000))
+
+    def __int__(self):
+        return int(float(self))
+
+    def __str__(self):
+        total_us = abs(self.days * 86400_000_000
+                       + self.seconds * 1_000_000
+                       + self.microseconds)
+        sign = "-" if self.total_seconds() < 0 else ""
+        days, rem_us = divmod(total_us, 86400_000_000)
+        hours, rem_us = divmod(rem_us, 3600_000_000)
+        minutes, rem_us = divmod(rem_us, 60_000_000)
+        seconds, us = divmod(rem_us, 1_000_000)
+        sec = seconds + us / 1_000_000
+        if days:
+            return f"{sign}{days}d {hours:02}h {minutes:02}m {sec:05.2f}s"
+        if hours:
+            return f"{sign}{hours:02}h {minutes:02}m {sec:05.2f}s"
+        if minutes:
+            return f"{sign}{minutes:02}m {sec:05.2f}s"
+        out = str(f"{sign}{sec:5.2f}s").strip()
+        if out == "0.00s" and sec:
+            out = "<10ms"
+        elif out == "-0.00s" and sec:
+            out = ">-10ms"
+        elif not sec:
+            out = "none"
+        elif int(sec)==0:
+            out = str(f"{sign}{int(sec*1000)}ms").strip()
+
+        return out
+
+
 class FancyDecimal(SerializableDecimal):
 
     def __new__(cls, value):
