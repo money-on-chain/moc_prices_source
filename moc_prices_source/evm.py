@@ -249,9 +249,6 @@ class EVMCallError(RuntimeError):
     pass
 
 
-addr_zero = '0x0000000000000000000000000000000000000000'
-
-
 class Address(str):
 
     def __new__(cls, addr: str | int):
@@ -287,6 +284,17 @@ class Address(str):
 
         return super().__new__(cls, addr)
 
+    def make_abbreviation(self, sep='…', length=11):                
+        length -= len(sep) 
+        length -= 2  # 0x
+        pre = int((length)/2)
+        post = length - pre
+        pre += 2  # 0x
+        return f"{self[:pre]}{sep}{self[-post:]}"
+
+    @property
+    def abbreviation(self):
+        return self.make_abbreviation()
 
 class URI(str):
 
