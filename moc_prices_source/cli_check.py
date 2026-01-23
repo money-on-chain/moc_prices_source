@@ -7,7 +7,7 @@ from .cli import show_envs as show_envs_fnc
 from .weighing import weighing
 from .engines import all_engines
 from .computed_pairs import show_computed_pairs_fromula, computed_pairs
-from .types import FancyDecimal, Decimal
+from .types import FancyDecimal, FancyTimedelta, Decimal, timedelta
 
 
 
@@ -277,9 +277,6 @@ COINPAIRS_FILTER:
         print(json.dumps(data, indent=4, sort_keys=True))
         return
 
-    def format_time(t):
-        return '{}s'.format(round(t.seconds + t.microseconds/1000000, 2))
-
     time = data['time']
     prices = data['prices']
     values = data['values']
@@ -316,7 +313,7 @@ COINPAIRS_FILTER:
         else:
             row.append('N/A')
         if p["time"]:
-            row.append(format_time(p["time"]))
+            row.append(str(FancyTimedelta(p["time"])))
         else:
             row.append('N/A')
         table.append(row)
@@ -349,6 +346,7 @@ COINPAIRS_FILTER:
         else:
             row.append('N/A')
         row.append('✓' if d['ok'] else '✕')
+        row.append(d['time'] if 'time' in d else None)
         table.append(row)
     if table:
         table.sort(key=lambda x: str(x[1]))
@@ -356,16 +354,18 @@ COINPAIRS_FILTER:
         def format_field(x):
             if type(x) is Decimal:
                 x = FancyDecimal(x)
+            if type(x) is timedelta:
+                x = FancyTimedelta(x)
             return str(x)
         table = [[format_field(f) for f in l] for l in table]
         if expand_values:
             headers=['', 'Coinpair', 'Mediam', 'Mean',
-                     'Weighted median', 'Sources', 'Ok' ]
+                     'Weighted median', 'Sources', 'Ok', 'Time']
             colalign=['center', 'left', 'right', 'right',
-                      'right', 'center', 'center']
+                      'right', 'center', 'center', 'left']
         else:
-            headers=['', 'Coinpair', 'Value', 'Sources count', 'Ok' ]
-            colalign=['center', 'left', 'right', 'center', 'center']
+            headers=['', 'Coinpair', 'Value', 'Sources count', 'Ok', 'Time']
+            colalign=['center', 'left', 'right', 'center', 'center', 'left']
         print(tabulate(table, headers=headers, colalign=colalign))
 
     errors = []
@@ -385,7 +385,7 @@ COINPAIRS_FILTER:
             print('{}: {}'.format(*e))
 
     print()
-    print('Response time {}'.format(format_time(time)))
+    print('Response time {}'.format(FancyTimedelta(time)))
     print()
 
 

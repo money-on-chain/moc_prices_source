@@ -111,6 +111,10 @@ def get_price(
         for v in d['data']:
             d['weighings'].append(v['percentual_weighing'])
             d['prices'].append(v['price'])
+        try:
+            d['time'] = max(filter(bool, [f.get('time') for f in d['data']]))
+        except:
+            d['time'] = None
         del d['data']
         del d['sum_weighing']
 
@@ -119,7 +123,7 @@ def get_price(
 
         d['median_price'] = median(d['prices'])
         d['mean_price'] = mean(d['prices'])
-        if any (d['weighings']):
+        if any(d['weighings']):
             d['weighted_median_price'] = weighted_median(
                 d['prices'], d['weighings'])
         else:
@@ -151,6 +155,7 @@ def get_price(
                 formula = computed_pairs[r]['formula']               
                 args = [coinpair_prices[q]['ok_value'] for q in requirements]
                 coinpair_prices[r]['error'] = ''
+                coinpair_prices[r]['start_time'] = datetime.datetime.now()
                 try:
                     coinpair_prices[r]['ok_value'] = formula(*args)
                 except Exception as e:
@@ -158,7 +163,8 @@ def get_price(
                     coinpair_prices[r]['ok_value'] = None
                     coinpair_prices[r]['ok'] = False
                 coinpair_prices[r]['weighted_median_price'] = \
-                    coinpair_prices[r]['ok_value'] 
+                    coinpair_prices[r]['ok_value']
+                coinpair_prices[r]['time'] = datetime.datetime.now() - coinpair_prices[r]['start_time']
         
         while True:
             callable_pairs = [r for r in requested_computed_pairs
@@ -176,6 +182,12 @@ def get_price(
                     coinpair_prices[r]['ok'] = False
                 coinpair_prices[r]['weighted_median_price'] = \
                     coinpair_prices[r]['ok_value'] 
+                coinpair_prices[r]['time'] = datetime.datetime.now() - coinpair_prices[r]['start_time']
+        
+        for r in requested_computed_pairs:
+            if 'start_time' in coinpair_prices[r]:
+                del coinpair_prices[r]['start_time']
+
 
     detail['values'] = coinpair_prices
 
