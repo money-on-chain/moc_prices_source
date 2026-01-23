@@ -794,34 +794,73 @@ def engine_register(name_id: Optional[str] = None):
 class Formula():
     
     value: Union[bool, float, Decimal, None] = None
-    max_steps: int = 1
     _step: int = 0
     _args = []
 
     def __init__(self, *args) -> None:
         self._args = args
-        self.value = self.formula(*args)
-    
+        self.value = None
+        for call in [self.init, self.formula]:
+            new_value = call(*args)
+            if new_value is not None:
+                self.valuevalue = new_value
+
+    @staticmethod
+    def init(*args) -> Union[bool, float, Decimal, None]:
+        ...
+        return None
+
     @staticmethod
     def formula(*args) -> Union[bool, float, Decimal, None]:
+        ...
         return None
     
+    def cleanup(self) -> Union[bool, float, Decimal, None]:
+        ...
+        return None
+
     def return_value(self) -> Union[bool, float, Decimal, None]:
         return self.value
 
-    def step_run(self,
-                 value: Union[bool, float, Decimal, None],
-                 step: int,
-                 *args
-                 ) -> Union[bool, float, Decimal, None]:
-        return None
+    #def step(self, value: Union[bool, float, Decimal, None],
+    #         *args) -> Union[bool, float, Decimal, None]:
+    #    ...
+    #    return None
 
-    def __call__(self):
-        self._step += 1
-        new_value = self.step_run(self.value, self._step, *self._args)
-        if new_value is not None:
-            self.value = new_value
-        if self._step==self.max_steps:
-            return self.return_value()
-        else:
+    _step_functions = None
+
+    @property
+    def step_functions(self):
+        if self._step_functions is None:
+            self._step_functions = []
+            for name in dir(self):
+                if name == 'step_functions': # skip this property
+                    continue
+                if name[0]=='_':
+                    continue
+                if not 'step' in name.replace('_', ' ').split():
+                    continue
+                obj = getattr(self, name)
+                if not callable(obj):
+                    continue
+                self._step_functions.append(obj)
+            self._step_functions.sort()
+        return self._step_functions
+
+    @step_functions.setter
+    def step_functions(self, value):
+        self._step_functions = value
+
+    def __call__(self):       
+        if self._step<len(self.step_functions):
+            step = self.step_functions[self._step]
+            new_value = step(self.value, *self._args)
+            if new_value is not None:
+                self.value = new_value
+            self._step += 1
             return self
+        for call in [self.cleanup, self.return_value]:
+            new_value = call()
+            if new_value is not None:
+                self.value = new_value
+        return self.value
