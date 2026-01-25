@@ -8,6 +8,7 @@ from .weighing import weighing
 from .engines import all_engines
 from .computed_pairs import show_computed_pairs_fromula, computed_pairs
 from .types import FancyDecimal, FancyTimedelta, Decimal, timedelta
+from .my_logging import set_level, OFF, INFO, DEBUG, VERBOSE
 
 
 
@@ -181,7 +182,9 @@ sources and if necessary we apply the changes to the parameterization.""")
 
 
 @command()
-@option('-v', '--version', 'show_version', is_flag=True,
+@option('-v', '--verbose', 'verbose', count=True,
+    help='Verbose mode.')
+@option('--version', 'show_version', is_flag=True,
         help='Show version and exit.')
 @option('-j', '--json', 'show_json', is_flag=True,
         help='Show data in JSON format and exit.')
@@ -208,7 +211,8 @@ def cli_check(
         md_summary=False,
         not_ignore_zero_weighing=False,
         expand_values=False,
-        show_envs=False
+        show_envs=False,
+        verbose = 0
     ):
     """\b
 Description:
@@ -221,6 +225,17 @@ COINPAIRS_FILTER:
     Example: "btc*"
     Default value: "*" (all available pairs)
 """
+
+    # Logger
+    if verbose==0:
+        level = OFF
+    elif verbose==1:
+        level = INFO
+    elif verbose==2:
+        level = VERBOSE
+    elif verbose>2:
+        level = DEBUG
+    set_level(level)
 
     if md_summary and not show_summary:
         print(
