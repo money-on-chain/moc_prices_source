@@ -17,18 +17,18 @@ def summary(coinpairs, md=False):
     summary_data = {}
 
     for name, weigh in weighing.as_dict.items():
+        if name in all_engines:
+            engine = all_engines[name]
+            coinpair = engine.coinpair
+            description = engine.description
+            uri = engine.uri
 
-        engine = all_engines[name]
-        coinpair = engine.coinpair
-        description = engine.description
-        uri = engine.uri
-
-        if not coinpair in summary_data:
-            summary_data[coinpair] = {'type': 'direct', 'sources': []}
-        
-        summary_data[coinpair]['sources'].append({
-            'weigh': weigh, 'name': description, 'uri': uri
-        })
+            if not coinpair in summary_data:
+                summary_data[coinpair] = {'type': 'direct', 'sources': []}
+            
+            summary_data[coinpair]['sources'].append({
+                'weigh': weigh, 'name': description, 'uri': uri
+            })
 
     for computed_coinpair, computed_data in computed_pairs.items():
         if not computed_coinpair in summary_data:
