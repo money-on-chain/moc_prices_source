@@ -2,7 +2,7 @@ import datetime
 from influxdb import InfluxDBClient
 from os.path import dirname, abspath
 from .conf import get
-from .my_logging import make_log
+from .my_logging import get_logger 
 
 
 
@@ -45,7 +45,7 @@ class Database(object):
 
     def __init__(self, name, **kargs):
 
-        self._log = make_log('database')
+        self._log = get_logger('database')
 
         self.name = name
         
