@@ -8,6 +8,7 @@ from .weighing import weighing
 from .engines import all_engines
 from .computed_pairs import show_computed_pairs_fromula, computed_pairs
 from .types import FancyDecimal, FancyTimedelta, Decimal, timedelta
+from .my_logging import set_level, OFF, INFO, DEBUG, VERBOSE
 
 
 
@@ -16,18 +17,18 @@ def summary(coinpairs, md=False):
     summary_data = {}
 
     for name, weigh in weighing.as_dict.items():
+        if name in all_engines:
+            engine = all_engines[name]
+            coinpair = engine.coinpair
+            description = engine.description
+            uri = engine.uri
 
-        engine = all_engines[name]
-        coinpair = engine.coinpair
-        description = engine.description
-        uri = engine.uri
-
-        if not coinpair in summary_data:
-            summary_data[coinpair] = {'type': 'direct', 'sources': []}
-        
-        summary_data[coinpair]['sources'].append({
-            'weigh': weigh, 'name': description, 'uri': uri
-        })
+            if not coinpair in summary_data:
+                summary_data[coinpair] = {'type': 'direct', 'sources': []}
+            
+            summary_data[coinpair]['sources'].append({
+                'weigh': weigh, 'name': description, 'uri': uri
+            })
 
     for computed_coinpair, computed_data in computed_pairs.items():
         if not computed_coinpair in summary_data:
@@ -170,18 +171,21 @@ sources and if necessary we apply the changes to the parameterization.""")
             table = [[d['name'], float(d['weigh']), d['uri']] for d in
                      sources if float(d['weigh'])>0]
             headers=['Source', 'Weight', 'URI']
-            print()
-            show_title(title, 2)
-            print()
-            if len(table)>1:
-                show_table(table, headers)
-            else:
-                show_p(f"Only {table[0][0]} (URI: {table[0][2]})")
-            print()
+            if table:
+                print()
+                show_title(title, 2)
+                print()
+                if len(table)>1:
+                    show_table(table, headers)
+                else:
+                    show_p(f"Only {table[0][0]} (URI: {table[0][2]})")
+                print()
 
 
 @command()
-@option('-v', '--version', 'show_version', is_flag=True,
+@option('-v', '--verbose', 'verbose', count=True,
+    help='Verbose mode.')
+@option('--version', 'show_version', is_flag=True,
         help='Show version and exit.')
 @option('-j', '--json', 'show_json', is_flag=True,
         help='Show data in JSON format and exit.')
@@ -208,7 +212,8 @@ def cli_check(
         md_summary=False,
         not_ignore_zero_weighing=False,
         expand_values=False,
-        show_envs=False
+        show_envs=False,
+        verbose = 0
     ):
     """\b
 Description:
@@ -221,6 +226,17 @@ COINPAIRS_FILTER:
     Example: "btc*"
     Default value: "*" (all available pairs)
 """
+
+    # Logger
+    if verbose==0:
+        level = OFF
+    elif verbose==1:
+        level = INFO
+    elif verbose==2:
+        level = VERBOSE
+    elif verbose>2:
+        level = DEBUG
+    set_level(level)
 
     if md_summary and not show_summary:
         print(

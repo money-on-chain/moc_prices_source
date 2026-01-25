@@ -11,7 +11,7 @@ from ..evm import OneShotHTTPProvider, HTTPProvider, Web3, EVM, Address, \
     URI, get_addr_env, get_uri_env, get_node_rpc_uri_env, \
         get_multicall_addr_env
 from ..cli import get_env
-from ..my_logging import WithLogger
+from ..my_logging import WithLogger, get_logger
 
 
 
@@ -75,6 +75,7 @@ def register_coins():
         if isinstance(obj, Coin):
             if not name in Coins:
                 Coins[name] = obj
+                get_logger(__name__).info("Register coin %s", obj)
 
 
 class CoinPair(object):
@@ -252,6 +253,7 @@ def register_pairs():
         if isinstance(obj, CoinPair):
             if not name in CoinPairs:
                 CoinPairs[name] = obj
+                get_logger(__name__).info("Register coinpair %s", obj)
 
 
 class NoLiquidity(Exception):
@@ -787,6 +789,9 @@ def engine_register(name_id: Optional[str] = None):
         nonlocal name_id
         if name_id is None:
             name_id = Path(getfile(cls)).stem
+        get_logger(__name__).info(
+            "Register engine '%s' (coinpair='%s', description='%s')",
+            name_id, cls._coinpair, cls._description)
         Engines[name_id] = cls
         return cls
     return engine_register_base

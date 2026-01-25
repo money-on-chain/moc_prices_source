@@ -1,15 +1,22 @@
 import pkgutil, traceback, importlib
-from pathlib import Path
 from .base import Engines, CoinPairs, Coins
 
-_pkg_dir = Path(__file__).parent
 
-for module_info in pkgutil.iter_modules([str(_pkg_dir)]):
+
+exclude = ['base']
+
+for module_info in pkgutil.walk_packages(
+    __path__,
+    prefix=f"{__name__}."):
+    
     name = module_info.name
-    if name in ("__main__", "base"):
+    basename = name.split('.')[-1]
+    
+    if basename.startswith('_') or basename in exclude:
         continue
+
     try:
-        importlib.import_module(f"{__name__}.{name}")
+        importlib.import_module(name)
     except Exception:
         traceback.print_exc()
 
