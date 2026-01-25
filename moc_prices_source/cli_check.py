@@ -171,14 +171,15 @@ sources and if necessary we apply the changes to the parameterization.""")
             table = [[d['name'], float(d['weigh']), d['uri']] for d in
                      sources if float(d['weigh'])>0]
             headers=['Source', 'Weight', 'URI']
-            print()
-            show_title(title, 2)
-            print()
-            if len(table)>1:
-                show_table(table, headers)
-            else:
-                show_p(f"Only {table[0][0]} (URI: {table[0][2]})")
-            print()
+            if table:
+                print()
+                show_title(title, 2)
+                print()
+                if len(table)>1:
+                    show_table(table, headers)
+                else:
+                    show_p(f"Only {table[0][0]} (URI: {table[0][2]})")
+                print()
 
 
 @command()
