@@ -11,6 +11,7 @@ from ..evm import OneShotHTTPProvider, HTTPProvider, Web3, EVM, Address, \
     URI, get_addr_env, get_uri_env, get_node_rpc_uri_env, \
         get_multicall_addr_env
 from ..cli import get_env
+from ..my_logging import WithLogger
 
 
 
@@ -791,20 +792,44 @@ def engine_register(name_id: Optional[str] = None):
     return engine_register_base
 
 
-class Formula():
+class classproperty:
+    def __init__(self, func):
+        self.func = func
+
+    def __get__(self, obj, owner):
+        return self.func(owner)
+
+
+class Formula(WithLogger):
     
     value: Union[bool, float, Decimal, None] = None
     _step: int = 0
     _args = []
 
     def __init__(self, *args) -> None:
+        self._logger.verbose('Init with args: %s',
+            ', '.join(repr(a) for a in args))
         self._args = args
         self.value = None
         for call in [self.init, self.formula]:
+            self._logger.verbose("Run %s", repr(call.__name__))
             new_value = call(*args)
             if new_value is not None:
                 self.valuevalue = new_value
 
+    @classmethod
+    def run(cls, *args):
+        f = cls(*args)
+        while True:
+            ans = f()
+            if not(isinstance(ans, cls)):
+                break
+        return ans
+    
+    @classproperty
+    def formula_desc(cls, *args):
+        return cls.__doc__
+        
     @staticmethod
     def init(*args) -> Union[bool, float, Decimal, None]:
         ...
@@ -845,22 +870,34 @@ class Formula():
                     continue
                 self._step_functions.append(obj)
             self._step_functions.sort()
+            self._logger.verbose(
+                "Set steps list (%s)",
+                ', '.join([x.__name__ for x in self._step_functions]))
         return self._step_functions
 
     @step_functions.setter
     def step_functions(self, value):
+        self._logger.verbose(
+            "Set steps list (%s)",
+            ', '.join([x.__name__ for x in self._step_functions]))
         self._step_functions = value
 
-    def __call__(self):       
+    def __call__(self):
         if self._step<len(self.step_functions):
             step = self.step_functions[self._step]
+            self._logger.verbose(
+                "Run %s (step #%s)",
+                repr(step.__name__),
+                self._step)
             new_value = step(self.value, *self._args)
             if new_value is not None:
                 self.value = new_value
             self._step += 1
             return self
         for call in [self.cleanup, self.return_value]:
+            self._logger.verbose("Run %s", repr(call.__name__))
             new_value = call()
             if new_value is not None:
                 self.value = new_value
+        self._logger.verbose("Retrun value: %s", self.value)
         return self.value
