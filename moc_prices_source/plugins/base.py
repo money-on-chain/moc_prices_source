@@ -75,6 +75,7 @@ def register_coins():
         if isinstance(obj, Coin):
             if not name in Coins:
                 Coins[name] = obj
+                get_logger(__name__).info("Register coin %s", obj)
 
 
 class CoinPair(object):
@@ -252,6 +253,7 @@ def register_pairs():
         if isinstance(obj, CoinPair):
             if not name in CoinPairs:
                 CoinPairs[name] = obj
+                get_logger(__name__).info("Register coinpair %s", obj)
 
 
 class NoLiquidity(Exception):
