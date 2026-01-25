@@ -4,7 +4,7 @@ from sys import stderr
 from . import get_price, ALL, get_coin_pairs
 from .cli import command, option, cli
 from .database import make_db_conn
-from .my_logging import make_log, INFO, DEBUG, VERBOSE
+from .my_logging import get_logger, set_level, INFO, DEBUG, VERBOSE
 from .redis_conn import get_redis, redis_conf_file
 from .types import FancyDecimal, Serializable, Decimal
 
@@ -302,7 +302,8 @@ COINPAIRS_FILTER:
         level = VERBOSE
     elif verbose>1:
         level = DEBUG
-    log = make_log(app_name, level = level)
+    set_level(level)
+    log = get_logger(app_name)
     log.info(f'Starts (frequency {frequency}s, time series {repr(name)})')
     if len(coinpairs)>3:
         log.info(f'Coinpairs count: {len(coinpairs)}')

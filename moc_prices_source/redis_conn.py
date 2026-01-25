@@ -4,11 +4,11 @@ from os.path import basename, dirname, abspath, expanduser
 from json.decoder import JSONDecodeError
 from redis import Redis
 from time import sleep
-from .my_logging import make_log
+from .my_logging import get_logger
 
 
 
-log = make_log('RedisDB')
+log = get_logger('RedisDB')
 
 def get_redis_conf():
     app_dir  = dirname(abspath(__file__))
