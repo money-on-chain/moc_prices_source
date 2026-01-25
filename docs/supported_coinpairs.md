@@ -86,7 +86,7 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | BNB/USD        |                                                                      |
 | BNB/USDT       |                                                                      |
 | BPRO/ARS       |                                                                      |
-| BPRO/BTC       |                                                                      |
+| BPRO/BTC       | Obtained from MOC onchain                                            |
 | BPRO/COP       |                                                                      |
 | BPRO/USD       | Offchain                                                             |
 | BTC/ARS        |                                                                      |
@@ -218,11 +218,6 @@ Only Binance (URI: https://api.binance.com/api/v3/ticker/24hr?symbol=RIFUSDT)
 ### For coinpair RIF/USDT(mp1%) (from RIF to Tether)
 
 Only Binance (URI: https://api.binance.com/api/v3/depth?symbol=RIFUSDT)
-
-
-### For coinpair RIF/BTC(mp1%) (from RIF to Bitcoin)
-
-Only Binance (URI: https://api.binance.com/api/v3/depth?symbol=RIFBTC)
 
 
 ### For coinpair RIF/USDT(MA) (from RIF to Tether)

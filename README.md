@@ -38,17 +38,17 @@ user@host:~$ moc_prices_source_check "BTC/USD"
 
 Coinpair    V.    Short description    Exchnage    Response        Weight    %  Time
 ----------  ----  -------------------  ----------  ------------  --------  ---  ------
-BTC/USD           Bitcoin to Dollar    Bitfinex    $  93.07100K      0.18   18  0.59s
-BTC/USD           Bitcoin to Dollar    Bitstamp    $  93.05500K      0.22   22  0.8s
-BTC/USD           Bitcoin to Dollar    Coinbase    $  93.04720K      0.25   25  1.2s
-BTC/USD           Bitcoin to Dollar    Gemini      $  93.04565K      0.17   17  1.0s
-BTC/USD           Bitcoin to Dollar    Kraken      $  93.04330K      0.18   18  0.8s
+BTC/USD           Bitcoin to Dollar    Bitfinex    $  88.92400K      0.18   18  330ms
+BTC/USD           Bitcoin to Dollar    Bitstamp    $  88.81800K      0.22   22  324ms
+BTC/USD           Bitcoin to Dollar    Coinbase    $  88.81476K      0.25   25  722ms
+BTC/USD           Bitcoin to Dollar    Gemini      $  88.82518K      0.17   17  1.12s
+BTC/USD           Bitcoin to Dollar    Kraken      $  88.82450K      0.18   18  314ms
 
-    Coinpair            Value   Sources count    Ok
---  ----------  -------------  ---------------  ----
-↓   BTC/USD     93,047.205000      5 of 5        ✓
+    Coinpair            Value   Sources count    Ok   Time
+--  ----------  -------------  ---------------  ----  ------
+↓   BTC/USD     88,824.500000      5 of 5        ✓    1.12s
 
-Response time 1.21s
+Response time 1.13s
 
 user@host:~$ 
 ```
