@@ -149,27 +149,36 @@ def get_price(
             requirements = computed_pairs[r]['requirements']
             if set(requirements).issubset(set(coinpair_prices.keys())):
                 coinpair_prices[r] = {}
-                coinpair_prices[r]['ok'] = all(
-                    [ coinpair_prices[q]['ok'] for q in requirements ])
+                ok = all([ coinpair_prices[q]['ok'] for q in requirements ])
+                coinpair_prices[r]['ok'] = ok
                 coinpair_prices[r]['requirements'] = requirements
                 formula = computed_pairs[r]['formula']               
                 args = [coinpair_prices[q]['ok_value'] for q in requirements]
                 coinpair_prices[r]['error'] = ''
                 coinpair_prices[r]['start_time'] = datetime.datetime.now()
-                try:
-                    coinpair_prices[r]['ok_value'] = formula(*args)
-                except Exception as e:
-                    coinpair_prices[r]['error'] = str(e)
+                if not ok:
+                    str_pairs = ', '.join([str(q) for q in requirements 
+                                           if not(coinpair_prices[q]['ok'])])
+                    coinpair_prices[r]['error'] = ("It cannot be calculated"
+                        f", is missing values: {str_pairs}.")
                     coinpair_prices[r]['ok_value'] = None
                     coinpair_prices[r]['ok'] = False
+                else:
+                    try:
+                        coinpair_prices[r]['ok_value'] = formula(*args)
+                    except Exception as e:
+                        coinpair_prices[r]['error'] = str(e)
+                        coinpair_prices[r]['ok_value'] = None
+                        coinpair_prices[r]['ok'] = False
                 coinpair_prices[r]['weighted_median_price'] = \
                     coinpair_prices[r]['ok_value']
-                coinpair_prices[r]['time'] = datetime.datetime.now() - coinpair_prices[r]['start_time']
+                coinpair_prices[r]['time'] = datetime.datetime.now() - \
+                    coinpair_prices[r]['start_time']
         
         while True:
             callable_pairs = [r for r in requested_computed_pairs
-                              if (coinpair_prices[r]['ok'] and
-                                  callable(coinpair_prices[r]['ok_value']))]
+                              if (coinpair_prices.get(r, {}).get('ok') and
+                                  callable(coinpair_prices.get(r, {}).get('ok_value')))]
             if not callable_pairs:
                 break
             for r in callable_pairs:
@@ -185,7 +194,7 @@ def get_price(
                 coinpair_prices[r]['time'] = datetime.datetime.now() - coinpair_prices[r]['start_time']
         
         for r in requested_computed_pairs:
-            if 'start_time' in coinpair_prices[r]:
+            if 'start_time' in coinpair_prices.get(r, {}):
                 del coinpair_prices[r]['start_time']
 
 
