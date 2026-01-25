@@ -815,7 +815,9 @@ class Formula(WithLogger):
             self._logger.verbose("Run %s", repr(call.__name__))
             new_value = call(*args)
             if new_value is not None:
-                self.valuevalue = new_value
+                self._logger.verbose("%s returns: %s",
+                                     repr(call.__name__), repr(new_value))
+                self.value = new_value
 
     @classmethod
     def run(cls, *args):
@@ -870,9 +872,10 @@ class Formula(WithLogger):
                     continue
                 self._step_functions.append(obj)
             self._step_functions.sort()
-            self._logger.verbose(
-                "Set steps list (%s)",
-                ', '.join([x.__name__ for x in self._step_functions]))
+            if self._step_functions:
+                self._logger.verbose(
+                    "Set steps list (%s)",
+                    ', '.join([x.__name__ for x in self._step_functions]))
         return self._step_functions
 
     @step_functions.setter
