@@ -8,8 +8,9 @@ modules_names = Engines.keys()
 for name in modules_names:
     locals()[name] = Engines[name](session_storage=session_storage)
     all_engines[name] = locals()[name]
-    
-del name, modules_names
+    del name
+
+del modules_names
 
 
 def get_coinpair_list():
