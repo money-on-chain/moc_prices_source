@@ -1,5 +1,6 @@
 from fnmatch import fnmatch as match
 from .plugins import CoinPairs
+from .plugins.base import CoinPair, CoinPairType
 
 
 
