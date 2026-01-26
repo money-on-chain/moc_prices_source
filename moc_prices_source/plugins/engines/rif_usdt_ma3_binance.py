@@ -4,7 +4,7 @@ from .rif_usdt_ma_binance import Engine as Base
 
 
 
-max_quantity = Decimal(get_env('MA_MAX3_QUANTITY', '600000'))
+max_quantity = Decimal(get_env('MA_MAX3_QUANTITY', 600000, int))
 
 @engine_register()
 class Engine(Base):
