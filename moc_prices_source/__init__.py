@@ -8,14 +8,13 @@ from .engines import get_coinpair_list, get_engines_names, get_prices, \
 from .computed_pairs import computed_pairs
 from .weighing import weighing, weighted_median, median, mean
 from .types import FancyDecimal, normalize_obj, Serializable
+from .app_info import version
 
 
 
 base_dir = dirname(abspath(__file__))
 
 
-with open(base_dir + "/version.txt", "r") as file_:
-    version = file_.read().split()[0]
 __version__ = version
 
 
