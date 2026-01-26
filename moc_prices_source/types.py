@@ -139,6 +139,18 @@ class Bool(Serializable):
     serializable_class = bool
     TRUE_TEXT = "true"
     FALSE_TEXT = "false"
+    _true_str_options = ['1', 't', 'true', 'y', 'yes', 'ok']
+    _false_str_options = ['0', 'f', 'false', 'n', 'no', 'cancel']
+
+    @classmethod
+    def from_string(cls, value: str, frozen: bool = False):
+        value = str(value).strip().lower()
+        if value in cls._true_str_options:
+            return cls(True, frozen=frozen)
+        elif value in cls._false_str_options:
+            return cls(False, frozen=frozen)
+        else:
+            raise ValueError(f"Cannot convert '{value}' to {cls.__name__}")
 
     def __init__(self, value: bool, frozen: bool = False):
         self._value = bool(value)
@@ -164,6 +176,8 @@ class YesNo(Bool):
 
     TRUE_TEXT = "Yes"
     FALSE_TEXT = "No"
+    _true_str_options = ['1', 'y', 'yes']
+    _false_str_options = ['0', 'n', 'no']
 
 
 Yes = YesNo(True, frozen = True)
