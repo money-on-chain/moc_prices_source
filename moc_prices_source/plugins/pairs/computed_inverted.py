@@ -1,7 +1,7 @@
-from .base import CoinPair, register_pairs, Formula
-from ..types import Decimal, FancyDecimal, Any
-from .pairs_onchain import BPRO_BTC
-from .pairs_computed import RIF_USD_WMTB, BPRO_ARS
+from ...types import Decimal, FancyDecimal, Any
+from ..base import CoinPair, Formula, register_pairs
+from .onchain import BPRO_BTC
+from .computed import RIF_USD_WMTB, BPRO_ARS
 
 
 
