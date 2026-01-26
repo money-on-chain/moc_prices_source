@@ -9,6 +9,7 @@ from .engines import all_engines
 from .computed_pairs import show_computed_pairs_fromula, computed_pairs
 from .types import FancyDecimal, FancyTimedelta, Decimal, timedelta
 from .my_logging import set_level, OFF, INFO, DEBUG, VERBOSE
+from .pairs import CoinPairType
 
 
 
@@ -24,7 +25,8 @@ def summary(coinpairs, md=False):
             uri = engine.uri
 
             if not coinpair in summary_data:
-                summary_data[coinpair] = {'type': 'direct', 'sources': []}
+                summary_data[coinpair] = {'type': coinpair.type,
+                                          'sources': []}
             
             summary_data[coinpair]['sources'].append({
                 'weigh': weigh, 'name': description, 'uri': uri
@@ -76,7 +78,8 @@ def summary(coinpairs, md=False):
         if md:
             if tablefmt=='psql':
                 tablefmt='github'
-        s = tabulate(table, headers=headers, tablefmt=tablefmt, floatfmt=".2f")
+        s = tabulate(table, headers=headers, tablefmt=tablefmt,
+                     floatfmt=".2f")
         if md:
             if tablefmt=='plain':
                 print('```')
@@ -109,12 +112,9 @@ def summary(coinpairs, md=False):
 
 
     title = "Coinpairs"
-    str_source = {
-        'direct': 'Weighted',
-        'computed': 'Computed'
-    }
     table = [[str(pair), pair.name_base, pair.variant,
-             str_source[data['type']]] for pair, data in summary_data.items()]
+             str(data['type']).capitalize()
+             ] for pair, data in summary_data.items()]
     table.sort()
     headers=['Name', 'Coinpair', 'Variant', 'Method']
     print()
@@ -122,10 +122,8 @@ def summary(coinpairs, md=False):
     print()
     show_table(table, headers)
     print()
-    table = [
-        ['Weighted', 'Weighted median of values ​​obtained from multiple sources'],
-        ['Computed', 'Compute made with previously obtained coinpairs']
-    ]
+    table = [[str(k).capitalize(), v] for k, v in CoinPairType.as_dict.items()]
+    table.sort()      
     headers=['Method', 'Description']
     show_table(table, headers)
     print()
@@ -134,7 +132,6 @@ def summary(coinpairs, md=False):
     headers=['Name', 'Comment/Description']
     show_table(table, headers)
     print()    
-
 
     title="Formulas used in the computed coinpairs"
     table=[[str(pair), '=', data['formula_desc']] for pair, data in
@@ -165,7 +162,7 @@ price source.""")
 sources and if necessary we apply the changes to the parameterization.""")
     print()
     for pair, data in summary_data.items():
-        if data['type']=='direct':
+        if data['type']!=CoinPairType.COMPUTED:
             title = f"For coinpair {pair.long_name}"
             sources = data['sources']
             table = [[d['name'], float(d['weigh']), d['uri']] for d in
@@ -344,10 +341,20 @@ COINPAIRS_FILTER:
     table=[]
     for coinpair, d in values.items():
         row = []
-        if 'prices' in d:
-            row.append('↓')
-        else:
+        if coinpair.type == CoinPairType.COMPUTED:
             row.append('ƒ')
+        elif coinpair.type == CoinPairType.DIRECT:
+            row.append('↓')
+        elif coinpair.type == CoinPairType.WEIGHTED:
+            row.append('⇓')
+        elif coinpair.type == CoinPairType.ONCHAIN:
+            row.append('⛓')
+        elif coinpair.type == CoinPairType.DUMMY:
+            row.append('=')
+        elif coinpair.type == CoinPairType.INVERTED:
+            row.append('⇄')
+        else:
+            row.append('·')        
         row.append(coinpair)
         if expand_values:
             row.append(d['median_price'] if 'median_price' in d else None)

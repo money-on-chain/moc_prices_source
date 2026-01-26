@@ -30,30 +30,31 @@ This package includes a CLI tool that allows you to query the coinpair values in
 
 | Name           | Coinpair   | Variant   | Method   |
 |----------------|------------|-----------|----------|
-| BLOCK(RSK)     | BLOCK      | RSK       | Weighted |
+| BLOCK(RSK)     | BLOCK      | RSK       | Onchain  |
 | BNB/USD        | BNB/USD    |           | Computed |
-| BNB/USDT       | BNB/USDT   |           | Weighted |
+| BNB/USDT       | BNB/USDT   |           | Direct   |
 | BPRO/ARS       | BPRO/ARS   |           | Computed |
-| BPRO/BTC       | BPRO/BTC   |           | Weighted |
+| BPRO/BTC       | BPRO/BTC   |           | Onchain  |
 | BPRO/COP       | BPRO/COP   |           | Computed |
 | BPRO/USD       | BPRO/USD   |           | Computed |
 | BTC/ARS        | BTC/ARS    |           | Weighted |
 | BTC/COP        | BTC/COP    |           | Weighted |
 | BTC/USD        | BTC/USD    |           | Weighted |
+| BTC/USD(och)   | BTC/USD    | och       | Onchain  |
 | BTC/USDT       | BTC/USDT   |           | Weighted |
-| DOC/USD        | DOC/USD    |           | Weighted |
+| DOC/USD        | DOC/USD    |           | Dummy    |
 | ETH/BTC        | ETH/BTC    |           | Weighted |
 | ETH/USD        | ETH/USD    |           | Weighted |
 | ETH/USD(B)     | ETH/USD    | B         | Computed |
-| GAS/BTC        | GAS/BTC    |           | Weighted |
+| GAS/BTC        | GAS/BTC    |           | Onchain  |
 | MOC/BPRO       | MOC/BPRO   |           | Computed |
 | MOC/BTC        | MOC/BTC    |           | Computed |
-| MOC/BTC(sov)   | MOC/BTC    | sov       | Weighted |
+| MOC/BTC(sov)   | MOC/BTC    | sov       | Onchain  |
 | MOC/USD        | MOC/USD    |           | Computed |
-| MOC/USD(Oku)   | MOC/USD    | Oku       | Weighted |
+| MOC/USD(Oku)   | MOC/USD    | Oku       | Onchain  |
 | MOC/USD(WM)    | MOC/USD    | WM        | Computed |
-| RIF/BTC        | RIF/BTC    |           | Weighted |
-| RIF/BTC(mp1%)  | RIF/BTC    | mp1%      | Weighted |
+| RIF/BTC        | RIF/BTC    |           | Direct   |
+| RIF/BTC(mp1%)  | RIF/BTC    | mp1%      | Direct   |
 | RIF/USD        | RIF/USD    |           | Computed |
 | RIF/USD(B)     | RIF/USD    | B         | Computed |
 | RIF/USD(T)     | RIF/USD    | T         | Computed |
@@ -61,11 +62,11 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | RIF/USD(TBMA)  | RIF/USD    | TBMA      | Computed |
 | RIF/USD(TMA)   | RIF/USD    | TMA       | Computed |
 | RIF/USD(WMTB)  | RIF/USD    | WMTB      | Computed |
-| RIF/USDT       | RIF/USDT   |           | Weighted |
-| RIF/USDT(MA)   | RIF/USDT   | MA        | Weighted |
-| RIF/USDT(MA2)  | RIF/USDT   | MA2       | Weighted |
-| RIF/USDT(MA3)  | RIF/USDT   | MA3       | Weighted |
-| RIF/USDT(mp1%) | RIF/USDT   | mp1%      | Weighted |
+| RIF/USDT       | RIF/USDT   |           | Direct   |
+| RIF/USDT(MA)   | RIF/USDT   | MA        | Direct   |
+| RIF/USDT(MA2)  | RIF/USDT   | MA2       | Direct   |
+| RIF/USDT(MA3)  | RIF/USDT   | MA3       | Direct   |
+| RIF/USDT(mp1%) | RIF/USDT   | mp1%      | Direct   |
 | USD/ARS        | USD/ARS    |           | Weighted |
 | USD/ARS(CCB)   | USD/ARS    | CCB       | Computed |
 | USD/ARS(CCL)   | USD/ARS    | CCL       | Weighted |
@@ -77,8 +78,12 @@ This package includes a CLI tool that allows you to query the coinpair values in
 
 | Method   | Description                                              |
 |----------|----------------------------------------------------------|
-| Weighted | Weighted median of values ​​obtained from multiple sources |
 | Computed | Compute made with previously obtained coinpairs          |
+| Direct   | Direct value from a single source                        |
+| Dummy    | Dummy constant value                                     |
+| Inverted | Inverted coinpair (x⁻¹)                                  |
+| Onchain  | Obtained directly from the blockchain                    |
+| Weighted | Weighted median of values obtained from multiple sources |
 
 | Name           | Comment/Description                                                  |
 |----------------|----------------------------------------------------------------------|
@@ -92,6 +97,7 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | BTC/ARS        |                                                                      |
 | BTC/COP        |                                                                      |
 | BTC/USD        |                                                                      |
+| BTC/USD(och)   | Obtained from the blockchain                                         |
 | BTC/USDT       |                                                                      |
 | DOC/USD        | Pegged 1:1 to USD                                                    |
 | ETH/BTC        |                                                                      |
@@ -102,7 +108,7 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | MOC/BTC        |                                                                      |
 | MOC/BTC(sov)   | Obtained from Sovryn onchain                                         |
 | MOC/USD        | Default option, weighted median                                      |
-| MOC/USD(Oku)   |                                                                      |
+| MOC/USD(Oku)   | Obtained from Oku onchain                                            |
 | MOC/USD(WM)    | Weighted median                                                      |
 | RIF/BTC        |                                                                      |
 | RIF/BTC(mp1%)  | To move the price 1 percent                                          |
@@ -118,10 +124,10 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | RIF/USDT(MA2)  |                                                                      |
 | RIF/USDT(MA3)  |                                                                      |
 | RIF/USDT(mp1%) | To move the price 1 percent                                          |
-| USD/ARS        | Free, from the news portals                                          |
+| USD/ARS        | Free, from press portals                                             |
 | USD/ARS(CCB)   | Paid in Bitcoin                                                      |
 | USD/ARS(CCL)   |                                                                      |
-| USD/COP        | Free, from the news portals                                          |
+| USD/COP        | Free, from press portals                                             |
 | USD/COP(CCB)   | Paid in Bitcoin                                                      |
 | USD/MXN        |                                                                      |
 | USDT/USD       |                                                                      |
@@ -358,4 +364,9 @@ Only RSK onchain (URI: https://public-node.rsk.co)
 ### For coinpair BLOCK(RSK)
 
 Only RSK onchain (URI: https://public-node.rsk.co)
+
+
+### For coinpair BTC/USD(och) (from Bitcoin to Dollar)
+
+Only MOC onchain (URI: https://public-node.rsk.co)
 

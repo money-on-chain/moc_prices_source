@@ -12,11 +12,20 @@ from ..evm import OneShotHTTPProvider, HTTPProvider, Web3, EVM, Address, \
         get_multicall_addr_env
 from ..cli import get_env
 from ..my_logging import WithLogger, get_logger
+from enum import Enum
 
 
 
 base_dir = dirname(dirname(abspath(__file__)))
 app_name = basename(base_dir)
+
+
+class classproperty:
+    def __init__(self, func):
+        self.func = func
+
+    def __get__(self, obj, owner):
+        return self.func(owner)
 
 
 
@@ -78,6 +87,38 @@ def register_coins():
                 get_logger(__name__).info("Register coin %s", obj)
 
 
+class CoinPairType(Enum):
+    WEIGHTED = (
+        "weighted",
+        "Weighted median of values obtained from multiple sources")
+    COMPUTED = (
+        "computed",
+        "Compute made with previously obtained coinpairs")
+    DIRECT = ("direct", "Direct value from a single source")
+    ONCHAIN = ("onchain", "Obtained directly from the blockchain")
+    DUMMY = ("dummy", "Dummy constant value")
+    INVERTED = ("inverted", "Inverted coinpair (x⁻¹)")
+
+    def __init__(self, value: str, descripcion: str):
+        self._value_ = value
+        self.descripcion = descripcion
+
+    @classproperty
+    def as_dict(cls) -> dict:
+        return {
+            e.value: e.descripcion
+            for e in cls
+        }
+
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.value.strip().lower() == other.strip().lower()
+        return super().__eq__(other)
+    
+    def __str__(self):
+        return self.value
+    
+
 class CoinPair(object):
 
     def __init__(self,
@@ -90,10 +131,13 @@ class CoinPair(object):
                  name: Optional[str] = None,
                  requirements: Optional[list] = None,
                  formula: Optional[Callable] = None,
-                 formula_desc: Optional[str] = None):
+                 formula_desc: Optional[str] = None,
+                 type_: Optional[CoinPairType] = None):
+        
         if (from_ is None or to_ is None) and name is None:
             raise ValueError("if no name is provided, from_ or to_ "
                              "parameters are required")
+        
         def to_str(x):
             if (bool(x) and str(x).strip()):
                 return str(x).strip()
@@ -108,6 +152,18 @@ class CoinPair(object):
         self._min_ok_sources_count = \
             int(min_ok_sources_count) if min_ok_sources_count else 0
         self.set_computed(requirements, formula, formula_desc)
+        self._type = type_
+    
+    @property
+    def type(self) -> CoinPairType:
+        if self._type is None:
+                if self.is_computed:
+                    return CoinPairType.COMPUTED
+                else:
+                    if self._min_ok_sources_count > 0:
+                        return CoinPairType.WEIGHTED
+                    return CoinPairType.DIRECT
+        return self._type
 
     @property
     def is_computed(self) -> bool:
@@ -227,7 +283,8 @@ class CoinPair(object):
             'variant': self.variant,
             'name': self.name,
             'description': self.description,
-            'is_computed': self.is_computed
+            'is_computed': self.is_computed,
+            'type': self.type.value
         }
 
     def __str__(self):
@@ -795,14 +852,6 @@ def engine_register(name_id: Optional[str] = None):
         Engines[name_id] = cls
         return cls
     return engine_register_base
-
-
-class classproperty:
-    def __init__(self, func):
-        self.func = func
-
-    def __get__(self, obj, owner):
-        return self.func(owner)
 
 
 class Formula(WithLogger):
