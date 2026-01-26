@@ -17,16 +17,16 @@ BTC_COP = CoinPair(BTC, COP,
     min_ok_sources_count=get_env('BTC_COP_MIN_OK_SOURCES_COUNT', 2, int))
 
 # BTC/USD
-BTC_USD = CoinPair(BTC, USD)
+BTC_USD = CoinPair(BTC, USD, min_ok_sources_count=1)
 
 # BTC/USDT
-BTC_USDT = CoinPair(BTC, USDT)
+BTC_USDT = CoinPair(BTC, USDT, min_ok_sources_count=1)
 
 # ETH/BTC
-ETH_BTC = CoinPair(ETH, BTC)
+ETH_BTC = CoinPair(ETH, BTC, min_ok_sources_count=1)
 
 # ETH/USD
-ETH_USD = CoinPair(ETH, USD)
+ETH_USD = CoinPair(ETH, USD, min_ok_sources_count=1)
 
 # RIF/BTC
 RIF_BTC = CoinPair(RIF, BTC)
@@ -38,16 +38,18 @@ RIF_USDT_MA2 = CoinPair(RIF, USDT, "MA2")
 RIF_USDT_MA3 = CoinPair(RIF, USDT, "MA3")
 
 # USD/ARS
-USD_ARS = CoinPair(USD, ARS, description="Free, from the news portals")
-USD_ARS_CCL = CoinPair(USD, ARS, "CCL")
+USD_ARS = CoinPair(USD, ARS, min_ok_sources_count=1,
+                   description="Free, from press portals")
+USD_ARS_CCL = CoinPair(USD, ARS, "CCL", min_ok_sources_count=1)
 
 # USD/COP
-USD_COP = CoinPair(USD, COP, description="Free, from the news portals")
+USD_COP = CoinPair(USD, COP, min_ok_sources_count=1,
+                   description="Free, from press portals")
 
 # USD/MXN
-USD_MXN = CoinPair(USD, MXN)
+USD_MXN = CoinPair(USD, MXN, min_ok_sources_count=1)
 
 # USDT/USD
-USDT_USD = CoinPair(USDT, USD)
+USDT_USD = CoinPair(USDT, USD, min_ok_sources_count=1)
 
 register_pairs()
