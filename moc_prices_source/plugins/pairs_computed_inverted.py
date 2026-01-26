@@ -39,14 +39,14 @@ def make_inverted_pair(base_pair: CoinPair) -> CoinPair:
             return CoinPair(*args,
                 requirements = base_pair.requirements,
                 formula = InvertedClass,
-                formula_desc = f"({base_pair})⁻¹")
+                formula_desc = f"({base_pair.formula_desc})⁻¹")
         else:
             raise TypeError("Unsupported formula type for inversion")
     else:
         return CoinPair(*args,
             requirements = [base_pair],
             formula = inverted_formula,
-            formula_desc = f"({base_pair})⁻¹")
+            formula_desc = f"({base_pair.name_base.lower().replace('/', '_')})⁻¹")
 
 def make_inverted_name(base_pair: CoinPair) -> str:
     args = [base_pair.to_, base_pair.from_, base_pair.variant]
