@@ -1,5 +1,5 @@
 from ...types import Decimal, FancyDecimal, Any
-from ..base import CoinPair, Formula, register_pairs
+from ..base import CoinPair, CoinPairType, Formula, register_pairs
 from .onchain import BPRO_BTC
 from .computed import RIF_USD_WMTB, BPRO_ARS
 
@@ -33,20 +33,24 @@ def make_inverted_pair(base_pair: CoinPair) -> CoinPair:
             return CoinPair(*args,
                 requirements = base_pair.requirements,
                 formula = inverted_func,
-                formula_desc = f"({base_pair.formula_desc})⁻¹")
+                formula_desc = f"({base_pair.formula_desc})⁻¹",
+                type_ = CoinPairType.INVERTED)
         elif issubclass(base_pair.formula, Formula):
             InvertedClass = make_inverted_class(base_pair.formula)
             return CoinPair(*args,
                 requirements = base_pair.requirements,
                 formula = InvertedClass,
-                formula_desc = f"({base_pair.formula_desc})⁻¹")
+                formula_desc = f"({base_pair.formula_desc})⁻¹",
+                type_ = CoinPairType.INVERTED)
         else:
             raise TypeError("Unsupported formula type for inversion")
     else:
         return CoinPair(*args,
             requirements = [base_pair],
             formula = inverted_formula,
-            formula_desc = f"({base_pair.name_base.lower().replace('/', '_')})⁻¹")
+            formula_desc = \
+                f"({base_pair.name_base.lower().replace('/', '_')})⁻¹",
+            type_ = CoinPairType.INVERTED)
 
 def make_inverted_name(base_pair: CoinPair) -> str:
     args = [base_pair.to_, base_pair.from_, base_pair.variant]
