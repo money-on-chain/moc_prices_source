@@ -1,10 +1,9 @@
-from .chains import chain, EVM
-from .base import CoinPair, Formula, register_pairs
-from .pairs import BTC_ARS, BTC_COP, BTC_USD
-from .pairs_onchain import BPRO_BTC
-from .base import get_addr_env, Decimal
-from ..types import PercentageDecimal, Yes, No
-from ..evm import Address
+from .simple import BTC_ARS, BTC_COP, BTC_USD
+from .onchain import BPRO_BTC
+from ..chains import EVM, chain
+from ..base import CoinPair, Formula, Decimal, register_pairs, get_addr_env 
+from ...types import PercentageDecimal, Yes, No
+from ...evm import Address
 
 
 
