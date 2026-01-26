@@ -108,5 +108,7 @@
     "btc_cop_bitso":     0,
     "btc_cop_cryptomkt": 0,
 
-    "rsk_blocknumber_onchain": 1
+    "rsk_blocknumber_onchain": 1,
+    
+    "btc_usd_onchain": 1
 }
