@@ -280,7 +280,7 @@ class Address(str):
             if len(addr) != 40:
                 raise ValueError('addr has less o more than 40 digits')
 
-        addr = '0x' + addr.lower()
+        addr = Web3.to_checksum_address('0x' + addr.lower())
 
         return super().__new__(cls, addr)
 
@@ -466,7 +466,7 @@ class Call:
     
     @property
     def as_tuple(self):
-        return (self.to_as_str, self.data_as_str)
+        return (self.to_as_str, self.data)
 
     def __repr__(self):
         return (f"Call(to={repr(self.to_as_str)}, "
@@ -489,6 +489,7 @@ class Multicall():
             raise ValueError('Invalid RPC URI or Web3 object or EVM object')
         self.web3: Web3 = self.evm.web3
         self.address = Address(address)
+        self._already_been_executed_once = {}
         self.clear_calls()
 
     def clear_calls(self):
@@ -912,8 +913,6 @@ class Multicall():
                 fn_spec = extra['fn_spec']
                 result = fn_spec.decode_outputs(raw_result)
             self._calls[call]['data'][namespace] = result
-
-    _already_been_executed_once = {}
 
     def reset_executed_once(self, namespace: Optional[str] = None):
         self._already_been_executed_once[namespace] = False   
