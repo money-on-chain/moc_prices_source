@@ -466,7 +466,7 @@ class Call:
     
     @property
     def as_tuple(self):
-        return (self.to_as_str, self.data_as_str)
+        return (self.to_as_str, self.data)
 
     def __repr__(self):
         return (f"Call(to={repr(self.to_as_str)}, "
