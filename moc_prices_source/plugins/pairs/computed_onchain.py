@@ -9,11 +9,26 @@ from ...evm import Address
 
 ### Computed onchain pairs
 
+# Get some ENV vars or use default addresses
+btc_usd_oracle_addr_env = 'BTC_USD_ORACLE_ADDR'
+btc_usd_oracle_addr = get_addr_env(btc_usd_oracle_addr_env,
+    '0xe2927A0620b82A66D67F678FC9b826B0E01B1bFD')
+
+mcg_addr_env = 'MULTI_COLLATERAL_GUARD_ADDR'
+mcg_addr = get_addr_env(mcg_addr_env,
+    Address(0))
+
+mcg_testnet_addr_env = 'MULTI_COLLATERAL_GUARD_TESTNET_ADDR'
+mcg_testnet_addr = get_addr_env(mcg_testnet_addr_env,                            
+    Address(0))
+
+
+# Classes for computed onchain pairs formulas
+
 class BTC_USD_24h_Formula(Formula):
 
     evm: EVM = chain.rsk_mainnet.evm
-    oracle_addr = get_addr_env('BTC_USD_ORACLE_ADDR',
-                               '0xe2927A0620b82A66D67F678FC9b826B0E01B1bFD')
+    oracle_addr = btc_usd_oracle_addr
     coinpair = BTC_USD
     requirements = [coinpair]
     hours: int = 24
@@ -45,13 +60,6 @@ class BTC_USD_24h_Formula(Formula):
         self.evm.multicall.clear_calls()
 
 
-BTC_USD_24h = CoinPair(
-    name = "BTC/USD(24h)",
-    short_description = "test",
-    requirements = BTC_USD_24h_Formula.requirements,
-    formula = BTC_USD_24h_Formula)
-
-
 class ISLIQ_FLIP_Formula(Formula):
     """
         MultiCollateralGuard.readyToLiquidate([
@@ -61,19 +69,15 @@ class ISLIQ_FLIP_Formula(Formula):
     """
 
     evm: EVM = chain.rsk_mainnet.evm
-    mcg_addr_env = 'MULTI_COLLATERAL_GUARD_ADDR'
-    mcg_addr_env_default = Address(0)
+    mcg_addr = mcg_addr
+    mcg_addr_env = mcg_addr_env
 
     requirements = [BTC_ARS, BTC_COP, BTC_USD, BPRO_BTC]
     fn_list = ['readyToLiquidate(uint256[][])(bool)',
                'readyToMicroLiquidate(uint256[][])(bool)']
 
     def init(self, btc_ars, btc_cop, btc_usd, bpro_btc):
-        
-        self.mcg_addr = get_addr_env(
-            self.mcg_addr_env,
-            self.mcg_addr_env_default)
-                
+                       
         wei = lambda value: int(value * Decimal("1e18"))
 
         usd_ars = wei(btc_ars / btc_usd)
@@ -114,13 +118,6 @@ class ISLIQ_FLIP_Formula(Formula):
         self.evm.multicall.clear_calls()
 
 
-ISLIQ_FLIP = CoinPair(
-    name="ISLIQ_FLIP",
-    short_description = "If FLip is in liquidation (mainnet)",
-    requirements = ISLIQ_FLIP_Formula.requirements,
-    formula = ISLIQ_FLIP_Formula)
-
-
 class ISLIQ_FLIP_TEST_Formula(ISLIQ_FLIP_Formula):
     """
         MultiCollateralGuardTestnet.readyToLiquidate([
@@ -130,8 +127,24 @@ class ISLIQ_FLIP_TEST_Formula(ISLIQ_FLIP_Formula):
     """
 
     evm: EVM = chain.rsk_testnet.evm
-    mcg_addr_env = 'MULTI_COLLATERAL_GUARD_TESTNET_ADDR'
-    mcg_addr_env_default = Address(0)
+    mcg_addr = mcg_testnet_addr
+    mcg_addr_env = mcg_testnet_addr_env
+
+
+# Computed onchain pairs
+
+BTC_USD_24h = CoinPair(
+    name = "BTC/USD(24h)",
+    short_description = "test",
+    requirements = BTC_USD_24h_Formula.requirements,
+    formula = BTC_USD_24h_Formula)
+
+
+ISLIQ_FLIP = CoinPair(
+    name="ISLIQ_FLIP",
+    short_description = "If FLip is in liquidation (mainnet)",
+    requirements = ISLIQ_FLIP_Formula.requirements,
+    formula = ISLIQ_FLIP_Formula)
 
 
 ISLIQ_FLIP_TEST = CoinPair(
