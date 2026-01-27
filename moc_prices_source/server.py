@@ -2,7 +2,6 @@ from os import getenv
 from decimal import Decimal
 from fnmatch import fnmatch as match
 from tabulate import tabulate
-from json import dumps, loads
 from .types import normalize_obj, Serializable
 from flask import Flask, request, redirect, jsonify, make_response
 from flask_restx import Api, Resource, reqparse, abort
@@ -12,6 +11,7 @@ from . import get_price, version
 from . import ALL as AllCoinPairs
 from .cli import command, option
 from .redis_conn import use_redis
+from .cli_check import show_computed_pairs_fromula, summary, coinpairs_report
 
 
 
@@ -79,13 +79,47 @@ def get_coin_pairs(
     return coinpairs
 
 
+
+class CacheKeyMaker():
+
+    def __init__(self, *args, headers=[],
+                 info=lambda x: None, pre="") -> None:
+        self._pre = pre
+        self._info = info
+        self._args = list(map(lambda x: str(x).strip().lower(),
+                              list(args)))
+        self._headers = list(map(lambda x: str(x).strip().lower(),
+                                 list(headers)))
+
+    def __call__(self) -> str:
+        
+        path = request.path
+        
+        args = {k.lower(): v for k, v in request.args.to_dict(
+            flat=True).items()}
+        filtered_args = {k: v for k, v in args.items() if k in self._args}
+        sorted_args = sorted(filtered_args.items())
+
+        headers = {k.lower(): v for k, v in request.headers.items()}
+        filtered_headers = {k: v for k, v in headers.items(
+            ) if k in self._headers}
+        sorted_headers = sorted(filtered_headers.items())
+
+        key = f"{self._pre}|{path}|{sorted_args}|{sorted_headers}"
+        
+        self._info(f"cache key = {repr(key)}")
+
+        return key
+
+
+
 class HashMethod():
 
     def __init__(self, *options, info=lambda x: None, pre="") -> None:
         self._pre = pre
         self.info = info
-        self.options = list(map(
-            lambda x: str(x).strip().lower(), list(options)))
+        self.options = list(map(lambda x: str(x).strip().lower(),
+                                list(options)))
         self.out = []
 
     def __call__(self, x) -> None:
@@ -94,6 +128,9 @@ class HashMethod():
             key=str(key).strip().lower()
             if key in self.options:
                 value=str(value).strip().lower()
+                if key=='coinpairs' and value:
+                    value = ','.join([str(c).lower() for c in get_coin_pairs(
+                        value)])
                 self.out.append((key, value))
         return self
 
@@ -105,6 +142,7 @@ class HashMethod():
         return hash_
 
 
+
 api = Api(
     app,
     prefix='/api',
@@ -113,7 +151,6 @@ api = Api(
     title=title,
     description=description,
 )
-
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 
@@ -193,6 +230,26 @@ class CoinPairsList(Resource):
                           'variant': x.variant,
                           'description': x.description or x.short_description}
                           for x in AllCoinPairs])
+
+
+
+@coinpairs_ns.route('/computed_coinpair_formulas')
+class ComputedCoinpairFormulas(Resource):
+
+    @api.doc(produces=['text/plain'])
+    def get(self):
+        """
+        Displays the formulas used for the computed coinpair
+        
+        In plain text
+        """
+        
+        text = show_computed_pairs_fromula()
+        response = make_response(text, 200)
+        response.mimetype = "text/plain"
+        return response
+
+
 
 coinpair_value_get = reqparse.RequestParser()
 coinpair_value_get.add_argument(
@@ -289,7 +346,34 @@ class CoinPairValue(Resource):
         return out
 
 
-def get_set_of_prices(*args, detail: dict = {}):
+
+@coinpairs_ns.route('/get_value_simple')
+@coinpairs_ns.response(200, 'Success!')
+@coinpairs_ns.response(*bad_coinpair_choice)
+@coinpairs_ns.response(*coinpair_value_not_found)
+class CoinPairValueSimple(Resource):
+
+    @coinpairs_ns.expect(coinpair_value_get)
+    @cache.cached(
+        timeout=5,
+        query_string=True,
+        hash_method=HashMethod(
+            'coinpair',
+            pre="get_coinpair_value_simple",
+            #info=lambda x: app.logger.info(f"Cache: {x}")
+        )
+    )
+    def get(self):
+        """Get the price of a specific coinpair (simple, no details)"""
+        return CoinPairValue.get(self)['value']
+
+
+
+def get_set_of_prices(*args,
+                      detail: dict = {},
+                      plain_text: bool = False,
+                      plain_text_summary: bool = False,
+                      md: bool = False) -> dict:
         
         if not args:
             raise ValueError("No arguments provided")
@@ -311,32 +395,43 @@ def get_set_of_prices(*args, detail: dict = {}):
         if not coinpairs:
             raise ValueError("No coinpairs provided")
 
-        values = get_price(
-            coinpairs=coinpairs,
-            detail=detail,
-            serializable=True,
-            ignore_zero_weighing=True)
+        if plain_text:
+            if plain_text_summary:
+                out = summary(
+                    coinpairs = coinpairs,
+                    md = md)
+            else:
+                out = coinpairs_report(
+                    coinpairs = coinpairs,
+                    data = detail)
+        else:
+            values = get_price(
+                coinpairs = coinpairs,
+                detail = detail,
+                serializable = True,
+                ignore_zero_weighing = True)
 
-        if values is None:
-            values = {}
+            if values is None:
+                values = {}
 
-        if isinstance(values, (Serializable, Decimal, float, int, bool)):
-            values = {coinpairs[0]: values}
+            if isinstance(values, (Serializable, Decimal, float, int, bool)):
+                values = {coinpairs[0]: values}
 
-        for cp in coinpairs:
-            if cp not in values:
-                values[cp] = None
+            for cp in coinpairs:
+                if cp not in values:
+                    values[cp] = None
 
-        out = {
-            'values': normalize_obj(values),
-            'detail': detail
-        }
+            out = {
+                'values': normalize_obj(values),
+                'detail': detail
+            }
         return out
-
 
 coinpairs_values_get = reqparse.RequestParser()
 coinpairs_values_get.add_argument(
     'coinpairs',
+    default="*",
+    required=False,    
     type = lambda s: get_coin_pairs(wildcard=s),
     help = 'Set of coinpairs symbols')
 bad_coinpairs_set = (400, 'Bad set of coinpairs symbols')
@@ -351,15 +446,14 @@ coinpairs_value_not_found = (404, 'Non coinpairs value found')
 @coinpairs_ns.response(*coinpairs_value_not_found)
 class CoinPairsValue(Resource):
 
+    @api.doc(produces=['application/json', 'text/plain'])
     @coinpairs_ns.expect(coinpairs_values_get)
     @cache.cached(
         timeout=10,
-        query_string=True,
-        hash_method=HashMethod(
+        key_prefix=CacheKeyMaker(
             'coinpairs',
-            pre="get_coinpairs_value",
-        )
-    )
+            headers=['Accept'],
+            pre="get_coinpairs_value"))
     def get(self):
         """
         Get the price of a specific set of coinpairs
@@ -376,6 +470,9 @@ class CoinPairsValue(Resource):
 
         """
 
+        accept = request.headers.get('Accept', 'text/plain')
+        plain_text = 'text/plain' in accept
+
         args = coinpairs_values_get.parse_args()
         coinpairs = args['coinpairs']
 
@@ -387,14 +484,21 @@ class CoinPairsValue(Resource):
 
         detail = {}
        
-        out = get_set_of_prices(coinpairs, detail=detail)
+        out = get_set_of_prices(coinpairs,
+                                detail = detail,
+                                plain_text = plain_text)
 
         self._extra_log(coinpairs, detail)
 
         if not out:
             abort(*coinpairs_value_not_found)       
         
-        return out
+        if plain_text:
+            response = make_response(out, 200)
+            response.mimetype = "text/plain"
+            return response
+        else:
+            return out
 
     @staticmethod
     def _extra_log(coinpairs, detail):
@@ -434,6 +538,61 @@ class CoinPairsValue(Resource):
                 else:
                     str_title = "Sources count for"
                 info(f"{str_title} {sources_count_str}")
+
+
+
+@coinpairs_ns.route('/summary')
+@coinpairs_ns.response(200, 'Success!')
+@coinpairs_ns.response(*bad_coinpairs_set)
+class Summary(Resource):
+
+    @api.doc(produces=['text/markdown', 'text/plain'])
+    @coinpairs_ns.expect(coinpairs_values_get)
+    @cache.cached(
+        timeout=10,
+        key_prefix=CacheKeyMaker(
+            'coinpairs',
+            headers=['Accept'],
+            pre="get_summary"))
+    def get(self):
+        """
+        Show how the data is obtained
+
+        Gets a summary of subset of coinpairs or all coinpairs ("*").
+        Showing information on how the data is obtained.
+        
+        It will be displayed in plain text or Markdown.
+
+        The __coinpairs__ parameter is required.
+        It represents the pairs you want to get the price for.
+        
+        It supports:
+
+        * A single parameter like __BTC/USD__
+        * Multiple parameters in a list, e.g.: __BTC/USD,USD/ARS__
+        * Accepts wildcards, e.g., __*/ARS__
+        * Or combinations, e.g.: __BTC/USD,*/ARS__
+
+        """
+
+        accept = request.headers.get('Accept', 'text/plain')
+        md = not('text/plain' in accept)
+
+        args = coinpairs_values_get.parse_args()
+        coinpairs = args['coinpairs']
+
+        if not coinpairs:
+            abort(*bad_coinpairs_set)
+      
+        out = get_set_of_prices(coinpairs,
+                                detail = {},
+                                plain_text = True,
+                                plain_text_summary = True,
+                                md = md)
+        
+        response = make_response(out, 200)
+        response.mimetype = "text/plain"
+        return response
 
 
 
