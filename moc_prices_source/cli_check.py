@@ -2,7 +2,7 @@ import json
 from sys import stderr
 from . import version
 from . import get_price, ALL, get_coin_pairs
-from .cli import command, option, tabulate, trim, cli
+from .cli import Output, command, option, tabulate, trim, cli
 from .cli import show_envs as show_envs_fnc
 from .weighing import weighing
 from .engines import all_engines
@@ -10,10 +10,18 @@ from .computed_pairs import show_computed_pairs_fromula, computed_pairs
 from .types import FancyDecimal, FancyTimedelta, Decimal, timedelta
 from .my_logging import set_level, OFF, INFO, DEBUG, VERBOSE
 from .pairs import CoinPairType
+from textwrap import wrap
 
 
 
-def summary(coinpairs, md=False):
+def summary(coinpairs,
+            md = False,
+            use_print = False):
+    
+    if callable(use_print):
+        out = use_print
+    else:
+        out = Output(print = print if bool(use_print) else None)
 
     summary_data = {}
 
@@ -61,18 +69,18 @@ def summary(coinpairs, md=False):
     def show_title(title, level=1):
         if md:
             prev = {1:"## ", 2:"### "}[level]
-            print(prev + ' '.join(title.split()))
+            out(prev + ' '.join(title.split()))
         else:
             prev = {1:"", 2:"  "}[level]
             sep = {1:"=", 2:"-"}[level]
-            print(prev + ' '.join(title.split()))
-            print(prev + ' '.join(map(lambda x: sep*len(x), title.split())))
+            out(prev + ' '.join(title.split()))
+            out(prev + ' '.join(map(lambda x: sep*len(x), title.split())))
 
     def show_p(p):
         if md:
-            print(p)
+            out(p)
         else:
-            print(f"    {p}")
+            out(f"    {p}")
 
     def show_table(table, headers=[], tablefmt='psql'):
         if md:
@@ -82,17 +90,15 @@ def summary(coinpairs, md=False):
                      floatfmt=".2f")
         if md:
             if tablefmt=='plain':
-                print('```')
-            print(s)
+                out('```')
+            out(s)
             if tablefmt=='plain':
-                print('```')
+                out('```')
         else:
             if tablefmt=='plain':
                 s = tabulate([[s]], tablefmt='psql')        
             for l in s.split('\n'):
-                print(f"    {l}")
-
-
+                out(f"    {l}")
 
     title = "Symbols"
     coins = []
@@ -104,12 +110,11 @@ def summary(coinpairs, md=False):
     table = [[c.symbol, c.name, c.small_symbol] for c in coins]
     table.sort()
     headers=['Symbol', 'Name', 'Char']
-    print()
+    out()
     show_title(title)
-    print()
+    out()
     show_table(table, headers)
-    print()
-
+    out()
 
     title = "Coinpairs"
     table = [[str(pair), pair.name_base, pair.variant,
@@ -117,50 +122,49 @@ def summary(coinpairs, md=False):
              ] for pair, data in summary_data.items()]
     table.sort()
     headers=['Name', 'Coinpair', 'Variant', 'Method']
-    print()
+    out()
     show_title(title)
-    print()
+    out()
     show_table(table, headers)
-    print()
+    out()
     table = [[str(k).capitalize(), v] for k, v in CoinPairType.as_dict.items()]
     table.sort()      
     headers=['Method', 'Description']
     show_table(table, headers)
-    print()
+    out()
     table = [[str(pair), pair.description] for pair, data in summary_data.items()]
     table.sort()
     headers=['Name', 'Comment/Description']
     show_table(table, headers)
-    print()    
+    out()    
 
     title="Formulas used in the computed coinpairs"
     table=[[str(pair), '=', data['formula_desc']] for pair, data in
            summary_data.items() if data['type']=='computed']
     table.sort()
-    print()
+    out()
     show_title(title)
-    print()
+    out()
     show_table(table, tablefmt='plain')
-    print()
-
+    out()
 
     title="Weights used for each obtained coinpairs from multiple sources"
-    print()
+    out()
     show_title(title)
-    print()
+    out()
     show_p("""If a price source is not available, this source is discarded
 and the rest of the sources are used but with their weights recalculated
 proportionally.""")
     show_p("""For example, you have 3 sources with 3 weights A:0.2, B:0.5, C:0.3
 and if for some reason B would not be available, A:0.4, C:0.6 would
 be used.""")
-    print()
+    out()
     show_p("""The weights used are fixed values.""")
     show_p("""These weightings are related to the historical volume handled by each
 price source.""")
     show_p("""Every established period of time we review the historical volume of the
 sources and if necessary we apply the changes to the parameterization.""")
-    print()
+    out()
     for pair, data in summary_data.items():
         if data['type']!=CoinPairType.COMPUTED:
             title = f"For coinpair {pair.long_name}"
@@ -169,14 +173,166 @@ sources and if necessary we apply the changes to the parameterization.""")
                      sources if float(d['weigh'])>0]
             headers=['Source', 'Weight', 'URI']
             if table:
-                print()
+                out()
                 show_title(title, 2)
-                print()
+                out()
                 if len(table)>1:
                     show_table(table, headers)
                 else:
                     show_p(f"Only {table[0][0]} (URI: {table[0][2]})")
-                print()
+                out()
+    if isinstance(out, Output):
+        return str(out)
+
+
+def coinpairs_report(coinpairs,
+           show_json = False,
+           not_ignore_zero_weighing = False,
+           expand_values = False,
+           use_print = False,
+           data = {}):
+    
+    get_price(
+        coinpairs,
+        ignore_zero_weighing = not(not_ignore_zero_weighing),
+        detail = data,
+        serializable = show_json)
+
+    if show_json:
+        return json.dumps(data, indent=4, sort_keys=True)
+
+    if callable(use_print):
+        out = use_print
+    else:
+        out = Output(print = print if bool(use_print) else None)
+
+    time = data['time']
+    prices = data['prices']
+    values = data['values']
+
+    table=[]
+    prices_count = {}
+    for p in prices:
+        row = []
+        row.append(p["coinpair"].name_base)
+        row.append(p["coinpair"].variant)
+        row.append(p["coinpair"].short_description)
+        row.append(p["description"])
+        if not p["coinpair"] in prices_count:
+            prices_count[p["coinpair"]] = 0
+        prices_count[p["coinpair"]] += 1
+        if p["ok"]:
+            if p['coinpair'].to_ is None:
+                row.append(f"{p['price']}")
+            else:
+                unit = 'p'
+                v = p['price'] * (1000**4)
+                if v > 1000:
+                    for unit in ['p', 'µ', 'm', ' ', 'K', 'M', 'G']:
+                        v = v/1000
+                        if v<1000:
+                            break
+                row.append(f"{p['coinpair'].to_.small_symbol} {v:9.5f}{unit}")
+        else:
+            row.append(trim(p["error"], 20))
+        row.append(round(p["weighing"], 2))
+        if p["percentual_weighing"]:
+            row.append(round(p[
+                "percentual_weighing"]*100, 1))
+        else:
+            row.append('N/A')
+        if p["time"]:
+            row.append(str(FancyTimedelta(p["time"])))
+        else:
+            row.append('N/A')
+        table.append(row)
+    
+    if table:
+        table.sort(key=str)
+        out()
+        out(tabulate(table, headers=[
+            'Coinpair', 'V.', 'Short description', 'Exchnage', 'Response',
+            'Weight', '%', 'Time'
+        ]))
+
+    table=[]
+    for coinpair, d in values.items():
+        row = []
+        if coinpair.type == CoinPairType.COMPUTED:
+            row.append('ƒ')
+        elif coinpair.type == CoinPairType.DIRECT:
+            row.append('↓')
+        elif coinpair.type == CoinPairType.WEIGHTED:
+            row.append('⇓')
+        elif coinpair.type == CoinPairType.ONCHAIN:
+            row.append('⛓')
+        elif coinpair.type == CoinPairType.DUMMY:
+            row.append('=')
+        elif coinpair.type == CoinPairType.INVERTED:
+            row.append('⇄')
+        else:
+            row.append('·')        
+        row.append(coinpair)
+        if expand_values:
+            row.append(d['median_price'] if 'median_price' in d else None)
+            row.append(d['mean_price'] if 'mean_price' in d else None)
+        row.append(d['weighted_median_price'])
+        if 'prices' in d:
+            if 'ok_sources_count' in d:
+                row.append(
+                    f"{d['ok_sources_count']} of {prices_count[coinpair]}")
+            else:
+                row.append(len(d['prices']))
+        else:
+            row.append('N/A')
+        row.append('✓' if d['ok'] else '✕')
+        row.append(d['time'] if 'time' in d else None)
+        table.append(row)
+    if table:
+        table.sort(key=lambda x: str(x[1]))
+        out()
+        def format_field(x):
+            if type(x) is Decimal:
+                x = FancyDecimal(x)
+            if type(x) is timedelta:
+                x = FancyTimedelta(x)
+            return str(x)
+        table = [[format_field(f) for f in l] for l in table]
+        if expand_values:
+            headers=['', 'Coinpair', 'Mediam', 'Mean',
+                     'Weighted median', 'Sources', 'Ok', 'Time']
+            colalign=['center', 'left', 'right', 'right',
+                      'right', 'center', 'center', 'left']
+        else:
+            headers=['', 'Coinpair', 'Value', 'Sources count', 'Ok', 'Time']
+            colalign=['center', 'left', 'right', 'center', 'center', 'left']
+        out(tabulate(table, headers=headers, colalign=colalign))
+
+    errors = []
+    for p in prices:
+        if not p["ok"] and p['weighing']:
+            str_error = '\n'.join(wrap(str(p["error"]),width=40,break_long_words=True,break_on_hyphens=False))
+            errors.append((f"Source {p['name']}:", str_error))
+    for k, v in values.items():
+        if 'error' in v and v["error"]:
+            str_error = '\n'.join(wrap(str(v["error"]),width=40,break_long_words=True,break_on_hyphens=False))   
+            errors.append((f"Coinpair {k}:", str_error))    
+
+    if errors:
+        out()
+        out("Errors detail")
+        out("------ ------")
+        for l in tabulate(errors, tablefmt='plain').split('\n'):
+            if l[0]!=' ':
+                out()
+            out(f"  {l}")
+
+    out()
+    out('Response time {}'.format(FancyTimedelta(time)))
+    out()
+
+    if isinstance(out, Output):
+        return str(out)
 
 
 @command()
@@ -256,7 +412,7 @@ COINPAIRS_FILTER:
         return
 
     if show_computed_pairs:
-        show_computed_pairs_fromula()
+        show_computed_pairs_fromula(use_print = True)
         return 
 
     if coinpairs_filter:
@@ -271,145 +427,20 @@ COINPAIRS_FILTER:
         return 1
     
     if show_summary:
-        summary(coinpairs, md_summary)
+        summary(coinpairs, md_summary,
+                use_print = True)
         return
 
     if show_envs:
-        show_envs_fnc()
+        show_envs_fnc(use_print = True)
         return
 
-    data = {}
-
-    get_price(
+    coinpairs_report(
         coinpairs,
-        ignore_zero_weighing=not(not_ignore_zero_weighing),
-        detail=data,
-        serializable=show_json)
-
-    if show_json:
-        print(json.dumps(data, indent=4, sort_keys=True))
-        return
-
-    time = data['time']
-    prices = data['prices']
-    values = data['values']
-
-    table=[]
-    prices_count = {}
-    for p in prices:
-        row = []
-        row.append(p["coinpair"].name_base)
-        row.append(p["coinpair"].variant)
-        row.append(p["coinpair"].short_description)
-        row.append(p["description"])
-        if not p["coinpair"] in prices_count:
-            prices_count[p["coinpair"]] = 0
-        prices_count[p["coinpair"]] += 1
-        if p["ok"]:
-            if p['coinpair'].to_ is None:
-                row.append(f"{p['price']}")
-            else:
-                unit = 'p'
-                v = p['price'] * (1000**4)
-                if v > 1000:
-                    for unit in ['p', 'µ', 'm', ' ', 'K', 'M', 'G']:
-                        v = v/1000
-                        if v<1000:
-                            break
-                row.append(f"{p['coinpair'].to_.small_symbol} {v:9.5f}{unit}")
-        else:
-            row.append(trim(p["error"], 20))
-        row.append(round(p["weighing"], 2))
-        if p["percentual_weighing"]:
-            row.append(round(p[
-                "percentual_weighing"]*100, 1))
-        else:
-            row.append('N/A')
-        if p["time"]:
-            row.append(str(FancyTimedelta(p["time"])))
-        else:
-            row.append('N/A')
-        table.append(row)
-    if table:
-        table.sort(key=str)
-        print()
-        print(tabulate(table, headers=[
-            'Coinpair', 'V.', 'Short description', 'Exchnage', 'Response',
-            'Weight', '%', 'Time'
-        ]))
-
-    table=[]
-    for coinpair, d in values.items():
-        row = []
-        if coinpair.type == CoinPairType.COMPUTED:
-            row.append('ƒ')
-        elif coinpair.type == CoinPairType.DIRECT:
-            row.append('↓')
-        elif coinpair.type == CoinPairType.WEIGHTED:
-            row.append('⇓')
-        elif coinpair.type == CoinPairType.ONCHAIN:
-            row.append('⛓')
-        elif coinpair.type == CoinPairType.DUMMY:
-            row.append('=')
-        elif coinpair.type == CoinPairType.INVERTED:
-            row.append('⇄')
-        else:
-            row.append('·')        
-        row.append(coinpair)
-        if expand_values:
-            row.append(d['median_price'] if 'median_price' in d else None)
-            row.append(d['mean_price'] if 'mean_price' in d else None)
-        row.append(d['weighted_median_price'])
-        if 'prices' in d:
-            if 'ok_sources_count' in d:
-                row.append(
-                    f"{d['ok_sources_count']} of {prices_count[coinpair]}")
-            else:
-                row.append(len(d['prices']))
-        else:
-            row.append('N/A')
-        row.append('✓' if d['ok'] else '✕')
-        row.append(d['time'] if 'time' in d else None)
-        table.append(row)
-    if table:
-        table.sort(key=lambda x: str(x[1]))
-        print()
-        def format_field(x):
-            if type(x) is Decimal:
-                x = FancyDecimal(x)
-            if type(x) is timedelta:
-                x = FancyTimedelta(x)
-            return str(x)
-        table = [[format_field(f) for f in l] for l in table]
-        if expand_values:
-            headers=['', 'Coinpair', 'Mediam', 'Mean',
-                     'Weighted median', 'Sources', 'Ok', 'Time']
-            colalign=['center', 'left', 'right', 'right',
-                      'right', 'center', 'center', 'left']
-        else:
-            headers=['', 'Coinpair', 'Value', 'Sources count', 'Ok', 'Time']
-            colalign=['center', 'left', 'right', 'center', 'center', 'left']
-        print(tabulate(table, headers=headers, colalign=colalign))
-
-    errors = []
-    for p in prices:
-        if not p["ok"] and p['weighing']:
-            errors.append((f"Source {p['name']}", p["error"]))
-    for k, v in values.items():
-        if 'error' in v and v["error"]:
-            errors.append((f"Coinpair {k}", v["error"]))    
-
-    if errors:
-        print()
-        print("Errors detail")
-        print("------ ------")
-        for e in errors:
-            print()
-            print('{}: {}'.format(*e))
-
-    print()
-    print('Response time {}'.format(FancyTimedelta(time)))
-    print()
+        show_json = show_json,
+        not_ignore_zero_weighing = not_ignore_zero_weighing,
+        expand_values = expand_values,
+        use_print = True)
 
 
 

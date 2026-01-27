@@ -12,6 +12,23 @@ BadParameter = click.BadParameter
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
+class Output():
+    def clean(self):
+        self.histo = []
+    def __init__(self, print=None):
+        self.print = print
+        self.clean()
+    def __call__(self, *args):
+        if self.print is not None:
+            self.print(*args)
+        if args:
+            self.histo.extend([str(a) for a in args])
+        else:
+            self.histo.append('')
+    def __str__(self):
+        return '\n'.join([str(h) for h in self.histo])
+
+
 def command_group(command_group_=None, name=None, **kargs):
     f = command_group_.group if command_group_ else cli.group
     kargs['context_settings'] = CONTEXT_SETTINGS
@@ -85,7 +102,11 @@ def get_env(name, default, cast=str, alias={}):
     return value
 
 
-def show_envs():
+def show_envs(use_print = False):
+    if callable(use_print):
+        out = use_print
+    else:
+        out = Output(print = print if bool(use_print) else None)
     envs.sort()
     data: Dict[str, Set[int]] = {}
     for name, value in envs:
@@ -102,6 +123,8 @@ def show_envs():
             ', '.join([repr(x) for x in data[name]])
         ])
     if table:
-        print()
-        print(tabulate(table, headers=['Environment variable', 'Value']))
-        print()
+        out()
+        out(tabulate(table, headers=['Environment variable', 'Value']))
+        out()
+    if isinstance(out, Output):
+        return str(out)
