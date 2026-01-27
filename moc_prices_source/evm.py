@@ -466,7 +466,7 @@ class Call:
     
     @property
     def as_tuple(self):
-        return (self.to_as_str, self.data_as_str)
+        return (self.to_as_str, self.data)
 
     def __repr__(self):
         return (f"Call(to={repr(self.to_as_str)}, "
@@ -492,6 +492,7 @@ class Multicall():
         self.clear_calls()
 
     def clear_calls(self):
+        self._already_been_executed_once = {}
         self._calls = {}
         self._last_id = 0
 
@@ -912,8 +913,6 @@ class Multicall():
                 fn_spec = extra['fn_spec']
                 result = fn_spec.decode_outputs(raw_result)
             self._calls[call]['data'][namespace] = result
-
-    _already_been_executed_once = {}
 
     def reset_executed_once(self, namespace: Optional[str] = None):
         self._already_been_executed_once[namespace] = False   
