@@ -1,5 +1,5 @@
 from .plugins import CoinPairs
-from .cli import tabulate
+from .cli import Output, tabulate
 
 
 
@@ -21,12 +21,19 @@ for name, coinpair in ComputedCoinPairs.items():
 del name, coinpair
 
 
-def show_computed_pairs_fromula():
-    print()
-    print("Computed pairs formula")
-    print("-------- ----- -------")
-    print("")
+def show_computed_pairs_fromula(use_print = False):
+    if callable(use_print):
+        out = use_print
+
+    else:
+        out = Output(print = print if bool(use_print) else None)
+    out()
+    out("Computed pairs formula")
+    out("-------- ----- -------")
+    out("")
     table = [[str(pair), '=', data['formula_desc']] for pair,
              data in computed_pairs.items()]
-    print(tabulate(table, tablefmt='plain'))
-    print("")
+    out(tabulate(table, tablefmt='plain'))
+    out("")
+    if isinstance(out, Output):
+        return str(out)
