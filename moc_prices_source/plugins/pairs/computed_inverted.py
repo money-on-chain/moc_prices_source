@@ -9,9 +9,9 @@ from ..pairs.special import BLOCK_RSK
 
 # Pairs to invert
 wildcard_pairs_to_invert_include = get_env(
-    'AUTO_INVERT_PAIRS_WILDCARD_INCLUDE', '')
+    'AUTO_INVERT_PAIRS_WILDCARD_INCLUDE', 'btc/*,bpro/*,moc/*')
 wildcard_pairs_to_invert_exclude = get_env(
-    'AUTO_INVERT_PAIRS_WILDCARD_EXCLUDE', '')
+    'AUTO_INVERT_PAIRS_WILDCARD_EXCLUDE', '*(*)')
 
 
 
