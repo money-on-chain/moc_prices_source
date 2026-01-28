@@ -2,6 +2,7 @@ import click, shutil, sys
 from tabulate import tabulate
 from os import environ
 from typing import Dict, Set, List, Tuple, Any
+from .types import Bool
 
 
 
@@ -128,3 +129,7 @@ def show_envs(use_print = False):
         out()
     if isinstance(out, Output):
         return str(out)
+
+
+def get_env_bool(name, default, alias={}):
+    return bool(get_env(name, default, Bool.from_string, alias=alias))
