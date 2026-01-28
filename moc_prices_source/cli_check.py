@@ -170,7 +170,8 @@ sources and if necessary we apply the changes to the parameterization.""")
     out()
     for pair, data in summary_data.items():
         if not(data['type'] in [CoinPairType.COMPUTED,
-                                CoinPairType.INVERTED]):
+                                CoinPairType.INVERTED,
+                                CoinPairType.DUMMY]):
             title = f"For coinpair {pair.long_name}"
             sources = data['sources']
             table = [[d['name'], float(d['weigh']), d['uri']] for d in
