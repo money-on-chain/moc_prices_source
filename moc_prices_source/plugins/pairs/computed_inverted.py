@@ -1,12 +1,12 @@
 from ...types import Decimal, FancyDecimal, Any
 from ..base import CoinPair, CoinPairType, Formula, register_pairs
-from .onchain import BPRO_BTC
-from .computed import RIF_USD_WMTB, BPRO_ARS
+# from .onchain import AAA_BBB, CCC_DDD
+# from .computed import EEE_FFF, GGG_HHH
 
 
 
 # Pairs to invert
-pairs_to_invert = [BPRO_BTC, RIF_USD_WMTB, BPRO_ARS]
+pairs_to_invert = [] #[AAA_BBB, CCC_DDD, EEE_FFF, GGG_HHH]
 
 def is_lambda(obj: Any) -> bool:
     return callable(obj) and getattr(obj, "__name__", None) == "<lambda>"
@@ -56,7 +56,7 @@ def make_inverted_name(base_pair: CoinPair) -> str:
     args = [base_pair.to_, base_pair.from_, base_pair.variant]
     return '_'.join([str(obj) for obj in args if obj is not None])
 
-for pair in pairs_to_invert:
-    locals()[make_inverted_name(pair)] = make_inverted_pair(pair)
-
-register_pairs()
+if pairs_to_invert:
+    for pair in pairs_to_invert:
+        locals()[make_inverted_name(pair)] = make_inverted_pair(pair)
+    register_pairs()
