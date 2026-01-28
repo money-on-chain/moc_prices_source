@@ -1,13 +1,15 @@
 from ...types import Decimal, FancyDecimal, Any
 from ...pairs import get_coin_pairs
 from ..base import CoinPairs, CoinPair, CoinPairType, Formula, \
-    RegistryCoinPairs
+    RegistryCoinPairs, get_env
 
 
 
 # Pairs to invert
-wildcard_pairs_to_invert_include = ""
-wildcard_pairs_to_invert_exclude = ""
+wildcard_pairs_to_invert_include = get_env(
+    'AUTO_INVERT_PAIRS_WILDCARD_INCLUDE', '')
+wildcard_pairs_to_invert_exclude = get_env(
+    'AUTO_INVERT_PAIRS_WILDCARD_EXCLUDE', '')
 
 
 def is_lambda(obj: Any) -> bool:
