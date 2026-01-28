@@ -1,4 +1,4 @@
-from ..base import CoinPair, register_pairs, get_env
+from ..base import CoinPairs, CoinPair, get_env
 from ..coins import ARS, BNB, BTC, COP, ETH, MXN, RIF, USD, USDT
 
 
@@ -52,4 +52,4 @@ USD_MXN = CoinPair(USD, MXN, min_ok_sources_count=1)
 # USDT/USD
 USDT_USD = CoinPair(USDT, USD, min_ok_sources_count=1)
 
-register_pairs()
+CoinPairs.register()

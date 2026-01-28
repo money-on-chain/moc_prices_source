@@ -1,5 +1,5 @@
 from ...pairs.special import RIF_BTC_MP1P
-from ...base import BaseWithFailover, engine_register, Decimal
+from ...base import BaseWithFailover, Engines, Decimal
 from .rif_btc_binance import Engine as RifBtcEngine
 
 
@@ -7,7 +7,7 @@ from .rif_btc_binance import Engine as RifBtcEngine
 base_uri = "https://{}/api/v3/depth?symbol=RIFBTC"
 factor = 0.01
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(BaseWithFailover):
 
     _description = "Binance"

@@ -30,18 +30,27 @@ This package includes a CLI tool that allows you to query the coinpair values in
 
 | Name           | Coinpair   | Variant   | Method   |
 |----------------|------------|-----------|----------|
+| ARS/BPRO       | ARS/BPRO   |           | Inverted |
+| ARS/BTC        | ARS/BTC    |           | Inverted |
+| ARS/USD(CCB)   | ARS/USD    | CCB       | Inverted |
 | BLOCK(RSK)     | BLOCK      | RSK       | Onchain  |
 | BNB/USD        | BNB/USD    |           | Computed |
 | BNB/USDT       | BNB/USDT   |           | Direct   |
 | BPRO/ARS       | BPRO/ARS   |           | Computed |
 | BPRO/BTC       | BPRO/BTC   |           | Onchain  |
 | BPRO/COP       | BPRO/COP   |           | Computed |
+| BPRO/MOC       | BPRO/MOC   |           | Inverted |
 | BPRO/USD       | BPRO/USD   |           | Computed |
 | BTC/ARS        | BTC/ARS    |           | Weighted |
+| BTC/BPRO       | BTC/BPRO   |           | Inverted |
 | BTC/COP        | BTC/COP    |           | Weighted |
+| BTC/MOC        | BTC/MOC    |           | Inverted |
 | BTC/USD        | BTC/USD    |           | Weighted |
 | BTC/USD(och)   | BTC/USD    | och       | Onchain  |
 | BTC/USDT       | BTC/USDT   |           | Weighted |
+| COP/BPRO       | COP/BPRO   |           | Inverted |
+| COP/BTC        | COP/BTC    |           | Inverted |
+| COP/USD(CCB)   | COP/USD    | CCB       | Inverted |
 | DOC/USD        | DOC/USD    |           | Dummy    |
 | ETH/BTC        | ETH/BTC    |           | Weighted |
 | ETH/USD        | ETH/USD    |           | Weighted |
@@ -70,9 +79,13 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | USD/ARS        | USD/ARS    |           | Weighted |
 | USD/ARS(CCB)   | USD/ARS    | CCB       | Computed |
 | USD/ARS(CCL)   | USD/ARS    | CCL       | Weighted |
+| USD/BPRO       | USD/BPRO   |           | Inverted |
+| USD/BTC        | USD/BTC    |           | Inverted |
 | USD/COP        | USD/COP    |           | Weighted |
 | USD/COP(CCB)   | USD/COP    | CCB       | Computed |
+| USD/MOC        | USD/MOC    |           | Inverted |
 | USD/MXN        | USD/MXN    |           | Weighted |
+| USDT/BTC       | USDT/BTC   |           | Inverted |
 | USDT/USD       | USDT/USD   |           | Weighted |
 | USDT/USD(B)    | USDT/USD   | B         | Computed |
 
@@ -87,18 +100,27 @@ This package includes a CLI tool that allows you to query the coinpair values in
 
 | Name           | Comment/Description                                                  |
 |----------------|----------------------------------------------------------------------|
+| ARS/BPRO       | Inverted pair of pair BPRO/ARS                                       |
+| ARS/BTC        | Inverted pair of pair BTC/ARS                                        |
+| ARS/USD(CCB)   | Inverted pair of pair USD/ARS(CCB)                                   |
 | BLOCK(RSK)     | Rootstock block number                                               |
 | BNB/USD        |                                                                      |
 | BNB/USDT       |                                                                      |
 | BPRO/ARS       |                                                                      |
 | BPRO/BTC       | Obtained from MOC onchain                                            |
 | BPRO/COP       |                                                                      |
+| BPRO/MOC       | Inverted pair of pair MOC/BPRO                                       |
 | BPRO/USD       | Offchain                                                             |
 | BTC/ARS        |                                                                      |
+| BTC/BPRO       | Inverted pair of pair BPRO/BTC                                       |
 | BTC/COP        |                                                                      |
+| BTC/MOC        | Inverted pair of pair MOC/BTC                                        |
 | BTC/USD        |                                                                      |
 | BTC/USD(och)   | Obtained from the blockchain                                         |
 | BTC/USDT       |                                                                      |
+| COP/BPRO       | Inverted pair of pair BPRO/COP                                       |
+| COP/BTC        | Inverted pair of pair BTC/COP                                        |
+| COP/USD(CCB)   | Inverted pair of pair USD/COP(CCB)                                   |
 | DOC/USD        | Pegged 1:1 to USD                                                    |
 | ETH/BTC        |                                                                      |
 | ETH/USD        |                                                                      |
@@ -127,9 +149,13 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | USD/ARS        | Free, from press portals                                             |
 | USD/ARS(CCB)   | Paid in Bitcoin                                                      |
 | USD/ARS(CCL)   |                                                                      |
+| USD/BPRO       | Inverted pair of pair BPRO/USD                                       |
+| USD/BTC        | Inverted pair of pair BTC/USD                                        |
 | USD/COP        | Free, from press portals                                             |
 | USD/COP(CCB)   | Paid in Bitcoin                                                      |
+| USD/MOC        | Inverted pair of pair MOC/USD                                        |
 | USD/MXN        |                                                                      |
+| USDT/BTC       | Inverted pair of pair BTC/USDT                                       |
 | USDT/USD       |                                                                      |
 | USDT/USD(B)    | Passing through Bitcoin                                              |
 
@@ -137,10 +163,19 @@ This package includes a CLI tool that allows you to query the coinpair values in
 ## Formulas used in the computed coinpairs
 
 ```
+ARS/BPRO       =  (bpro_btc × btc_ars)⁻¹
+ARS/BTC        =  (btc_ars)⁻¹
+ARS/USD(CCB)   =  (btc_ars / btc_usd)⁻¹
 BNB/USD        =  bnb_usdt × btc_usd / btc_usdt
 BPRO/ARS       =  bpro_btc × btc_ars
 BPRO/COP       =  bpro_btc × btc_cop
+BPRO/MOC       =  (Median((moc_btc_sov × btc_usd), moc_usd_oku) / btc_usd × bpro_btc)⁻¹
 BPRO/USD       =  bpro_btc × btc_usd
+BTC/BPRO       =  (bpro_btc)⁻¹
+BTC/MOC        =  (Median((moc_btc_sov × btc_usd), moc_usd_oku) / btc_usd)⁻¹
+COP/BPRO       =  (bpro_btc × btc_cop)⁻¹
+COP/BTC        =  (btc_cop)⁻¹
+COP/USD(CCB)   =  (btc_cop / btc_usd)⁻¹
 ETH/USD(B)     =  eth_btc × btc_usd
 MOC/BPRO       =  Median((moc_btc_sov × btc_usd), moc_usd_oku) / btc_usd × bpro_btc
 MOC/BTC        =  Median((moc_btc_sov × btc_usd), moc_usd_oku) / btc_usd
@@ -157,7 +192,11 @@ RIF/USD(WMTB)  =  Weighted(
                     (rif_btc × btc_usd) at 25%
                   )
 USD/ARS(CCB)   =  btc_ars / btc_usd
+USD/BPRO       =  (bpro_btc × btc_usd)⁻¹
+USD/BTC        =  (btc_usd)⁻¹
 USD/COP(CCB)   =  btc_cop / btc_usd
+USD/MOC        =  (Median((moc_btc_sov × btc_usd), moc_usd_oku))⁻¹
+USDT/BTC       =  (btc_usdt)⁻¹
 USDT/USD(B)    =  btc_usd / btc_usdt
 ```
 
@@ -322,11 +361,6 @@ Only Oku onchain (URI: https://public-node.rsk.co)
 ### For coinpair BPRO/BTC (from BPro to Bitcoin)
 
 Only MOC onchain (URI: https://public-node.rsk.co)
-
-
-### For coinpair DOC/USD (from DOC to Dollar)
-
-Only Dummy (URI: None)
 
 
 ### For coinpair GAS/BTC (from Gas to Bitcoin)

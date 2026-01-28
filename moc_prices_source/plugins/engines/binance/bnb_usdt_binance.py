@@ -1,11 +1,11 @@
 from ...pairs.simple import BNB_USDT
-from ...base import BaseWithFailover, engine_register
+from ...base import BaseWithFailover, Engines
 
 
 
 base_uri = "https://{}/api/v3/ticker/24hr?symbol=BNBUSDT"
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(BaseWithFailover):
 
     _description = "Binance"

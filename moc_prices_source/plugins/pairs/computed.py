@@ -1,6 +1,6 @@
 from ...weighing import weighted_median
 from ...weighing import median as Median
-from ..base import CoinPair, Formula, register_pairs
+from ..base import CoinPairs, CoinPair, Formula
 from ..coins import BTC, USD, RIF, MOC, ETH, USDT, BNB, ARS, COP, BPRO
 from .simple import BNB_USDT,  BTC_ARS, BTC_COP, BTC_USD, BTC_USDT, \
     ETH_BTC, RIF_USDT, RIF_USDT_MA, USDT_USD, RIF_BTC
@@ -136,4 +136,4 @@ USDT_USD_B = CoinPair(USDT, USD, "B", "Passing through Bitcoin",
     requirements = [BTC_USD, BTC_USDT],
     formula = lambda btc_usd, btc_usdt: btc_usd / btc_usdt)
 
-register_pairs()
+CoinPairs.register()
