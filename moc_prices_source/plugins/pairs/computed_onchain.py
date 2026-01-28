@@ -1,7 +1,7 @@
 from .simple import BTC_ARS, BTC_COP, BTC_USD
 from .onchain import BPRO_BTC
 from ..chains import EVM, chain
-from ..base import CoinPair, Formula, Decimal, register_pairs, get_addr_env 
+from ..base import CoinPairs, CoinPair, Formula, Decimal, get_addr_env
 from ...types import PercentageDecimal, Yes, No
 from ...evm import Address
 
@@ -155,4 +155,4 @@ ISLIQ_FLIP_TEST = CoinPair(
     formula = ISLIQ_FLIP_TEST_Formula)
 
 
-register_pairs()
+CoinPairs.register()
