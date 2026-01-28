@@ -9,55 +9,50 @@ from ...evm import Address
 
 ### Computed onchain pairs
 
-# Get some ENV vars or use default addresses
-btc_usd_oracle_addr_env = 'BTC_USD_ORACLE_ADDR'
-btc_usd_oracle_addr = get_addr_env(btc_usd_oracle_addr_env,
-    '0xe2927A0620b82A66D67F678FC9b826B0E01B1bFD')
+# BTC_USD_24h
+if chain.rsk_mainnet.enabled and \
+    chain.rsk_mainnet.btc_usd_oracle_addr!=Address(0):
 
-mcg_addr_env = 'MULTI_COLLATERAL_GUARD_ADDR'
-mcg_addr = get_addr_env(mcg_addr_env,
-    Address(0))
+    class BTC_USD_24h_Formula(Formula):
 
-mcg_testnet_addr_env = 'MULTI_COLLATERAL_GUARD_TESTNET_ADDR'
-mcg_testnet_addr = get_addr_env(mcg_testnet_addr_env,                            
-    Address(0))
+        evm: EVM = chain.rsk_mainnet.evm
+        oracle_addr = chain.rsk_mainnet.btc_usd_oracle_addr
+        coinpair = BTC_USD
+        requirements = [coinpair]
+        hours: int = 24
 
+        __doc__ = (f"({coinpair}@NOW - {coinpair}@{hours}hAGO)"
+                f" / {coinpair}@{hours}hAGO")
 
-# Classes for computed onchain pairs formulas
+        def init(self, btc_usd):
+            self.block = (self.evm.latest_block_number
+                        - int(3600 * self.hours / 25))
+            self.call_id = self.evm.multicall.add_call(
+                self.oracle_addr, 'peek()(bytes32,bool)')
+            self._namespace = f"{self.hours}h ago"
 
-class BTC_USD_24h_Formula(Formula):
+        def step(self, value, btc_usd):
+            self.evm.multicall.run_only_first_time(
+                block_identifier = self.block,
+                namespace = self._namespace)
+            value_b, ok = self.evm.multicall.get_call(
+                self.call_id, namespace = self._namespace)
+            if ok:
+                btc_usd_before = (Decimal(int(value_b.hex(), 16))
+                                / Decimal(10**18))
+            else:
+                raise ValueError('invalid or expired price')
+            return PercentageDecimal((btc_usd - btc_usd_before)
+                                     / btc_usd_before)
+        
+        def cleanup(self):
+            self.evm.multicall.clear_calls()
 
-    evm: EVM = chain.rsk_mainnet.evm
-    oracle_addr = btc_usd_oracle_addr
-    coinpair = BTC_USD
-    requirements = [coinpair]
-    hours: int = 24
-
-    __doc__ = (f"({coinpair}@NOW - {coinpair}@{hours}hAGO)"
-               f" / {coinpair}@{hours}hAGO")
-
-    def init(self, btc_usd):
-        self.block = (self.evm.latest_block_number
-                      - int(3600 * self.hours / 25))
-        self.call_id = self.evm.multicall.add_call(
-            self.oracle_addr, 'peek()(bytes32,bool)')
-        self._namespace = f"{self.hours}h ago"
-
-    def step(self, value, btc_usd):
-        self.evm.multicall.run_only_first_time(
-            block_identifier = self.block,
-            namespace = self._namespace)
-        value_b, ok = self.evm.multicall.get_call(
-            self.call_id, namespace = self._namespace)
-        if ok:
-            btc_usd_before = (Decimal(int(value_b.hex(), 16))
-                              / Decimal(10**18))
-        else:
-            raise ValueError('invalid or expired price')
-        return PercentageDecimal((btc_usd - btc_usd_before) / btc_usd_before)
-    
-    def cleanup(self):
-        self.evm.multicall.clear_calls()
+    BTC_USD_24h = CoinPair(
+        name = "BTC/USD(24h)",
+        short_description = "test",
+        requirements = BTC_USD_24h_Formula.requirements,
+        formula = BTC_USD_24h_Formula)
 
 
 class ISLIQ_FLIP_Formula(Formula):
@@ -68,9 +63,9 @@ class ISLIQ_FLIP_Formula(Formula):
         ])
     """
 
-    evm: EVM = chain.rsk_mainnet.evm
-    mcg_addr = mcg_addr
-    mcg_addr_env = mcg_addr_env
+    evm: EVM = ...
+    mcg_addr = ...
+    mcg_addr_env = ...
 
     requirements = [BTC_ARS, BTC_COP, BTC_USD, BPRO_BTC]
     fn_list = ['readyToLiquidate(uint256[][])(bool)',
@@ -118,41 +113,42 @@ class ISLIQ_FLIP_Formula(Formula):
         self.evm.multicall.clear_calls()
 
 
-class ISLIQ_FLIP_TEST_Formula(ISLIQ_FLIP_Formula):
-    """
-        MultiCollateralGuardTestnet.readyToLiquidate([
-            [bpro_ars, bpro_cop],
-            [usd_ars, usd_cop]
-        ])
-    """
+# ISLIQ_FLIP
+if chain.rsk_mainnet.enabled and chain.rsk_mainnet.mcg_addr!=Address(0):
 
-    evm: EVM = chain.rsk_testnet.evm
-    mcg_addr = mcg_testnet_addr
-    mcg_addr_env = mcg_testnet_addr_env
+    class ISLIQ_FLIP_MAIN_Formula(ISLIQ_FLIP_Formula):
+        evm: EVM = chain.rsk_mainnet.evm
+        mcg_addr = chain.rsk_mainnet.mcg_addr
+        mcg_addr_env = chain.rsk_mainnet.env.mcg_addr.name
 
-
-# Computed onchain pairs
-
-BTC_USD_24h = CoinPair(
-    name = "BTC/USD(24h)",
-    short_description = "test",
-    requirements = BTC_USD_24h_Formula.requirements,
-    formula = BTC_USD_24h_Formula)
+    ISLIQ_FLIP = CoinPair(
+        name="ISLIQ_FLIP",
+        short_description = "If FLip is in liquidation (mainnet)",
+        requirements = ISLIQ_FLIP_MAIN_Formula.requirements,
+        formula = ISLIQ_FLIP_MAIN_Formula)
 
 
-ISLIQ_FLIP = CoinPair(
-    name="ISLIQ_FLIP",
-    short_description = "If FLip is in liquidation (mainnet)",
-    requirements = ISLIQ_FLIP_Formula.requirements,
-    formula = ISLIQ_FLIP_Formula)
+# ISLIQ_FLIP_TEST
+if chain.rsk_testnet.enabled and chain.rsk_testnet.mcg_addr!=Address(0):
 
+    class ISLIQ_FLIP_TEST_Formula(ISLIQ_FLIP_Formula):
+        """
+            MultiCollateralGuardTestnet.readyToLiquidate([
+                [bpro_ars, bpro_cop],
+                [usd_ars, usd_cop]
+            ])
+        """
 
-ISLIQ_FLIP_TEST = CoinPair(
-    name="ISLIQ_FLIP",
-    variant="test",
-    short_description = "If FLip is in liquidation (testnet)",
-    requirements = ISLIQ_FLIP_TEST_Formula.requirements,
-    formula = ISLIQ_FLIP_TEST_Formula)
+        evm: EVM = chain.rsk_testnet.evm
+        mcg_addr = chain.rsk_testnet.mcg_addr
+        mcg_addr_env = chain.rsk_testnet.env.mcg_addr.name
+    
+    ISLIQ_FLIP_TEST = CoinPair(
+        name="ISLIQ_FLIP",
+        variant="test",
+        short_description = "If FLip is in liquidation (testnet)",
+        requirements = ISLIQ_FLIP_TEST_Formula.requirements,
+        formula = ISLIQ_FLIP_TEST_Formula)
 
 
 CoinPairs.register()
