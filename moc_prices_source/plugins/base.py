@@ -56,7 +56,7 @@ class TypedDict(dict):
         super().update(post_items)
 
 
-class RegistryDict(TypedDict):
+class RegistryDict(TypedDict, WithLogger):
 
     value_type = object  # override in subclasses
 
