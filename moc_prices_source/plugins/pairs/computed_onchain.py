@@ -50,7 +50,7 @@ if chain.rsk_mainnet.enabled and \
 
     BTC_USD_24h = CoinPair(
         name = "BTC/USD(24h)",
-        short_description = "test",
+        description = "BTC/USD percentage difference over 24 hours",
         requirements = BTC_USD_24h_Formula.requirements,
         formula = BTC_USD_24h_Formula)
 
