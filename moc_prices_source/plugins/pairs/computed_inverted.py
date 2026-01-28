@@ -1,7 +1,9 @@
-from ...types import Decimal, FancyDecimal, Any
+from ...types import Decimal, PercentageDecimal, FancyDecimal, Bool, Any, \
+    Yes, No 
 from ...pairs import get_coin_pairs
 from ..base import CoinPairs, CoinPair, CoinPairType, Formula, \
     RegistryCoinPairs, get_env
+from ..pairs.special import BLOCK_RSK
 
 
 
@@ -12,10 +14,25 @@ wildcard_pairs_to_invert_exclude = get_env(
     'AUTO_INVERT_PAIRS_WILDCARD_EXCLUDE', '')
 
 
+
+exclude_harcoded = [BLOCK_RSK]
+
 def is_lambda(obj: Any) -> bool:
     return callable(obj) and getattr(obj, "__name__", None) == "<lambda>"
 
-def inverted_formula(value) -> FancyDecimal:
+def inverted_formula(value) -> Any:
+    if value is None:
+        return None # Cannot invert None
+    if isinstance(value, PercentageDecimal):
+        return PercentageDecimal(Decimal(-1)*Decimal(value))
+    if value is Yes:
+        return No
+    if value is No:
+        return Yes
+    if isinstance(value, Bool):
+        return Bool(not bool(value), frozen=value._frozen)
+    if isinstance(value, bool):
+        return not(value)
     if value == 0:
         raise ZeroDivisionError("Cannot invert zero value")
     return FancyDecimal(Decimal(1) / Decimal(value))
@@ -29,6 +46,9 @@ def make_inverted_class(base):
 
 def make_inverted_pair(base_pair: CoinPair) -> CoinPair:
     args = [base_pair.to_, base_pair.from_, base_pair.variant]
+    kargs = {}
+    if base_pair.to_ is None and base_pair.from_ is None:
+        kargs['name'] = f"INV[{base_pair.name_base}]"
     if base_pair.is_computed:
         if is_lambda(base_pair.formula) or \
                 base_pair.formula is inverted_formula:
@@ -38,14 +58,14 @@ def make_inverted_pair(base_pair: CoinPair) -> CoinPair:
                 requirements = base_pair.requirements,
                 formula = inverted_func,
                 formula_desc = f"({base_pair.formula_desc})⁻¹",
-                type_ = CoinPairType.INVERTED)
+                type_ = CoinPairType.INVERTED, **kargs)
         elif issubclass(base_pair.formula, Formula):
             InvertedClass = make_inverted_class(base_pair.formula)
             return CoinPair(*args,
                 requirements = base_pair.requirements,
                 formula = InvertedClass,
                 formula_desc = f"({base_pair.formula_desc})⁻¹",
-                type_ = CoinPairType.INVERTED)
+                type_ = CoinPairType.INVERTED, **kargs)
         else:
             raise TypeError("Unsupported formula type for inversion")
     else:
@@ -54,13 +74,15 @@ def make_inverted_pair(base_pair: CoinPair) -> CoinPair:
             formula = inverted_formula,
             formula_desc = \
                 f"({base_pair.name_base.lower().replace('/', '_')})⁻¹",
-            type_ = CoinPairType.INVERTED)
+            type_ = CoinPairType.INVERTED, **kargs)
 
 def make_inverted_name(base_pair: CoinPair) -> str:
     args = [base_pair.to_, base_pair.from_, base_pair.variant]
     return '_'.join([str(obj) for obj in args if obj is not None])
 
 def callback(self: RegistryCoinPairs, key, value):
+    if value in exclude_harcoded:
+        return
     if (wildcard_pairs_to_invert_exclude and
         get_coin_pairs(wildcard_pairs_to_invert_exclude,
                        coinpairs_base=[value])):
