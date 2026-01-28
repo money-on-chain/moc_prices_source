@@ -46,7 +46,7 @@ def make_inverted_class(base):
 
 def make_inverted_pair(base_pair: CoinPair) -> CoinPair:
     args = [base_pair.to_, base_pair.from_, base_pair.variant]
-    kargs = {}
+    kargs = {'description': f"Inverted pair of pair {base_pair}"}
     if base_pair.to_ is None and base_pair.from_ is None:
         kargs['name'] = f"INV[{base_pair.name_base}]"
     if base_pair.is_computed:
