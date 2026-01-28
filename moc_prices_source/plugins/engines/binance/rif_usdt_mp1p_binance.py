@@ -1,5 +1,5 @@
 from ...pairs.special import RIF_USDT_MP1P
-from ...base import BaseWithFailover, Decimal, engine_register
+from ...base import BaseWithFailover, Decimal, Engines
 from .rif_usdt_binance import Engine as RifUsdtEngine
 
 
@@ -7,7 +7,7 @@ from .rif_usdt_binance import Engine as RifUsdtEngine
 base_uri = "https://{}/api/v3/depth?symbol=RIFUSDT"
 factor = 0.01
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(BaseWithFailover):
 
     _description = "Binance"

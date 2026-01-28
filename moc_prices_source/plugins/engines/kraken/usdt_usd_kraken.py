@@ -1,9 +1,9 @@
 from ...pairs.simple import USDT_USD
-from ...base import Base, engine_register, Decimal
+from ...base import Base, Engines, Decimal
 
 
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(Base):
 
     _description = "Kraken"

@@ -1,9 +1,9 @@
 from ...pairs.simple import BTC_ARS
-from ...base import Base, engine_register, Decimal, NoLiquidity
+from ...base import Base, Engines, Decimal, NoLiquidity
 
 
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(Base):
 
     _description = "cryptomkt.com"

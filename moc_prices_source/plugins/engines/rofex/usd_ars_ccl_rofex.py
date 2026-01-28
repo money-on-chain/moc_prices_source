@@ -1,9 +1,9 @@
 from ...pairs.simple import USD_ARS_CCL
-from ...base import Base, engine_register 
+from ...base import Base, Engines 
 
 
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(Base):
 
     _description = "MatbaRofex.com.ar"

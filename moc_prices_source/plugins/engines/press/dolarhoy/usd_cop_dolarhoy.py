@@ -1,5 +1,5 @@
 from ....pairs.simple import USD_COP
-from ....base import EngineWebScraping, engine_register, \
+from ....base import EngineWebScraping, Engines, \
     Decimal, InvalidOperation
 
 
@@ -9,7 +9,7 @@ to_dec = lambda x: Decimal(
           .replace(',', '')
           .strip())
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(EngineWebScraping):
 
 
