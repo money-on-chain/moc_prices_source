@@ -1,12 +1,14 @@
 from ...types import Decimal, FancyDecimal, Any
-from ..base import CoinPairs, CoinPair, CoinPairType, Formula
-# from .onchain import AAA_BBB, CCC_DDD
-# from .computed import EEE_FFF, GGG_HHH
+from ...pairs import get_coin_pairs
+from ..base import CoinPairs, CoinPair, CoinPairType, Formula, \
+    RegistryCoinPairs
 
 
 
 # Pairs to invert
-pairs_to_invert = [] #[AAA_BBB, CCC_DDD, EEE_FFF, GGG_HHH]
+wildcard_pairs_to_invert_include = ""
+wildcard_pairs_to_invert_exclude = ""
+
 
 def is_lambda(obj: Any) -> bool:
     return callable(obj) and getattr(obj, "__name__", None) == "<lambda>"
@@ -56,7 +58,29 @@ def make_inverted_name(base_pair: CoinPair) -> str:
     args = [base_pair.to_, base_pair.from_, base_pair.variant]
     return '_'.join([str(obj) for obj in args if obj is not None])
 
-if pairs_to_invert:
-    for pair in pairs_to_invert:
-        locals()[make_inverted_name(pair)] = make_inverted_pair(pair)
-    CoinPairs.register()
+def callback(self: RegistryCoinPairs, key, value):
+    if (wildcard_pairs_to_invert_exclude and
+        get_coin_pairs(wildcard_pairs_to_invert_exclude,
+                       coinpairs_base=[value])):
+        return
+    if not(wildcard_pairs_to_invert_include and
+           get_coin_pairs(wildcard_pairs_to_invert_include,
+                          coinpairs_base=[value])):
+        return
+    if value.type == CoinPairType.INVERTED:
+        return
+    inverted_name = make_inverted_name(value)
+    if inverted_name in self:
+        return
+    try:
+        inverted_pair = make_inverted_pair(value)
+    except TypeError as e:
+        self._logger.warning(
+            f"Cannot create inverted pair for {value}: {e}")
+        return
+    self[inverted_name] = inverted_pair
+    self._logger.info(f"Adds inverted pair {inverted_pair} from {value}")
+
+if wildcard_pairs_to_invert_include or \
+   wildcard_pairs_to_invert_exclude:
+    CoinPairs.register_callback(callback)
