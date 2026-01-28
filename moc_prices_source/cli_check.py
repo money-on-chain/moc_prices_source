@@ -46,7 +46,7 @@ def summary(coinpairs,
             if all([(c in summary_data) for c in requirements]):
                 if not computed_coinpair in summary_data:
                     summary_data[computed_coinpair] = {
-                        'type': 'computed',
+                        'type': computed_coinpair.type,
                         'requirements': requirements,
                         'formula': computed_data['formula'],
                         'formula_desc': computed_data['formula_desc']
@@ -56,7 +56,8 @@ def summary(coinpairs,
     coinpairs_and_requirements = coinpairs[:]
     for coinpair in coinpairs:
         c_data = summary_data.get(coinpair, None) 
-        if c_data and c_data['type']=='computed':
+        if c_data and c_data['type'] in [CoinPairType.COMPUTED,
+                                         CoinPairType.INVERTED]:
             for r in c_data['requirements']:
                 if not r in coinpairs_and_requirements:
                     coinpairs_and_requirements.append(r)
@@ -127,7 +128,8 @@ def summary(coinpairs,
     out()
     show_table(table, headers)
     out()
-    table = [[str(k).capitalize(), v] for k, v in CoinPairType.as_dict.items()]
+    table = [[str(k).capitalize(), v] for k, v in CoinPairType.as_dict.items()
+             if k in [data['type']for data in summary_data.values()]]
     table.sort()      
     headers=['Method', 'Description']
     show_table(table, headers)
@@ -140,7 +142,8 @@ def summary(coinpairs,
 
     title="Formulas used in the computed coinpairs"
     table=[[str(pair), '=', data['formula_desc']] for pair, data in
-           summary_data.items() if data['type']=='computed']
+           summary_data.items() if data['type'] in [CoinPairType.COMPUTED,
+                                                    CoinPairType.INVERTED]]
     table.sort()
     out()
     show_title(title)
@@ -166,7 +169,8 @@ price source.""")
 sources and if necessary we apply the changes to the parameterization.""")
     out()
     for pair, data in summary_data.items():
-        if data['type']!=CoinPairType.COMPUTED:
+        if not(data['type'] in [CoinPairType.COMPUTED,
+                                CoinPairType.INVERTED]):
             title = f"For coinpair {pair.long_name}"
             sources = data['sources']
             table = [[d['name'], float(d['weigh']), d['uri']] for d in
