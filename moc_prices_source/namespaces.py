@@ -42,3 +42,8 @@ class AutoNamespace(SimpleNamespace):
     def __iter__(self):
         return iter([ v for k, v in self.__dict__.items() if k[0]!='_'])
     
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        pass
