@@ -1,4 +1,4 @@
-from ..base import CoinPair, CoinPairType, register_pairs 
+from ..base import CoinPairs, CoinPair, CoinPairType 
 from ..coins import BTC, DOC, RIF, USD, USDT
 
 
@@ -26,4 +26,4 @@ RIF_USDT_MP1P = CoinPair(RIF, USDT, "mp1%",
                         short_description = "To move the price 1%",
                         type_ = CoinPairType.DIRECT)
 
-register_pairs()
+CoinPairs.register()

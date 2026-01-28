@@ -1,4 +1,4 @@
-from .base import Coin, register_coins
+from .base import Coins, Coin
 
 
 
@@ -16,4 +16,4 @@ GAS = Coin('Gas', 'gas')
 BPRO = Coin('BPro', 'bpro')
 DOC = Coin('DOC', 'doc')
 
-register_coins()
+Coins.register()

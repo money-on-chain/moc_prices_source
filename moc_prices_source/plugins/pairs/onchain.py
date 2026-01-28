@@ -1,4 +1,4 @@
-from ..base import CoinPair, register_pairs, CoinPairType
+from ..base import CoinPairs, CoinPair, CoinPairType
 from ..coins import BPRO, BTC, GAS, MOC, USD
 
 
@@ -31,4 +31,4 @@ MOC_USD_OKU = CoinPair(MOC, USD, "Oku",
                           description = "Obtained from Oku onchain",
                           type_= CoinPairType.ONCHAIN)
 
-register_pairs()
+CoinPairs.register()

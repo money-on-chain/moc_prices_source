@@ -1,5 +1,5 @@
 from ...types import Decimal, FancyDecimal, Any
-from ..base import CoinPair, CoinPairType, Formula, register_pairs
+from ..base import CoinPairs, CoinPair, CoinPairType, Formula
 # from .onchain import AAA_BBB, CCC_DDD
 # from .computed import EEE_FFF, GGG_HHH
 
@@ -59,4 +59,4 @@ def make_inverted_name(base_pair: CoinPair) -> str:
 if pairs_to_invert:
     for pair in pairs_to_invert:
         locals()[make_inverted_name(pair)] = make_inverted_pair(pair)
-    register_pairs()
+    CoinPairs.register()

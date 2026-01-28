@@ -1,10 +1,10 @@
 from ...pairs.special import DOC_USD
-from ...base import Base, engine_register, Decimal
+from ...base import Base, Engines, Decimal
 import datetime
 
 
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(Base):
 
     _description = "Dummy"

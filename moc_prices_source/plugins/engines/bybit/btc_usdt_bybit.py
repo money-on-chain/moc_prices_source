@@ -1,11 +1,11 @@
 from ...pairs.simple import BTC_USDT
-from ...base import BaseWithFailover, engine_register, Decimal
+from ...base import BaseWithFailover, Engines, Decimal
 
 
 
 base_uri = "https://{}/v5/market/tickers?category=spot&symbol=BTCUSDT"
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(BaseWithFailover):
 
     _description = "Bybit"

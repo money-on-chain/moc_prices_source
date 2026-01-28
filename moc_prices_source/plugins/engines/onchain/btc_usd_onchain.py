@@ -1,9 +1,9 @@
 from ...pairs.onchain import BTC_USD_OCH
-from ...base import BaseOnChain, engine_register, get_addr_env, EVM, Decimal
+from ...base import BaseOnChain, Engines, get_addr_env, EVM, Decimal
 
 
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(BaseOnChain):
 
     _description = "MOC onchain"
