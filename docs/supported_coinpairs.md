@@ -28,66 +28,67 @@ This package includes a CLI tool that allows you to query the coinpair values in
 
 ## Coinpairs
 
-| Name           | Coinpair   | Variant   | Method   |
-|----------------|------------|-----------|----------|
-| ARS/BPRO       | ARS/BPRO   |           | Inverted |
-| ARS/BTC        | ARS/BTC    |           | Inverted |
-| ARS/USD(CCB)   | ARS/USD    | CCB       | Inverted |
-| BLOCK(RSK)     | BLOCK      | RSK       | Onchain  |
-| BNB/USD        | BNB/USD    |           | Computed |
-| BNB/USDT       | BNB/USDT   |           | Direct   |
-| BPRO/ARS       | BPRO/ARS   |           | Computed |
-| BPRO/BTC       | BPRO/BTC   |           | Onchain  |
-| BPRO/COP       | BPRO/COP   |           | Computed |
-| BPRO/MOC       | BPRO/MOC   |           | Inverted |
-| BPRO/USD       | BPRO/USD   |           | Computed |
-| BTC/ARS        | BTC/ARS    |           | Weighted |
-| BTC/BPRO       | BTC/BPRO   |           | Inverted |
-| BTC/COP        | BTC/COP    |           | Weighted |
-| BTC/MOC        | BTC/MOC    |           | Inverted |
-| BTC/USD        | BTC/USD    |           | Weighted |
-| BTC/USD(och)   | BTC/USD    | och       | Onchain  |
-| BTC/USDT       | BTC/USDT   |           | Weighted |
-| COP/BPRO       | COP/BPRO   |           | Inverted |
-| COP/BTC        | COP/BTC    |           | Inverted |
-| COP/USD(CCB)   | COP/USD    | CCB       | Inverted |
-| DOC/USD        | DOC/USD    |           | Dummy    |
-| ETH/BTC        | ETH/BTC    |           | Weighted |
-| ETH/USD        | ETH/USD    |           | Weighted |
-| ETH/USD(B)     | ETH/USD    | B         | Computed |
-| GAS/BTC        | GAS/BTC    |           | Onchain  |
-| MOC/BPRO       | MOC/BPRO   |           | Computed |
-| MOC/BTC        | MOC/BTC    |           | Computed |
-| MOC/BTC(sov)   | MOC/BTC    | sov       | Onchain  |
-| MOC/USD        | MOC/USD    |           | Computed |
-| MOC/USD(Oku)   | MOC/USD    | Oku       | Onchain  |
-| MOC/USD(WM)    | MOC/USD    | WM        | Computed |
-| RIF/BTC        | RIF/BTC    |           | Direct   |
-| RIF/BTC(mp1%)  | RIF/BTC    | mp1%      | Direct   |
-| RIF/USD        | RIF/USD    |           | Computed |
-| RIF/USD(B)     | RIF/USD    | B         | Computed |
-| RIF/USD(T)     | RIF/USD    | T         | Computed |
-| RIF/USD(TB)    | RIF/USD    | TB        | Computed |
-| RIF/USD(TBMA)  | RIF/USD    | TBMA      | Computed |
-| RIF/USD(TMA)   | RIF/USD    | TMA       | Computed |
-| RIF/USD(WMTB)  | RIF/USD    | WMTB      | Computed |
-| RIF/USDT       | RIF/USDT   |           | Direct   |
-| RIF/USDT(MA)   | RIF/USDT   | MA        | Direct   |
-| RIF/USDT(MA2)  | RIF/USDT   | MA2       | Direct   |
-| RIF/USDT(MA3)  | RIF/USDT   | MA3       | Direct   |
-| RIF/USDT(mp1%) | RIF/USDT   | mp1%      | Direct   |
-| USD/ARS        | USD/ARS    |           | Weighted |
-| USD/ARS(CCB)   | USD/ARS    | CCB       | Computed |
-| USD/ARS(CCL)   | USD/ARS    | CCL       | Weighted |
-| USD/BPRO       | USD/BPRO   |           | Inverted |
-| USD/BTC        | USD/BTC    |           | Inverted |
-| USD/COP        | USD/COP    |           | Weighted |
-| USD/COP(CCB)   | USD/COP    | CCB       | Computed |
-| USD/MOC        | USD/MOC    |           | Inverted |
-| USD/MXN        | USD/MXN    |           | Weighted |
-| USDT/BTC       | USDT/BTC   |           | Inverted |
-| USDT/USD       | USDT/USD   |           | Weighted |
-| USDT/USD(B)    | USDT/USD   | B         | Computed |
+| Name           | Coinpair     | Variant   | Method   |
+|----------------|--------------|-----------|----------|
+| ARS/BPRO       | ARS/BPRO     |           | Inverted |
+| ARS/BTC        | ARS/BTC      |           | Inverted |
+| ARS/USD(CCB)   | ARS/USD      | CCB       | Inverted |
+| BLOCK(RSK)     | BLOCK        | RSK       | Onchain  |
+| BNB/USD        | BNB/USD      |           | Computed |
+| BNB/USDT       | BNB/USDT     |           | Direct   |
+| BPRO/ARS       | BPRO/ARS     |           | Computed |
+| BPRO/BTC       | BPRO/BTC     |           | Onchain  |
+| BPRO/COP       | BPRO/COP     |           | Computed |
+| BPRO/MOC       | BPRO/MOC     |           | Inverted |
+| BPRO/USD       | BPRO/USD     |           | Computed |
+| BTC/ARS        | BTC/ARS      |           | Weighted |
+| BTC/BPRO       | BTC/BPRO     |           | Inverted |
+| BTC/COP        | BTC/COP      |           | Weighted |
+| BTC/MOC        | BTC/MOC      |           | Inverted |
+| BTC/USD        | BTC/USD      |           | Weighted |
+| BTC/USD(24h)   | BTC/USD(24h) |           | Computed |
+| BTC/USD(och)   | BTC/USD      | och       | Onchain  |
+| BTC/USDT       | BTC/USDT     |           | Weighted |
+| COP/BPRO       | COP/BPRO     |           | Inverted |
+| COP/BTC        | COP/BTC      |           | Inverted |
+| COP/USD(CCB)   | COP/USD      | CCB       | Inverted |
+| DOC/USD        | DOC/USD      |           | Dummy    |
+| ETH/BTC        | ETH/BTC      |           | Weighted |
+| ETH/USD        | ETH/USD      |           | Weighted |
+| ETH/USD(B)     | ETH/USD      | B         | Computed |
+| GAS/BTC        | GAS/BTC      |           | Onchain  |
+| MOC/BPRO       | MOC/BPRO     |           | Computed |
+| MOC/BTC        | MOC/BTC      |           | Computed |
+| MOC/BTC(sov)   | MOC/BTC      | sov       | Onchain  |
+| MOC/USD        | MOC/USD      |           | Computed |
+| MOC/USD(Oku)   | MOC/USD      | Oku       | Onchain  |
+| MOC/USD(WM)    | MOC/USD      | WM        | Computed |
+| RIF/BTC        | RIF/BTC      |           | Direct   |
+| RIF/BTC(mp1%)  | RIF/BTC      | mp1%      | Direct   |
+| RIF/USD        | RIF/USD      |           | Computed |
+| RIF/USD(B)     | RIF/USD      | B         | Computed |
+| RIF/USD(T)     | RIF/USD      | T         | Computed |
+| RIF/USD(TB)    | RIF/USD      | TB        | Computed |
+| RIF/USD(TBMA)  | RIF/USD      | TBMA      | Computed |
+| RIF/USD(TMA)   | RIF/USD      | TMA       | Computed |
+| RIF/USD(WMTB)  | RIF/USD      | WMTB      | Computed |
+| RIF/USDT       | RIF/USDT     |           | Direct   |
+| RIF/USDT(MA)   | RIF/USDT     | MA        | Direct   |
+| RIF/USDT(MA2)  | RIF/USDT     | MA2       | Direct   |
+| RIF/USDT(MA3)  | RIF/USDT     | MA3       | Direct   |
+| RIF/USDT(mp1%) | RIF/USDT     | mp1%      | Direct   |
+| USD/ARS        | USD/ARS      |           | Weighted |
+| USD/ARS(CCB)   | USD/ARS      | CCB       | Computed |
+| USD/ARS(CCL)   | USD/ARS      | CCL       | Weighted |
+| USD/BPRO       | USD/BPRO     |           | Inverted |
+| USD/BTC        | USD/BTC      |           | Inverted |
+| USD/COP        | USD/COP      |           | Weighted |
+| USD/COP(CCB)   | USD/COP      | CCB       | Computed |
+| USD/MOC        | USD/MOC      |           | Inverted |
+| USD/MXN        | USD/MXN      |           | Weighted |
+| USDT/BTC       | USDT/BTC     |           | Inverted |
+| USDT/USD       | USDT/USD     |           | Weighted |
+| USDT/USD(B)    | USDT/USD     | B         | Computed |
 
 | Method   | Description                                              |
 |----------|----------------------------------------------------------|
@@ -116,6 +117,7 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | BTC/COP        |                                                                      |
 | BTC/MOC        | Inverted pair of pair MOC/BTC                                        |
 | BTC/USD        |                                                                      |
+| BTC/USD(24h)   | BTC/USD percentage difference over 24 hours                          |
 | BTC/USD(och)   | Obtained from the blockchain                                         |
 | BTC/USDT       |                                                                      |
 | COP/BPRO       | Inverted pair of pair BPRO/COP                                       |
@@ -173,6 +175,7 @@ BPRO/MOC       =  (Median((moc_btc_sov × btc_usd), moc_usd_oku) / btc_usd × bp
 BPRO/USD       =  bpro_btc × btc_usd
 BTC/BPRO       =  (bpro_btc)⁻¹
 BTC/MOC        =  (Median((moc_btc_sov × btc_usd), moc_usd_oku) / btc_usd)⁻¹
+BTC/USD(24h)   =  (BTC/USD@NOW - BTC/USD@24hAGO) / BTC/USD@24hAGO
 COP/BPRO       =  (bpro_btc × btc_cop)⁻¹
 COP/BTC        =  (btc_cop)⁻¹
 COP/USD(CCB)   =  (btc_cop / btc_usd)⁻¹
@@ -263,6 +266,11 @@ Only Binance (URI: https://api.binance.com/api/v3/ticker/24hr?symbol=RIFUSDT)
 ### For coinpair RIF/USDT(mp1%) (from RIF to Tether)
 
 Only Binance (URI: https://api.binance.com/api/v3/depth?symbol=RIFUSDT)
+
+
+### For coinpair RIF/BTC(mp1%) (from RIF to Bitcoin)
+
+Only Binance (URI: https://api.binance.com/api/v3/depth?symbol=RIFBTC)
 
 
 ### For coinpair RIF/USDT(MA) (from RIF to Tether)
