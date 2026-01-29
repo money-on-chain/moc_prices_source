@@ -2,7 +2,7 @@ from logging import addLevelName, basicConfig
 from logging import getLogger as original_get_logger
 from logging import INFO, WARNING, CRITICAL, DEBUG
 from types import MethodType
-from .cli import get_env
+from .my_envs import envs
 
 
 
@@ -11,12 +11,14 @@ VERBOSE = INFO - 5
 OFF = 100
 addLevelName(OFF, "OFF")
 addLevelName(VERBOSE, "VERBOSE")
-DEFAULT_LOG_LEVEL = get_env("MOC_PRICES_LOG_LEVEL", "OFF", lambda v: {
-    "OFF": OFF, "CRITICAL": CRITICAL, "WARNING": WARNING,
-    "INFO": INFO, "VERBOSE": VERBOSE,"DEBUG": DEBUG,
-    str(OFF): OFF, str(CRITICAL): CRITICAL, str(WARNING): WARNING,
-    str(INFO): INFO, str(VERBOSE): VERBOSE, str(DEBUG): DEBUG
-}.get(v.upper().strip(), OFF))
+def log_level(x, default = OFF):
+    return {
+        "OFF": OFF, "CRITICAL": CRITICAL, "WARNING": WARNING,
+        "INFO": INFO, "VERBOSE": VERBOSE,"DEBUG": DEBUG,
+        str(OFF): OFF, str(CRITICAL): CRITICAL, str(WARNING): WARNING,
+        str(INFO): INFO, str(VERBOSE): VERBOSE, str(DEBUG): DEBUG
+    }.get(str(x).upper().strip(), default)
+DEFAULT_LOG_LEVEL = envs("MOC_PRICES_LOG_LEVEL", "OFF", log_level)
 
 
 # Default config

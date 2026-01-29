@@ -3,7 +3,7 @@ from sys import stderr
 from . import version
 from . import get_price, ALL, get_coin_pairs
 from .cli import Output, command, option, tabulate, trim, cli
-from .cli import show_envs as show_envs_fnc
+from .my_envs import envs
 from .weighing import weighing
 from .engines import all_engines
 from .computed_pairs import show_computed_pairs_fromula, computed_pairs
@@ -437,7 +437,7 @@ COINPAIRS_FILTER:
         return
 
     if show_envs:
-        show_envs_fnc(use_print = True)
+        print(envs)
         return
 
     coinpairs_report(

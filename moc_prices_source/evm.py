@@ -15,7 +15,7 @@ try:
 except ImportError:
     from eth_abi.abi import encode_abi as abi_encode
 from urllib.parse import urlparse
-from .cli import get_env
+from .my_envs import envs
 
 
 
@@ -954,16 +954,16 @@ class Multicall():
 
 
 def get_addr_env(env_name: str, default_addr:str) -> str:
-    return get_env(env_name, Address(default_addr), cast=Address)
+    return envs(env_name, Address(default_addr), cast=Address)
 
 
 def get_uri_env(env_name: str, default_addr: Optional[str] = '') -> str:
-    return get_env(env_name, default_addr, cast=URI)
+    return envs(env_name, default_addr, cast=URI)
 
 
 def get_node_rpc_uri_env(env_name: str = 'NODE_RPC_URI',
                          default_uri: str = 'rootstock') -> str:
-    return get_env(env_name, default_uri,
+    return envs(env_name, default_uri,
         cast=URI,
         alias={
             'main': 'mainnet',
@@ -981,7 +981,7 @@ def get_node_rpc_uri_env(env_name: str = 'NODE_RPC_URI',
 
 def get_multicall_addr_env(env_name: str = 'MULTICALL_ADDR',
                          default_addr: str = 'rootstock') -> str:
-    return get_env(env_name, default_addr,
+    return envs(env_name, default_addr,
         cast=Address,
         alias={
             'main': 'mainnet',

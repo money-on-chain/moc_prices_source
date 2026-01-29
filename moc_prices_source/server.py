@@ -1,4 +1,3 @@
-from os import getenv
 from decimal import Decimal
 from fnmatch import fnmatch as match
 from tabulate import tabulate
@@ -12,6 +11,7 @@ from . import ALL as AllCoinPairs
 from .cli import command, option
 from .redis_conn import use_redis
 from .cli_check import show_computed_pairs_fromula, summary, coinpairs_report
+from .my_envs import envs
 
 
 
@@ -41,18 +41,15 @@ Simplify integrations with other environments than **Python**.
 ## Endpoints
 """
 
-def get_env_positive_int(key, default=1):
-    try:
-        value = int(getenv(key, default))
-        if value > 0:
-            return value
-        else:
-            raise ValueError
-    except (ValueError, TypeError):
-        return default
+def positive_integer(value):
+    value = int(value)
+    if value > 0:
+        return value
+    else:
+        raise ValueError('value < 1')
 
 all_coinpairs = list([str(x) for x in AllCoinPairs])
-max_coinpair_limit = get_env_positive_int('MAX_COINPAIR_LIMIT', 12)
+max_coinpair_limit = envs('MAX_COINPAIR_LIMIT', 12, positive_integer)
 
 app = Flask(__name__)
 

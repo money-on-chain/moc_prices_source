@@ -2,15 +2,15 @@ from ...types import Decimal, PercentageDecimal, FancyDecimal, Bool, Any, \
     Yes, No 
 from ...pairs import get_coin_pairs
 from ..base import CoinPairs, CoinPair, CoinPairType, Formula, \
-    RegistryCoinPairs, get_env
+    RegistryCoinPairs, envs
 from ..pairs.special import BLOCK_RSK
 
 
 
 # Pairs to invert
-wildcard_pairs_to_invert_include = get_env(
+wildcard_pairs_to_invert_include = envs(
     'AUTO_INVERT_PAIRS_WILDCARD_INCLUDE', 'btc/*,bpro/*,moc/*,*(ccb)')
-wildcard_pairs_to_invert_exclude = get_env(
+wildcard_pairs_to_invert_exclude = envs(
     'AUTO_INVERT_PAIRS_WILDCARD_EXCLUDE', 'btc/*(*),bpro/*(*),moc/*(*)')
 
 

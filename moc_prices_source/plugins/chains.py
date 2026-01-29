@@ -1,7 +1,7 @@
 from ..namespaces import AutoNamespace
 from ..evm import EVM, Address
 from ..evm import get_multicall_addr_env, get_node_rpc_uri_env, get_addr_env
-from ..cli import get_env_bool
+from ..my_envs import envs
 from ..my_logging import get_logger 
 
 
@@ -9,7 +9,7 @@ chain = AutoNamespace()
 
 with chain.rsk_mainnet as network:
     network.name = "RSK Mainnet"
-    network.enabled = get_env_bool('RSK_MAINNET_ENABLED', True)
+    network.enabled = envs('RSK_MAINNET_ENABLED', True, bool)
     if network.enabled:
         with network.env.node_rpc_uri as env:
             env.name = 'NODE_RPC_URI'
@@ -26,7 +26,7 @@ with chain.rsk_mainnet as network:
 
 with chain.rsk_testnet as network:
     network.name = "RSK Testnet"
-    network.enabled = get_env_bool('RSK_TESTNET_ENABLED', True)
+    network.enabled = envs('RSK_TESTNET_ENABLED', True, bool)
     if network.enabled:
         with network.env.node_rpc_uri as env:
             env.name = 'NODE_RPC_URI_TESTNET'
