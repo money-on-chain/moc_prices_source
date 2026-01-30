@@ -1,14 +1,13 @@
 from typing import Dict, List, Any, Optional
 from ...pairs.simple import RIF_USDT_MA
-from ...base import BaseWithFailover, Engines, get_env, Decimal
-from ....cli import get_env_bool
+from ...base import Decimal, BaseWithFailover, Engines, envs
 
 
 
 # Some params
 base_uri = "https://{}/api/v3/depth?symbol=RIFUSDT"
-max_quantity = Decimal(get_env('MA_MAX_QUANTITY', 100000, int))
-allow_degraded = get_env_bool('MA_ALLOW_DEGRADED', False)
+max_quantity = Decimal(envs('MA_MAX_QUANTITY', 100000, int))
+allow_degraded = envs('MA_ALLOW_DEGRADED', False, bool)
 
 @Engines.register_decorator()
 class Engine(BaseWithFailover):

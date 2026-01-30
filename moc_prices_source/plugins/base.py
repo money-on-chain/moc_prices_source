@@ -10,7 +10,7 @@ from ..redis_conn import get_redis
 from ..evm import OneShotHTTPProvider, HTTPProvider, Web3, EVM, Address, \
     URI, get_addr_env, get_uri_env, get_node_rpc_uri_env, \
         get_multicall_addr_env
-from ..cli import get_env
+from ..my_envs import envs as envs
 from ..my_logging import WithLogger, get_logger
 from enum import Enum
 

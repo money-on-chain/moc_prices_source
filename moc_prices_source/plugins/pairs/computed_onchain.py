@@ -1,7 +1,7 @@
 from .simple import BTC_ARS, BTC_COP, BTC_USD
 from .onchain import BPRO_BTC
 from ..chains import EVM, chain
-from ..base import CoinPairs, CoinPair, Formula, Decimal, get_addr_env
+from ..base import CoinPairs, CoinPair, Formula, Decimal
 from ...types import PercentageDecimal, Yes, No
 from ...evm import Address
 

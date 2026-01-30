@@ -33,6 +33,7 @@ def show_computed_pairs_fromula(use_print = False):
     out("")
     table = [[str(pair), '=', data['formula_desc']] for pair,
              data in computed_pairs.items()]
+    table.sort()
     out(tabulate(table, tablefmt='plain'))
     out("")
     if isinstance(out, Output):

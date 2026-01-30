@@ -1,8 +1,5 @@
-import click, shutil, sys
+import click, shutil,sys
 from tabulate import tabulate
-from os import environ
-from typing import Dict, Set, List, Tuple, Any
-from .types import Bool
 
 
 
@@ -68,68 +65,3 @@ def print_list(items):
         if (i + 1) % cols == 0:
             print()
     print()
-
-
-envs: List[Tuple[str, Any]] = []
-
-
-def get_env(name, default, cast=str, alias={}):
-    alias = dict(
-        [(str(k).strip().lower(),
-          str(v).strip()) for (k, v) in alias.items()])
-    try:
-        value = environ[name]
-    except KeyError:
-        value = default
-    while str(value).strip().lower() in alias:
-        value = alias[str(value).strip().lower()]
-    try:
-        value =  cast(str(value))
-    except Exception as e:
-        options = list(alias.keys())
-        options.sort()
-        if options:
-            options_str = ' or this options: ' + ', '.join(map(repr, options))
-        else:
-            options_str = ''
-
-        print(
-            f"ERROR: invalid value for env var {name}: {value!r} "
-            f"(expected valid {cast.__name__}{options_str})",
-            file=sys.stderr
-        )
-        sys.exit(1)
-    envs.append((name, value))
-    return value
-
-
-def show_envs(use_print = False):
-    if callable(use_print):
-        out = use_print
-    else:
-        out = Output(print = print if bool(use_print) else None)
-    envs.sort()
-    data: Dict[str, Set[int]] = {}
-    for name, value in envs:
-        if not name in data:
-            data[name] = set()
-        data[name].add(value)
-    names = list(data.keys())
-    names.sort()
-    table = []
-    for name in names:
-        c = len(data[name])
-        table.append([
-            f"{name} ({c})" if c>1 else name,
-            ', '.join([repr(x) for x in data[name]])
-        ])
-    if table:
-        out()
-        out(tabulate(table, headers=['Environment variable', 'Value']))
-        out()
-    if isinstance(out, Output):
-        return str(out)
-
-
-def get_env_bool(name, default, alias={}):
-    return bool(get_env(name, default, Bool.from_string, alias=alias))
