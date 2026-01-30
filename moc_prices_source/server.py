@@ -301,6 +301,9 @@ class CoinPairValue(Resource):
         if coinpair not in all_coinpairs:
             abort(*bad_coinpair_choice)
 
+        current_app.logger.info(
+            f"Asking for the value of {coinpair}")
+
         detail = {}
         value = get_price(
             coinpairs=coinpair,
@@ -496,6 +499,11 @@ class CoinPairsValue(Resource):
         if len(coinpairs)>max_coinpair_limit:
             abort(*max_coinpairs_reached)
 
+        if len(coinpairs)==1:
+            current_app.logger.info(f"Asking for the value of {coinpairs[0]}")
+        else:
+            current_app.logger.info(f"Asking for the value of {len(coinpairs)} coinpairs")
+
         detail = {}
        
         out = get_set_of_prices(coinpairs,
@@ -507,6 +515,12 @@ class CoinPairsValue(Resource):
         if not out:
             abort(*coinpairs_value_not_found)       
         
+        for coinpair, value in out['values'].items():
+            if value is None:
+                current_app.logger.error(f"No value for {coinpair}")
+            else:
+                current_app.logger.info(f"Value for {coinpair}: {value}")
+
         if plain_text:
             response = make_response(out, 200)
             response.mimetype = "text/plain"
