@@ -10,11 +10,15 @@ BNB_USDT = CoinPair(BNB, USDT)
 
 # BTC/ARS
 BTC_ARS = CoinPair(BTC, ARS,
-    min_ok_sources_count=envs('BTC_ARS_MIN_OK_SOURCES_COUNT', 3, int))
+    min_ok_sources_count=envs('BTC_ARS_MIN_OK_SOURCES_COUNT', 3,
+        envs.types.positive_integer,
+        description = "Minimum number of sources to consider BTC/ARS valid"))
 
 # BTC/COP
 BTC_COP = CoinPair(BTC, COP,
-    min_ok_sources_count=envs('BTC_COP_MIN_OK_SOURCES_COUNT', 2, int))
+    min_ok_sources_count=envs('BTC_COP_MIN_OK_SOURCES_COUNT', 2,
+        envs.types.positive_integer,
+        description = "Minimum number of sources to consider BTC/COP valid"))
 
 # BTC/USD
 BTC_USD = CoinPair(BTC, USD, min_ok_sources_count=1)

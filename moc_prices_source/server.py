@@ -2,7 +2,7 @@ from decimal import Decimal
 from fnmatch import fnmatch as match
 from tabulate import tabulate
 from .types import normalize_obj, Serializable
-from flask import Flask, request, redirect, jsonify, make_response
+from flask import Flask, request, redirect, jsonify, make_response, current_app
 from flask_restx import Api, Resource, reqparse, abort
 from flask_cors import CORS
 from flask_caching import Cache
@@ -41,20 +41,48 @@ Simplify integrations with other environments than **Python**.
 ## Endpoints
 """
 
-def positive_integer(value):
-    value = int(value)
-    if value > 0:
-        return value
-    else:
-        raise ValueError('value < 1')
 
 all_coinpairs = list([str(x) for x in AllCoinPairs])
-max_coinpair_limit = envs('MAX_COINPAIR_LIMIT', 12, positive_integer)
+all_coinpairs.sort()
+max_coinpair_limit = envs(
+    'MAX_COINPAIR_LIMIT', 12, envs.types.positive_integer)
 
-app = Flask(__name__)
 
-cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
-cache.init_app(app)
+cache = Cache()
+cors = CORS()
+api = Api(
+    prefix='/api',
+    doc='/api/doc',
+    version=f"v{version}",
+    title=title,
+    description=description,
+)
+
+def create_app():
+    
+    app = Flask(__name__)
+    
+    app.config["CACHE_TYPE"] = "SimpleCache"
+    cache.init_app(app)
+   
+    api.init_app(app)
+
+    app.config["CORS_RESOURCES"] = {r'/*': {"origins": "*"}}
+    cors.init_app(app)
+    
+    @app.before_first_request
+    def before_first_request():
+        app.logger.setLevel(1)
+        app.logger.info(f"{title} (v{version})")
+        app.logger.info(f"{len(all_coinpairs)} available coinpairs")
+        app.logger.info(f"CONFIG: {use_redis=}")
+        app.logger.info(f"CONFIG: {max_coinpair_limit=}")
+
+    return app
+
+app = create_app()
+
+
 
 def get_coin_pairs(
         wildcard: str = "*",
@@ -73,6 +101,7 @@ def get_coin_pairs(
         f = list(set(list(f)))
         coinpairs.extend(f)
     coinpairs = list(set(coinpairs))
+    coinpairs.sort()
     return coinpairs
 
 
@@ -140,18 +169,6 @@ class HashMethod():
 
 
 
-api = Api(
-    app,
-    prefix='/api',
-    doc='/api/doc',
-    version=f"v{version}",
-    title=title,
-    description=description,
-)
-CORS(app, resources={r'/*': {'origins': '*'}})
-
-
-
 @app.after_request
 def add_header(response):
     response.headers["Pragma"] = "no-cache"
@@ -200,6 +217,8 @@ class CoinPairsList(Resource):
         """Shows a list of all supported coinpairs"""
 
         accept = request.headers.get('Accept', 'text/plain')
+        pairs = AllCoinPairs[:]
+        pairs.sort()
         
         if 'text/plain' in accept:
             text = tabulate(
@@ -209,7 +228,7 @@ class CoinPairsList(Resource):
                         str(x.to_) if x.to_ else '',
                         x.variant if x.variant else '',
                         x.description or x.short_description
-                        ) for x in AllCoinPairs]),
+                        ) for x in pairs]),
                 headers=['Name', 'Base', 'From', 'To', 'Variant',
                          'Description'],
                 tablefmt="simple",
@@ -226,7 +245,7 @@ class CoinPairsList(Resource):
                           'to': str(x.to_) if x.to_ else None,
                           'variant': x.variant,
                           'description': x.description or x.short_description}
-                          for x in AllCoinPairs])
+                          for x in pairs])
 
 
 
@@ -271,7 +290,6 @@ class CoinPairValue(Resource):
         hash_method=HashMethod(
             'coinpair',
             pre="get_coinpair_value",
-            #info=lambda x: app.logger.info(f"Cache: {x}")
         )
     )
     def get(self):
@@ -305,18 +323,18 @@ class CoinPairValue(Resource):
                 source = p.get('description', 'unknown')
                 error = p.get('error', 'unknown')
                 if coinpair==sub_coinpair:
-                    app.logger.warning(f"{coinpair} --> {source} {error}")
+                    current_app.logger.warning(f"{coinpair} --> {source} {error}")
                 else:
-                    app.logger.warning(
+                    current_app.logger.warning(
                         f"{sub_coinpair} for {coinpair} --> {source} {error}")
 
         for sub_coinpair, p in detail.get('values', {}).items():
             error = p.get('error')
             if error:
                 if coinpair==sub_coinpair:
-                    app.logger.warning(f"{coinpair} --> {error}")
+                    current_app.logger.warning(f"{coinpair} --> {error}")
                 else:
-                    app.logger.warning(
+                    current_app.logger.warning(
                         f"{sub_coinpair} for {coinpair} --> {error}")
 
         if sources_count:
@@ -324,16 +342,16 @@ class CoinPairValue(Resource):
                 [ f"{k}: {sources_count_ok[k]} of {v}"
                  for (k, v) in sources_count.items()])
             if len(sources_count)>1:
-                app.logger.info(
+                current_app.logger.info(
                     f"Sources count for {coinpair}: {sources_count_str}")
             else:
-                app.logger.info(f"Sources count for {sources_count_str}")
+                current_app.logger.info(f"Sources count for {sources_count_str}")
 
         if value is None:
-            app.logger.error(f"Not value for {coinpair}")
+            current_app.logger.error(f"Not value for {coinpair}")
             abort(*coinpair_value_not_found)
         else:
-            app.logger.info(f"Value for {coinpair}: {value}")
+            current_app.logger.info(f"Value for {coinpair}: {value}")
 
         out = {}
         out['required_coinpair'] = coinpair 
@@ -357,7 +375,6 @@ class CoinPairValueSimple(Resource):
         hash_method=HashMethod(
             'coinpair',
             pre="get_coinpair_value_simple",
-            #info=lambda x: app.logger.info(f"Cache: {x}")
         )
     )
     def get(self):
@@ -499,7 +516,7 @@ class CoinPairsValue(Resource):
 
     @staticmethod
     def _extra_log(coinpairs, detail):
-        warn, info  = app.logger.warning, app.logger.info
+        warn, info  = current_app.logger.warning, current_app.logger.info
         values = detail.get('values', {})
         prices = detail.get('prices', {})
         for coinpair in map(str, coinpairs):
@@ -608,11 +625,6 @@ class Info(Resource):
 
 
 def main(host='0.0.0.0', port=7989, debug=False):
-    #default_logger_level = app.logger.level
-    app.logger.setLevel(1)
-    app.logger.info(f"{title} (v{version})")
-    app.logger.info(f"service at {host}:{port}")
-    #app.logger.setLevel(default_logger_level)
     app.run(debug=debug, host=host, port=port)
 
 
@@ -621,8 +633,13 @@ def main(host='0.0.0.0', port=7989, debug=False):
         default='0.0.0.0', help='Server host addr.')
 @option('-p', '--port', 'port', type=int,
         default=7989, help='Server port.')
-def server_cli(host, port):
+@option('-e', '--show-envs', 'show_envs', is_flag=True,
+        help='Show used ENV variables used and exit.')
+def server_cli(host, port, show_envs=False):
     """MoC prices source API Rest webservice"""
+    if show_envs:
+        print(envs)
+        return
     main(host=host, port=port)
 
 

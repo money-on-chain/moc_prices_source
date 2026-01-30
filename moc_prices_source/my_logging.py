@@ -11,14 +11,9 @@ VERBOSE = INFO - 5
 OFF = 100
 addLevelName(OFF, "OFF")
 addLevelName(VERBOSE, "VERBOSE")
-def log_level(x, default = OFF):
-    return {
-        "OFF": OFF, "CRITICAL": CRITICAL, "WARNING": WARNING,
-        "INFO": INFO, "VERBOSE": VERBOSE,"DEBUG": DEBUG,
-        str(OFF): OFF, str(CRITICAL): CRITICAL, str(WARNING): WARNING,
-        str(INFO): INFO, str(VERBOSE): VERBOSE, str(DEBUG): DEBUG
-    }.get(str(x).upper().strip(), default)
-DEFAULT_LOG_LEVEL = envs("MOC_PRICES_LOG_LEVEL", "OFF", log_level)
+options = {'OFF': OFF, 'CRITICAL': CRITICAL, 'WARNING': WARNING, 'INFO': INFO,
+           'VERBOSE': VERBOSE, 'DEBUG': DEBUG}
+DEFAULT_LOG_LEVEL = options.get(envs("MOC_PRICES_LOG_LEVEL", "OFF", list(options.keys())))
 
 
 # Default config

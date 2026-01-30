@@ -1,12 +1,110 @@
 from tabulate import tabulate
 from os import environ
-from typing import Dict, List, Any
-from .types import Bool
+from typing import Dict, List, Any, Union
+from .types import Bool as types_bool
 from dotenv import load_dotenv
-from shutil import get_terminal_size
 from os.path import basename
 from sys import argv, stderr, exit
+import re
+from textwrap import wrap
 
+
+
+def camel_to_words(s: str) -> str:
+    words = re.sub(r'(?<!^)(?=[A-Z])', ' ', s)
+    return words
+
+
+class TypeBase():
+
+    def __call__(self, value):
+        ...
+        answer = None
+        ...
+        return answer
+    
+    def __str__(self):
+        return camel_to_words(str(self.__class__.__name__))
+
+
+class Bool(TypeBase):
+
+    def __call__(self, value):
+        return bool(types_bool.from_string(value))
+
+
+class PositiveIntegerAndZero(TypeBase):
+
+    def __call__(self, value):
+        try:
+            answer = int(value)
+        except ValueError:
+            raise ValueError(f"{repr(value)} must be an integer")
+        if answer >= 0:
+            return answer
+        else:
+            raise ValueError(f"value can't be negative")
+            
+    def __str__(self):
+        return "Integer>=0"
+
+
+class PositiveInteger(PositiveIntegerAndZero):
+
+    def __call__(self, value):
+        answer = PositiveIntegerAndZero.__call__(self, value)
+        if not answer:
+            raise ValueError(f"value can't be zero")
+        return answer
+            
+    def __str__(self):
+        return "Integer>0"
+
+
+class Options(TypeBase):
+
+    def __init__(self, options: Union[List, dict]):
+        if not isinstance(options, (list, dict)):
+            raise ValueError('options must be a dict or list')
+        if not options:
+            raise ValueError('options cannot be empty')
+        if len(options)<2:
+            raise ValueError('options must be two or more')
+        self._options = options
+    
+    @property
+    def options(self):
+        return self._options
+
+    @property
+    def options_as_string(self):
+        options = [repr(opt) for opt in self.options]
+        return f"{', '.join(options[:-1])} or {options[-1]}"
+
+    def __call__(self, value):
+        
+        if isinstance(self.options, dict):
+            options = [ (str(key).lower().strip(), opt_value)
+                       for key, opt_value in self.options.items()]
+        else: # list
+            options = [ (str(opt).lower().strip(), opt)
+                       for opt in self.options]
+        translator = dict(options)
+        
+        key = str(value).lower().strip()
+        
+        if key not in translator:
+            raise ValueError(f"{repr(value)} is not {self.options_as_string}")
+        answer = translator.get(key)
+
+        return answer
+
+
+class EnvsTypes():
+    bool = staticmethod(Bool())
+    positive_integer = staticmethod(PositiveInteger())
+    positive_integer_and_zero = staticmethod(PositiveIntegerAndZero())
+    Options = Options
 
 
 class Envs():
@@ -28,6 +126,11 @@ class Envs():
             self._load_dotenv()
         self._load_envfile_on_first_get = load_envfile_on_first_get
         self._load_env_file_on_any_get = load_env_file_on_any_get
+        self._types = EnvsTypes()
+
+    @property
+    def types(self):
+        return self._types
     
     def load_dotenv(self,
                      var_name: str = None,
@@ -43,7 +146,7 @@ class Envs():
             var_name = f"{var_name}_env_file"
         
         envfile = self(var_name, default_file, str,
-                       descripion = var_description,
+                       description = var_description,
                        hide = hide,
                        use_load_dotenv = False)
         
@@ -63,18 +166,14 @@ class Envs():
         if name is None:
             raise ValueError("Environment variable name cannot be empty")
         return name
-
-    @staticmethod
-    def _bool_from_string(value: str) -> bool:
-        return bool(Bool.from_string(value))
-    
+   
     def __call__(self,
             name: str,
             default: Any = None,
             cast: callable = None,
             alias: dict = {},
             on_error_exit: bool = True,
-            descripion = None,
+            description = None,
             use_load_dotenv = None,
             hide = False
         ) -> Any:
@@ -103,6 +202,7 @@ class Envs():
             alias = new_alias
 
         # Try to obtain previously recorded data
+        prev_description = None
         if self:
             prev_data = envs[name]
             if len(prev_data)==1:
@@ -110,21 +210,35 @@ class Envs():
                 prev_cast = prev_data['cast']
                 prev_default = prev_data['default']
                 prev_alias = prev_data['alias']
-                prev_descripion = prev_data['descripion']
+                prev_description = prev_data['description']
                 if cast is None:
                     cast = prev_cast
                 if default is None:
                     default = prev_default
                 if alias=={}:
                     alias = prev_alias
-                if descripion is None:
-                    descripion = prev_descripion                    
+                if description is not None:
+                    prev_description = None
 
         # Normalize cast
+        denormalize_cast = None
         if cast is None:
             cast = str
         elif cast is bool:
-            cast = self._bool_from_string
+            denormalize_cast = bool
+            cast = self.types.bool
+        elif isinstance(cast, (list, dict)):
+            denormalize_cast = cast
+            cast = self.types.Options(cast)
+
+        # Intervene the description
+        if isinstance(cast, self.types.Options):
+            if description:
+                description = f"{description} (use: {cast.options_as_string})"
+            else:
+                description = f"Use: {cast.options_as_string}"
+        if prev_description is not None:
+            description = prev_description
 
         # Get value from environment
         try:
@@ -152,29 +266,16 @@ class Envs():
                 value = cast(str(value))
             except Exception as e:
                 if on_error_exit: # Show errors
-                    msg = ["ERROR: invalid value for env var "
-                           f"{name}: {value!r}\n"]
-                    if len(options)==1:
-                        msg.append(f"       expected valid {cast.__name__}\n"
-                                   f" or {repr(options[0])}")
-                    msg.append(f"       expected valid {cast.__name__}\n")
-                    if len(options)>1:
-                        msg.append(f"       some valid options:\n")
-                        width = get_terminal_size().columns - 7
-                        col_width = max(len(s) for s in options) + 2
-                        cols = max(1, width // col_width)
-                        for i, s in enumerate(options):
-                            msg.append(s.ljust(col_width))
-                            if (i + 1) % cols == 0:
-                                msg.append("\n       ")
-                    print(''.join().strip(), file=stderr)
+                    msg = ("ERROR: invalid value for env var "
+                           f"{name}: {value!r}\n{e}")
+                    print(msg, file=stderr)
                     exit(1)
                 else:
                     value = default
 
         # (De)normalize cast
-        if cast==self._bool_from_string:
-            cast = bool
+        if denormalize_cast is not None:
+            cast = denormalize_cast
         
         # Registry
         if not hide:
@@ -184,7 +285,7 @@ class Envs():
                 'value': value,
                 'default': default,
                 'options': options,
-                'descripion': descripion,
+                'description': description,
                 'alias': alias}
             if not registry in self._list:
                 self._list.append(registry)
@@ -211,10 +312,10 @@ class Envs():
     def __str__(self):
         if not self:
             return ''
-        fields = ['name','value', 'default', 'cast', 'descripion']
+        fields = ['name','value', 'default', 'cast', 'description']
         titles = {'cast': 'Type'}
         headers = [titles.get(f, str(f).capitalize()) for f in fields]
-        def format(obj):
+        def format(obj, name):
             if obj is None:
                 return ''
             if obj is int:
@@ -225,16 +326,26 @@ class Envs():
                 return 'String'
             if obj is bool:
                 return 'Bool'
-            if obj==self._bool_from_string:
-                return 'Bool'
             if callable(obj):
-                return ' '.join(map(lambda w: w.capitalize(), str(obj.__name__
-                    ).replace('_', ' ').split()))
-            if isinstance(obj, list):
+                if hasattr(obj, '__name__'):
+                    return ' '.join(map(lambda w: w.capitalize(),
+                        str(obj.__name__).replace('_', ' ').split()))
+                return str(obj)
+            if isinstance(obj, (list, dict)):
+                if name=='cast':
+                    return 'Options'
                 return ', '.join([str(x) for x in obj])
-            return str(obj)
-        table = [[format(r[f]) for f in fields] for r in self]
-        return f"\n{tabulate(table, headers=headers, tablefmt='simple')}\n"
+            if name=='description':
+                return '\n'.join(wrap(str(obj),
+                                      width = 30,
+                                      break_long_words = True,
+                                      break_on_hyphens = False))
+            if hasattr(obj, 'abbreviation'): #Address
+                return obj.abbreviation
+            return f"{obj}"
+        table = [[format(r[f], f) for f in fields] for r in self]
+        str_table = tabulate(table, headers=headers, tablefmt='grid')
+        return f"\n{str_table}\n"
 
     def _data_of(self, name, key) -> Any:
         data = envs[name]
@@ -257,8 +368,8 @@ class Envs():
     def options_of(self, name) -> List:
         return self._data_of(name, 'options')
     
-    def descripion_of(self, name) -> str:
-        return self._data_of(name, 'descripion')
+    def description_of(self, name) -> str:
+        return self._data_of(name, 'description')
     
     def alias_of(self, name) -> Dict:
         return self._data_of(name, 'alias')
