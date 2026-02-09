@@ -70,13 +70,11 @@ def create_app():
     app.config["CORS_RESOURCES"] = {r'/*': {"origins": "*"}}
     cors.init_app(app)
     
-    @app.before_first_request
-    def before_first_request():
-        app.logger.setLevel(1)
-        app.logger.info(f"{title} (v{version})")
-        app.logger.info(f"{len(all_coinpairs)} available coinpairs")
-        app.logger.info(f"CONFIG: {use_redis=}")
-        app.logger.info(f"CONFIG: {max_coinpair_limit=}")
+    app.logger.setLevel(1)
+    app.logger.info(f"{title} (v{version})")
+    app.logger.info(f"{len(all_coinpairs)} available coinpairs")
+    app.logger.info(f"CONFIG: {use_redis=}")
+    app.logger.info(f"CONFIG: {max_coinpair_limit=}")
 
     return app
 
