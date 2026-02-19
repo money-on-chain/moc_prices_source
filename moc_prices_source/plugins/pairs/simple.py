@@ -37,9 +37,26 @@ RIF_BTC = CoinPair(RIF, BTC)
 
 # RIF/USDT
 RIF_USDT = CoinPair(RIF, USDT)
-RIF_USDT_MA = CoinPair(RIF, USDT, "MA", "Using [WDAP](fundamentals/wdap.md)")
-RIF_USDT_MA2 = CoinPair(RIF, USDT, "MA2")
-RIF_USDT_MA3 = CoinPair(RIF, USDT, "MA3")
+
+depth = envs('RIF_USD_MA_DEPTH', 100000, int,
+             description = "Depth in RIF for RIF/USDT(MA) or RIF/USD(MA)")
+depth_2 = envs('RIF_USD_MA2_DEPTH', 200000, int,
+               description = "Depth in RIF for RIF/USDT(MA2) or RIF/USD(MA2)")
+depth_3 = envs('RIF_USD_MA3_DEPTH', 600000, int,
+               description = "Depth in RIF for RIF/USDT(MA3) or RIF/USD(MA3)")
+
+depth = f"{int(depth/1000)}k"
+depth_2 = f"{int(depth_2/1000)}k"
+depth_3 = f"{int(depth_3/1000)}k"
+
+RIF_USDT_MA = CoinPair(RIF, USDT, "MA",
+    f"Using [WDAP](fundamentals/wdap.md), {depth} depth")
+
+RIF_USDT_MA2 = CoinPair(RIF, USDT, "MA2",
+    f"Using [WDAP](fundamentals/wdap.md), {depth_2} depth")
+
+RIF_USDT_MA3 = CoinPair(RIF, USDT, "MA3",
+    f"Using [WDAP](fundamentals/wdap.md), {depth_3} depth")
 
 # USD/ARS
 USD_ARS = CoinPair(USD, ARS, min_ok_sources_count=1,
