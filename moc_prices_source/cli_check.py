@@ -203,14 +203,16 @@ def coinpairs_report(coinpairs,
         detail = data,
         serializable = show_json)
 
-    if show_json:
-        return json.dumps(data, indent=4, sort_keys=True)
-
     if callable(use_print):
         out = use_print
     else:
         out = Output(print = print if bool(use_print) else None)
 
+    if show_json:
+        out(json.dumps(data, indent=4, sort_keys=True))
+        if isinstance(out, Output):
+            return str(out)
+    
     time = data['time']
     prices = data['prices']
     values = data['values']

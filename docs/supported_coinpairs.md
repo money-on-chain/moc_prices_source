@@ -71,6 +71,8 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | RIF/USD(TB)    | RIF/USD      | TB        | Computed |
 | RIF/USD(TBMA)  | RIF/USD      | TBMA      | Computed |
 | RIF/USD(TMA)   | RIF/USD      | TMA       | Computed |
+| RIF/USD(TMA2)  | RIF/USD      | TMA2      | Computed |
+| RIF/USD(TMA3)  | RIF/USD      | TMA3      | Computed |
 | RIF/USD(WMTB)  | RIF/USD      | WMTB      | Computed |
 | RIF/USDT       | RIF/USDT     |           | Direct   |
 | RIF/USDT(MA)   | RIF/USDT     | MA        | Direct   |
@@ -99,67 +101,69 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | Onchain  | Obtained directly from the blockchain                    |
 | Weighted | Weighted median of values obtained from multiple sources |
 
-| Name           | Comment/Description                                                  |
-|----------------|----------------------------------------------------------------------|
-| ARS/BPRO       | Inverted pair of pair BPRO/ARS                                       |
-| ARS/BTC        | Inverted pair of pair BTC/ARS                                        |
-| ARS/USD(CCB)   | Inverted pair of pair USD/ARS(CCB)                                   |
-| BLOCK(RSK)     | Rootstock block number                                               |
-| BNB/USD        |                                                                      |
-| BNB/USDT       |                                                                      |
-| BPRO/ARS       |                                                                      |
-| BPRO/BTC       | Obtained from MOC onchain                                            |
-| BPRO/COP       |                                                                      |
-| BPRO/MOC       | Inverted pair of pair MOC/BPRO                                       |
-| BPRO/USD       | Offchain                                                             |
-| BTC/ARS        |                                                                      |
-| BTC/BPRO       | Inverted pair of pair BPRO/BTC                                       |
-| BTC/COP        |                                                                      |
-| BTC/MOC        | Inverted pair of pair MOC/BTC                                        |
-| BTC/USD        |                                                                      |
-| BTC/USD(24h)   | BTC/USD percentage difference over 24 hours                          |
-| BTC/USD(och)   | Obtained from the blockchain                                         |
-| BTC/USDT       |                                                                      |
-| COP/BPRO       | Inverted pair of pair BPRO/COP                                       |
-| COP/BTC        | Inverted pair of pair BTC/COP                                        |
-| COP/USD(CCB)   | Inverted pair of pair USD/COP(CCB)                                   |
-| DOC/USD        | Pegged 1:1 to USD                                                    |
-| ETH/BTC        |                                                                      |
-| ETH/USD        |                                                                      |
-| ETH/USD(B)     | Passing through Bitcoin                                              |
-| GAS/BTC        | Rootstock gas price from nodes                                       |
-| MOC/BPRO       |                                                                      |
-| MOC/BTC        |                                                                      |
-| MOC/BTC(sov)   | Obtained from Sovryn onchain                                         |
-| MOC/USD        | Default option, weighted median                                      |
-| MOC/USD(Oku)   | Obtained from Oku onchain                                            |
-| MOC/USD(WM)    | Weighted median                                                      |
-| RIF/BTC        |                                                                      |
-| RIF/BTC(mp1%)  | To move the price 1 percent                                          |
-| RIF/USD        | Leave this as legacy                                                 |
-| RIF/USD(B)     | Passing through Bitcoin                                              |
-| RIF/USD(T)     | Passing through Tether                                               |
-| RIF/USD(TB)    | Passing through Tether & Bitcoin                                     |
-| RIF/USD(TBMA)  | Passing through Tether & Bitcoin, using [WDAP](fundamentals/wdap.md) |
-| RIF/USD(TMA)   | Passing through Tether, using [WDAP](fundamentals/wdap.md)           |
-| RIF/USD(WMTB)  | Passing through Tether & Bitcoin using weighted median               |
-| RIF/USDT       |                                                                      |
-| RIF/USDT(MA)   | Using [WDAP](fundamentals/wdap.md)                                   |
-| RIF/USDT(MA2)  |                                                                      |
-| RIF/USDT(MA3)  |                                                                      |
-| RIF/USDT(mp1%) | To move the price 1 percent                                          |
-| USD/ARS        | Free, from press portals                                             |
-| USD/ARS(CCB)   | Paid in Bitcoin                                                      |
-| USD/ARS(CCL)   |                                                                      |
-| USD/BPRO       | Inverted pair of pair BPRO/USD                                       |
-| USD/BTC        | Inverted pair of pair BTC/USD                                        |
-| USD/COP        | Free, from press portals                                             |
-| USD/COP(CCB)   | Paid in Bitcoin                                                      |
-| USD/MOC        | Inverted pair of pair MOC/USD                                        |
-| USD/MXN        |                                                                      |
-| USDT/BTC       | Inverted pair of pair BTC/USDT                                       |
-| USDT/USD       |                                                                      |
-| USDT/USD(B)    | Passing through Bitcoin                                              |
+| Name           | Comment/Description                                                    |
+|----------------|------------------------------------------------------------------------|
+| ARS/BPRO       | Inverted pair of pair BPRO/ARS                                         |
+| ARS/BTC        | Inverted pair of pair BTC/ARS                                          |
+| ARS/USD(CCB)   | Inverted pair of pair USD/ARS(CCB)                                     |
+| BLOCK(RSK)     | Rootstock block number                                                 |
+| BNB/USD        |                                                                        |
+| BNB/USDT       |                                                                        |
+| BPRO/ARS       |                                                                        |
+| BPRO/BTC       | Obtained from MOC onchain                                              |
+| BPRO/COP       |                                                                        |
+| BPRO/MOC       | Inverted pair of pair MOC/BPRO                                         |
+| BPRO/USD       | Offchain                                                               |
+| BTC/ARS        |                                                                        |
+| BTC/BPRO       | Inverted pair of pair BPRO/BTC                                         |
+| BTC/COP        |                                                                        |
+| BTC/MOC        | Inverted pair of pair MOC/BTC                                          |
+| BTC/USD        |                                                                        |
+| BTC/USD(24h)   | BTC/USD percentage difference over 24 hours                            |
+| BTC/USD(och)   | Obtained from the blockchain                                           |
+| BTC/USDT       |                                                                        |
+| COP/BPRO       | Inverted pair of pair BPRO/COP                                         |
+| COP/BTC        | Inverted pair of pair BTC/COP                                          |
+| COP/USD(CCB)   | Inverted pair of pair USD/COP(CCB)                                     |
+| DOC/USD        | Pegged 1:1 to USD                                                      |
+| ETH/BTC        |                                                                        |
+| ETH/USD        |                                                                        |
+| ETH/USD(B)     | Passing through Bitcoin                                                |
+| GAS/BTC        | Rootstock gas price from nodes                                         |
+| MOC/BPRO       |                                                                        |
+| MOC/BTC        |                                                                        |
+| MOC/BTC(sov)   | Obtained from Sovryn onchain                                           |
+| MOC/USD        | Default option, weighted median                                        |
+| MOC/USD(Oku)   | Obtained from Oku onchain                                              |
+| MOC/USD(WM)    | Weighted median                                                        |
+| RIF/BTC        |                                                                        |
+| RIF/BTC(mp1%)  | To move the price 1 percent                                            |
+| RIF/USD        | Leave this as legacy                                                   |
+| RIF/USD(B)     | Passing through Bitcoin                                                |
+| RIF/USD(T)     | Passing through Tether                                                 |
+| RIF/USD(TB)    | Passing through Tether & Bitcoin                                       |
+| RIF/USD(TBMA)  | Passing through Tether & Bitcoin, using [WDAP](fundamentals/wdap.md)   |
+| RIF/USD(TMA)   | Passing through Tether, using [WDAP](fundamentals/wdap.md), 100k depth |
+| RIF/USD(TMA2)  | Passing through Tether, using [WDAP](fundamentals/wdap.md), 200k depth |
+| RIF/USD(TMA3)  | Passing through Tether, using [WDAP](fundamentals/wdap.md), 600k depth |
+| RIF/USD(WMTB)  | Passing through Tether & Bitcoin using weighted median                 |
+| RIF/USDT       |                                                                        |
+| RIF/USDT(MA)   | Using [WDAP](fundamentals/wdap.md), 100k depth                         |
+| RIF/USDT(MA2)  | Using [WDAP](fundamentals/wdap.md), 200k depth                         |
+| RIF/USDT(MA3)  | Using [WDAP](fundamentals/wdap.md), 600k depth                         |
+| RIF/USDT(mp1%) | To move the price 1 percent                                            |
+| USD/ARS        | Free, from press portals                                               |
+| USD/ARS(CCB)   | Paid in Bitcoin                                                        |
+| USD/ARS(CCL)   |                                                                        |
+| USD/BPRO       | Inverted pair of pair BPRO/USD                                         |
+| USD/BTC        | Inverted pair of pair BTC/USD                                          |
+| USD/COP        | Free, from press portals                                               |
+| USD/COP(CCB)   | Paid in Bitcoin                                                        |
+| USD/MOC        | Inverted pair of pair MOC/USD                                          |
+| USD/MXN        |                                                                        |
+| USDT/BTC       | Inverted pair of pair BTC/USDT                                         |
+| USDT/USD       |                                                                        |
+| USDT/USD(B)    | Passing through Bitcoin                                                |
 
 
 ## Formulas used in the computed coinpairs
@@ -190,6 +194,8 @@ RIF/USD(T)     =  rif_usdt × usdt_usd
 RIF/USD(TB)    =  rif_usdt × btc_usd / btc_usdt
 RIF/USD(TBMA)  =  rif_usdt_ma × btc_usd / btc_usdt
 RIF/USD(TMA)   =  rif_usdt_ma × usdt_usd
+RIF/USD(TMA2)  =  rif_usdt_ma2 × usdt_usd
+RIF/USD(TMA3)  =  rif_usdt_ma3 × usdt_usd
 RIF/USD(WMTB)  =  Weighted(
                     (rif_usdt × btc_usd / btc_usdt) at 75%,
                     (rif_btc × btc_usd) at 25%

@@ -1,9 +1,10 @@
 from ...weighing import weighted_median
 from ...weighing import median as Median
-from ..base import CoinPairs, CoinPair, Formula
+from ..base import CoinPairs, CoinPair, Formula, envs
 from ..coins import BTC, USD, RIF, MOC, ETH, USDT, BNB, ARS, COP, BPRO
 from .simple import BNB_USDT,  BTC_ARS, BTC_COP, BTC_USD, BTC_USDT, \
-    ETH_BTC, RIF_USDT, RIF_USDT_MA, USDT_USD, RIF_BTC
+    ETH_BTC, RIF_USDT, RIF_USDT_MA, RIF_USDT_MA2, RIF_USDT_MA3, USDT_USD, \
+    RIF_BTC
 from .onchain import BPRO_BTC, MOC_BTC_SOV, MOC_USD_OKU
 
 
@@ -95,11 +96,30 @@ RIF_USD_TBMA = CoinPair(RIF, USD, "TBMA",
     formula = lambda rif_usdt_ma, btc_usd, btc_usdt\
         : rif_usdt_ma * btc_usd / btc_usdt)
 
+depth = f"{int(envs.value_of('RIF_USD_MA_DEPTH')/1000)}k"
+depth_2 = f"{int(envs.value_of('RIF_USD_MA2_DEPTH')/1000)}k"
+depth_3 = f"{int(envs.value_of('RIF_USD_MA3_DEPTH')/1000)}k"
+
 RIF_USD_TMA = CoinPair(RIF, USD, "TMA",
     description = "Passing through Tether, "
-                  "using [WDAP](fundamentals/wdap.md)",
+                  "using [WDAP](fundamentals/wdap.md)"
+                  f", {depth} depth",
     requirements = [RIF_USDT_MA, USDT_USD],
     formula = lambda rif_usdt_ma, usdt_usd: rif_usdt_ma * usdt_usd)
+
+RIF_USD_TMA2 = CoinPair(RIF, USD, "TMA2",
+    description = "Passing through Tether, "
+                  "using [WDAP](fundamentals/wdap.md)"
+                  f", {depth_2} depth",
+    requirements = [RIF_USDT_MA2, USDT_USD],
+    formula = lambda rif_usdt_ma2, usdt_usd: rif_usdt_ma2 * usdt_usd)
+
+RIF_USD_TMA3 = CoinPair(RIF, USD, "TMA3",
+    description = "Passing through Tether, "
+                  "using [WDAP](fundamentals/wdap.md)"
+                  f", {depth_3} depth",
+    requirements = [RIF_USDT_MA3, USDT_USD],
+    formula = lambda rif_usdt_ma3, usdt_usd: rif_usdt_ma3 * usdt_usd)
 
 class RIF_USD_WMTB_Formula(Formula):
     """

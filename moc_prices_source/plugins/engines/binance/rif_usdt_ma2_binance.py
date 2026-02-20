@@ -4,7 +4,7 @@ from .rif_usdt_ma_binance import Engine as Base
 
 
 
-max_quantity = Decimal(envs('MA_MAX2_QUANTITY', 200000, int))
+max_quantity = Decimal(envs.value_of('RIF_USD_MA2_DEPTH'))
 
 @Engines.register_decorator()
 class Engine(Base):

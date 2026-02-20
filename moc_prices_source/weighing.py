@@ -271,7 +271,7 @@ def weighted_median_idx(values, weights):
 def median(*args):
     data = args[0] if len(args)==1 and isinstance(args[0], list) else args
     value = median_base(data)
-    if all([v in [True, False] for v in data]):
+    if all([(v is True or v is False) for v in data]):
         value = bool(value>0.5)
     return value
 
@@ -279,6 +279,6 @@ def median(*args):
 def mean(*args):
     data = args[0] if len(args)==1 and isinstance(args[0], list) else args
     value = mean_base(data)
-    if all([v in [True, False] for v in data]):
+    if all([(v is True or v is False) for v in data]):
         value = bool(value>0.5)
     return value

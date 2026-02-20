@@ -6,7 +6,7 @@ from ...base import Decimal, BaseWithFailover, Engines, envs
 
 # Some params
 base_uri = "https://{}/api/v3/depth?symbol=RIFUSDT"
-max_quantity = Decimal(envs('MA_MAX_QUANTITY', 100000, int))
+max_quantity = Decimal(envs.value_of('RIF_USD_MA_DEPTH'))
 allow_degraded = envs('MA_ALLOW_DEGRADED', False, bool)
 
 @Engines.register_decorator()
