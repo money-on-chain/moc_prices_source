@@ -1,36 +1,39 @@
-import sys, json, datetime
+import datetime
 from os.path import dirname, abspath
 from decimal import Decimal
+from .coins import Coins
+from .pairs import CoinPairs, get_coin_pairs
+from .engines import get_coinpair_list, get_engines_names, get_prices, \
+    session_storage
+from .computed_pairs import computed_pairs
+from .weighing import weighing, weighted_median, median, mean
+from .types import FancyDecimal, normalize_obj, Serializable
+from .app_info import version
+
+
 
 base_dir = dirname(abspath(__file__))
 
-with open(base_dir + "/version.txt", "r") as file_:
-    version = file_.read().split()[0]
+
 __version__ = version
 
-bkpath   = sys.path[:]
-sys.path.insert(0, dirname(base_dir))
 
-from moc_prices_source.engines        import get_coinpair_list, get_engines_names, get_prices, session_storage
-from moc_prices_source.computed_pairs import computed_pairs
-from moc_prices_source.weighing       import weighing, weighted_median, median, mean
-from moc_prices_source.coins          import *
-
-sys.path = bkpath
-
-
-
-ALL = CoinPairs
-
+ALL = [c for c in CoinPairs.values()]
+for name, coinpair in CoinPairs.items():
+    locals()[name] = coinpair
+del name, coinpair
+for name, coin in Coins.items():
+    locals()[name] = coin
+del name, coin
 
 
 def get_price(
-    coinpairs            = None,
-    engines_names        = None,
-    detail               = {},
-    weighing             = weighing,
-    serializable         = False,
-    ignore_zero_weighing = True):
+    coinpairs = None,
+    engines_names = None,
+    detail = {},
+    weighing = weighing,
+    serializable = False,
+    ignore_zero_weighing = True): 
 
     start_time = datetime.datetime.now()
 
@@ -67,7 +70,7 @@ def get_price(
         engines_names = list(weighing.keys())
 
     prices = get_prices(
-        coinpairs     = coinpairs,
+        coinpairs = coinpairs,
         engines_names = engines_names)
 
     for value in prices:
@@ -84,7 +87,8 @@ def get_price(
                     'data': [],
                     'sum_weighing': Decimal('0.0')}
             coinpair_prices[value['coinpair']]['data'].append(value)
-            coinpair_prices[value['coinpair']]['sum_weighing'] += value['weighing']
+            coinpair_prices[value['coinpair']
+                            ]['sum_weighing'] += value['weighing']
 
     for d in coinpair_prices.values():
         sum_weighing = d['sum_weighing']
@@ -106,6 +110,10 @@ def get_price(
         for v in d['data']:
             d['weighings'].append(v['percentual_weighing'])
             d['prices'].append(v['price'])
+        try:
+            d['time'] = max(filter(bool, [f.get('time') for f in d['data']]))
+        except:
+            d['time'] = None
         del d['data']
         del d['sum_weighing']
 
@@ -114,8 +122,9 @@ def get_price(
 
         d['median_price'] = median(d['prices'])
         d['mean_price'] = mean(d['prices'])
-        if any (d['weighings']):
-            d['weighted_median_price'] = weighted_median(d['prices'], d['weighings'])
+        if any(d['weighings']):
+            d['weighted_median_price'] = weighted_median(
+                d['prices'], d['weighings'])
         else:
             d['weighted_median_price'] = None
 
@@ -127,26 +136,66 @@ def get_price(
 
         if ok_sources_count < min_ok_sources_count:
             d['ok'] = False
-            d['error'] = f"Not enough price sources ({ok_sources_count} < {min_ok_sources_count})"
+            d['error'] = ("Not enough price sources "
+                          f"({ok_sources_count} < {min_ok_sources_count})")
             d['ok_value'] = None
 
     if requested:
-        for r in [r for r in requested if (
-            (r in computed_pairs) and (not r in coinpair_prices)) ]:
+        requested_computed_pairs = [
+            r for r in requested if ((r in computed_pairs) and
+                                     (not r in coinpair_prices)) ]
+        for r in requested_computed_pairs:
             requirements = computed_pairs[r]['requirements']
             if set(requirements).issubset(set(coinpair_prices.keys())):
                 coinpair_prices[r] = {}
-                coinpair_prices[r]['ok'] = all([ coinpair_prices[q]['ok'] for q in requirements ])
+                ok = all([ coinpair_prices[q]['ok'] for q in requirements ])
+                coinpair_prices[r]['ok'] = ok
                 coinpair_prices[r]['requirements'] = requirements
-                formula = computed_pairs[r]['formula']
-                for k in ['median_price', 'mean_price', 'weighted_median_price']:
-                    args = [ coinpair_prices[q][k] for q in requirements ]
+                formula = computed_pairs[r]['formula']               
+                args = [coinpair_prices[q]['ok_value'] for q in requirements]
+                coinpair_prices[r]['error'] = ''
+                coinpair_prices[r]['start_time'] = datetime.datetime.now()
+                if not ok:
+                    str_pairs = ', '.join([str(q) for q in requirements 
+                                           if not(coinpair_prices[q]['ok'])])
+                    coinpair_prices[r]['error'] = ("It cannot be calculated"
+                        f", is missing values: {str_pairs}.")
+                    coinpair_prices[r]['ok_value'] = None
+                    coinpair_prices[r]['ok'] = False
+                else:
                     try:
-                        coinpair_prices[r][k] = formula(*args)
-                    except:
-                        coinpair_prices[r][k] = None
-                coinpair_prices[r]['ok_value'] = (coinpair_prices[r]['weighted_median_price'] if 
-                                                  coinpair_prices[r]['ok'] else None)
+                        coinpair_prices[r]['ok_value'] = formula(*args)
+                    except Exception as e:
+                        coinpair_prices[r]['error'] = str(e)
+                        coinpair_prices[r]['ok_value'] = None
+                        coinpair_prices[r]['ok'] = False
+                coinpair_prices[r]['weighted_median_price'] = \
+                    coinpair_prices[r]['ok_value']
+                coinpair_prices[r]['time'] = datetime.datetime.now() - \
+                    coinpair_prices[r]['start_time']
+        
+        while True:
+            callable_pairs = [r for r in requested_computed_pairs
+                              if (coinpair_prices.get(r, {}).get('ok') and
+                                  callable(coinpair_prices.get(r, {}).get('ok_value')))]
+            if not callable_pairs:
+                break
+            for r in callable_pairs:
+                try:
+                    coinpair_prices[r]['ok_value'] = \
+                        coinpair_prices[r]['ok_value']()
+                except Exception as e:
+                    coinpair_prices[r]['error'] = str(e)
+                    coinpair_prices[r]['ok_value'] = None
+                    coinpair_prices[r]['ok'] = False
+                coinpair_prices[r]['weighted_median_price'] = \
+                    coinpair_prices[r]['ok_value'] 
+                coinpair_prices[r]['time'] = datetime.datetime.now() - coinpair_prices[r]['start_time']
+        
+        for r in requested_computed_pairs:
+            if 'start_time' in coinpair_prices.get(r, {}):
+                del coinpair_prices[r]['start_time']
+
 
     detail['values'] = coinpair_prices
 
@@ -155,11 +204,15 @@ def get_price(
     for key, value in coinpair_prices.items():
         if requested:
             if key in requested:
-                if value['weighted_median_price'] and value['ok']:
-                    out[key] = value['weighted_median_price']
+                if value['ok']:
+                    out[key] = value['ok_value']
         else:
-            if value['weighted_median_price'] and value['ok']:
-                out[key] = value['weighted_median_price']
+            if value['ok']:
+                out[key] = value['ok_value']
+
+    for key in out.keys():
+        if type(out[key]) is Decimal:
+            out[key] = FancyDecimal(out[key])
 
     if requested and len(requested)==1:
         if requested[0] in out:
@@ -173,46 +226,10 @@ def get_price(
     detail['time'] = datetime.datetime.now() - start_time
 
     if serializable:
-        detail['time'] = detail['time'].seconds + detail['time'].microseconds/1000000
-        for p in prices:
-            p['coinpair'] = str(p['coinpair'])
-            if p['time']:
-                p['time'] = p['time'].seconds + p['time'].microseconds/1000000
-            p['timestamp'] = str(p['timestamp'])
-            p['last_change_timestamp'] = str(p['last_change_timestamp'])
-            if p['error']:
-                p['error'] = str(p['error'])
-            for k in ['price', 'weighing', 'percentual_weighing', 'volume']:
-                if p[k]!=None:
-                    p[k] = float(p[k])
-        for d in coinpair_prices.values():
-            for k in ['weighings', 'prices']:
-                if k in d:
-                    d[k] = [ float(x) for x in d[k] if d[k] ]
-            for k in ['median_price', 'mean_price', 'weighted_median_price', 'ok_value']:
-                if d[k]:
-                    d[k] = float(d[k])
-        for k in list(coinpair_prices.keys()):
-            v = coinpair_prices[k]
-            del coinpair_prices[k]
-            coinpair_prices[str(k)] = v
-            if 'requirements' in coinpair_prices[str(k)]:
-                coinpair_prices[str(k)]['requirements'] = list(
-                    map(str, coinpair_prices[str(k)]['requirements']))
+        for k, v in detail.items():
+            detail[k] = normalize_obj(v)
 
-    if not out:
+    if not out and not(isinstance(out, Serializable)):
         return None
 
     return out
-
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    print('Version: {}'.format(version))
-    detail = {}
-    output = get_price(ALL, detail=detail, serializable=True)
-    print()
-    print(json.dumps(detail, indent=4, sort_keys=True))
-    print()
-    print('output = {}'.format(repr(output)))

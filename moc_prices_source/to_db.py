@@ -1,32 +1,28 @@
-import sys, datetime, json
-from os.path import dirname, abspath, basename, expanduser
+import datetime, json
 from time import sleep
-from tabulate import tabulate
-from fnmatch import fnmatch as match
-from redis import Redis
-from json.decoder import JSONDecodeError
 from sys import stderr
-from decimal import Decimal
+from . import get_price, ALL, get_coin_pairs
+from .cli import command, option, cli
+from .database import make_db_conn
+from .my_logging import get_logger, set_level, INFO, DEBUG, VERBOSE
+from .redis_conn import get_redis, redis_conf_file
+from .types import FancyDecimal, Serializable, Decimal
 
-bkpath   = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
 
-from moc_prices_source import get_price
-from moc_prices_source import ALL
-from moc_prices_source.cli import command, option, cli
-from moc_prices_source.database import make_db_conn
-from moc_prices_source.database import config_file as db_config_file
-from moc_prices_source.my_logging import make_log, INFO, DEBUG, VERBOSE
 
-sys.path = bkpath
 app_name = 'moc_prices_source'
 
+
+def obj_to_str(obj):
+    if obj is None:
+        return "(NONE)"
+    elif type(obj) is Decimal:
+        return str(FancyDecimal(obj))
+    return str(obj)
 
 
 class OutputClose(Exception):
     pass
-
 
 
 class OutputBase(object):
@@ -74,7 +70,6 @@ class OutputBase(object):
         pass
 
 
-
 class OutputDB(OutputBase):
 
     def __init__(self, name,
@@ -96,55 +91,13 @@ class OutputDB(OutputBase):
                 self._database = make_db_conn()
             except Exception as e:
                 exit(1)
-        
-        app_dir  = dirname(abspath(__file__))
-        app_name = basename(app_dir)
-        redis_conf_files = [
-            expanduser("~") + '/.' + app_name + '/redis.json',
-            expanduser("~") + '/.' + app_name + '/redis_default.json',
-            app_dir + '/data/redis.json',
-            app_dir + '/data/redis_default.json']
-        redis_conf = {}
-        for file_ in redis_conf_files:
-            try:
-                with open(file_, 'r') as f:
-                    redis_conf = json.load(f)
-            except JSONDecodeError as e:
-                print(f'Error in "{file_}", {str(e)}', file=stderr)
-                exit(1)
-            except Exception as e:
-                redis_conf = {}
-            if redis_conf:
-                break
+               
+        self._redis = get_redis()
 
-        self._redis_enable = redis_conf.get('enable', False)
-
-        if only_redis and not self._redis_enable:
-            print(f'Error, Redis not enabled in config (File: {file_})',
+        if only_redis and self._redis is None:
+            print(f'Error, Redis not enabled in config (File: {redis_conf_file})',
                   file=stderr)
             exit(1)
-
-        if self._redis_enable:
-
-            redis_connection = {}
-
-            for key, type_ in [('host', str),
-                               ('port', int),
-                               ('db', int),
-                               ('unix_socket_path', str)]:
-                if key in redis_conf:
-                    try:
-                        redis_connection[key] = type_(redis_conf[key])
-                    except Exception as e:
-                        print(f'Error in "{file_}", {str(e)}', file=stderr)
-                        exit(1)
-
-            try:
-                self._redis = Redis(**redis_connection)
-                self._redis.ping()
-            except Exception as e:
-                print(f'Error in "{file_}", {str(e)}', file=stderr)
-                exit(1)
 
 
     def _call(self, value):
@@ -166,7 +119,7 @@ class OutputDB(OutputBase):
                 into = f"{kargs['measurement']}@{kargs['time_'].strftime('%Y-%m-%dT%H:%M:%S')}"
                 self._info(
                     f"Insert into {into} {len(kargs['fields'])} fileds.")
-            if self._redis_enable:
+            if self._redis is not None:
                 for (k, v) in kargs['fields'].items():
                     for (key, value) in [
                             (f"{self.name}/{k}", v),
@@ -183,7 +136,6 @@ class OutputDB(OutputBase):
                 into = f"redis@{kargs['time_'].strftime('%Y-%m-%dT%H:%M:%S')}"
                 self._info(
                     f"Insert into {into} {len(kargs['fields'])*2} fileds.")
-
 
 
 def get_values(log,
@@ -222,7 +174,7 @@ def get_values(log,
         timestamp = p['timestamp'] if p['timestamp'] else datetime.datetime.now().replace(microsecond=0)
         coinpair =  p['coinpair']
         name =      p['description']
-        price =     p['price']
+        price =     None if p['price'] is None else Decimal(p['price']) 
         weighing =  None if p['percentual_weighing'] is None else float(p['percentual_weighing'])
         age =       None if p['age'] is None else int(p['age'])
         error =     None if p['error'] is None else str(p['error'])
@@ -235,28 +187,40 @@ def get_values(log,
             'age': age,
             'error': error
         }
-        log.verbose(f'Exchange {name} {coinpair} value: {price}')
+        log.verbose(f'Exchange {name} {coinpair} value: {obj_to_str(price)}')
         data.append(row)
 
     for coinpair, v in d['values'].items():
-        median_price =          v['median_price']
-        mean_price =            v['mean_price']
-        weighted_median_price = v['weighted_median_price']
         row = {
             'timestamp': datetime.datetime.now().replace(microsecond=0),
-            'coinpair': coinpair,
-            'median_price': median_price,
-            'mean_price': mean_price,
-            'weighted_median_price': weighted_median_price
-        }
+            'coinpair': coinpair}
 
         for key in ['ok_sources_count',
                     'min_ok_sources_count',
                     'ok',
                     'error',
-                    'ok_value']:
+                    'ok_value',
+                    'mean_price',
+                    'median_price',
+                    'weighted_median_price']:
             if key in v:
-                row[key]=v[key]
+                if type(v[key]) is FancyDecimal:
+                    row[key] = Decimal(v[key])
+                elif isinstance(v[key], Decimal):
+                    row[key] = Decimal(v[key])
+                elif isinstance(v[key], Serializable):
+                    row[key] = v[key].as_serializable
+                else:
+                    row[key] = v[key]
+
+        value = None
+        for key in ['ok_value',
+                    'weighted_median_price',
+                    'median_price',
+                    'mean_price']:
+            if key in v:
+                value = v[key]
+                break
 
         if 'ok' in v:
             row['int_ok'] = 1 if v['ok'] else 0
@@ -264,7 +228,7 @@ def get_values(log,
         if coinpair in sources_count:
             row['sources_count'] = sources_count[coinpair]
 
-        log.verbose(f'{coinpair} weighted:{weighted_median_price}, median;{median_price}, mean:{mean_price}')
+        log.verbose(f'{coinpair} value: {obj_to_str(value)}')
         data.append(row)
 
     out = []
@@ -285,7 +249,6 @@ def get_values(log,
 
     out.sort(key=lambda x: x[0].timestamp())
     return out
-
 
 
 @command()
@@ -323,9 +286,7 @@ COINPAIRS_FILTER:
 """
     
     if coinpairs_filter:
-        coinpairs = list(filter(
-            lambda i: match(str(i).lower(), str(coinpairs_filter).lower()),
-            ALL))
+        coinpairs = get_coin_pairs(coinpairs_filter)
     else:
         coinpairs = ALL
     if not coinpairs:
@@ -341,7 +302,8 @@ COINPAIRS_FILTER:
         level = VERBOSE
     elif verbose>1:
         level = DEBUG
-    log = make_log(app_name, level = level)
+    set_level(level)
+    log = get_logger(app_name)
     log.info(f'Starts (frequency {frequency}s, time series {repr(name)})')
     if len(coinpairs)>3:
         log.info(f'Coinpairs count: {len(coinpairs)}')
@@ -376,13 +338,3 @@ COINPAIRS_FILTER:
 
     if not condition():
         log.info(f'Ends (interval {interval}m)')        
-
-
-
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    log = make_log(app_name, level = INFO)
-    values = get_values(log)
-    print()
-    print(tabulate(values, headers=['timestamp', 'key', 'value']))
-    print()

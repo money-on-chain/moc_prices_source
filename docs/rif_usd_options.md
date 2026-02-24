@@ -1,18 +1,22 @@
 # **Options for the `RIF/USD` price source**
 
-Date: **2024-05-23**
+Date: **2026-02-19**
 
 
 
 
 ## Options
 
-Currently there are **6** options:
+Currently there are **10** options:
 
 * RIF/USD(B)
-* RIF/USD(TB)
-* RIF/USD(WMTB)
 * RIF/USD(T)
+* RIF/USD(TB)
+* RIF/USD(TBMA)
+* RIF/USD(TMA)
+* RIF/USD(TMA2)
+* RIF/USD(TMA3)
+* RIF/USD(WMTB)
 * RIF/USDT(MA)
 * RIF/USDT
 
@@ -33,12 +37,12 @@ Currently there are **6** options:
 
 ## Symbols
 
-| Symbol   | Name      | Char   |
-|----------|-----------|--------|
-| BTC      | Bitcoin   | ₿      |
-| RIF      | RIF Token |        |
-| USD      | Dollar    | $      |
-| USDT     | Tether    | ₮      |
+| Symbol   | Name    | Char   |
+|----------|---------|--------|
+| BTC      | Bitcoin | ₿      |
+| RIF      | RIF     |        |
+| USD      | Dollar  | $      |
+| USDT     | Tether  | ₮      |
 
 
 ## Coinpairs
@@ -47,52 +51,66 @@ Currently there are **6** options:
 |----------------|------------|-----------|----------|
 | BTC/USD        | BTC/USD    |           | Weighted |
 | BTC/USDT       | BTC/USDT   |           | Weighted |
-| RIF/BTC        | RIF/BTC    |           | Weighted |
+| RIF/BTC        | RIF/BTC    |           | Direct   |
 | RIF/USD        | RIF/USD    |           | Computed |
 | RIF/USD(B)     | RIF/USD    | B         | Computed |
 | RIF/USD(T)     | RIF/USD    | T         | Computed |
 | RIF/USD(TB)    | RIF/USD    | TB        | Computed |
+| RIF/USD(TBMA)  | RIF/USD    | TBMA      | Computed |
+| RIF/USD(TMA)   | RIF/USD    | TMA       | Computed |
+| RIF/USD(TMA2)  | RIF/USD    | TMA2      | Computed |
+| RIF/USD(TMA3)  | RIF/USD    | TMA3      | Computed |
 | RIF/USD(WMTB)  | RIF/USD    | WMTB      | Computed |
-| RIF/USDT       | RIF/USDT   |           | Weighted |
-| RIF/USDT(MA)   | RIF/USDT   | MA        | Weighted |
-| RIF/USDT(MA2)  | RIF/USDT   | MA2       | Weighted |
-| RIF/USDT(MA3)  | RIF/USDT   | MA3       | Weighted |
-| RIF/USDT(mp1%) | RIF/USDT   | mp1%      | Weighted |
+| RIF/USDT       | RIF/USDT   |           | Direct   |
+| RIF/USDT(MA)   | RIF/USDT   | MA        | Direct   |
+| RIF/USDT(MA2)  | RIF/USDT   | MA2       | Direct   |
+| RIF/USDT(MA3)  | RIF/USDT   | MA3       | Direct   |
+| RIF/USDT(mp1%) | RIF/USDT   | mp1%      | Direct   |
 | USDT/USD       | USDT/USD   |           | Weighted |
 
 | Method   | Description                                              |
 |----------|----------------------------------------------------------|
-| Weighted | Weighted median of values ​​obtained from multiple sources |
 | Computed | Compute made with previously obtained coinpairs          |
+| Direct   | Direct value from a single source                        |
+| Weighted | Weighted median of values obtained from multiple sources |
 
-| Name           | Comment/Description                                     |
-|----------------|---------------------------------------------------------|
-| BTC/USD        |                                                         |
-| BTC/USDT       |                                                         |
-| RIF/BTC        |                                                         |
-| RIF/USD        | Leave this as legacy                                    |
-| RIF/USD(B)     | Passing through Bitcoin                                 |
-| RIF/USD(T)     | Passing through Tether                                  |
-| RIF/USD(TB)    | Passing through Tether & Bitcoin                        |
-| RIF/USD(WMTB)  | Passing through Tether & Bitcoin usinng weighted_median |
-| RIF/USDT       |                                                         |
-| RIF/USDT(MA)   | Using the magic average algorithm with orderbook depth  |
-| RIF/USDT(MA2)  |                                                         |
-| RIF/USDT(MA3)  |                                                         |
-| RIF/USDT(mp1%) | To move the price 1 percent                             |
-| USDT/USD       |                                                         |
+| Name           | Comment/Description                                                    |
+|----------------|------------------------------------------------------------------------|
+| BTC/USD        |                                                                        |
+| BTC/USDT       |                                                                        |
+| RIF/BTC        |                                                                        |
+| RIF/USD        | Leave this as legacy                                                   |
+| RIF/USD(B)     | Passing through Bitcoin                                                |
+| RIF/USD(T)     | Passing through Tether                                                 |
+| RIF/USD(TB)    | Passing through Tether & Bitcoin                                       |
+| RIF/USD(TBMA)  | Passing through Tether & Bitcoin, using [DWAP](fundamentals/dwap.md)   |
+| RIF/USD(TMA)   | Passing through Tether, using [DWAP](fundamentals/dwap.md), 100k depth |
+| RIF/USD(TMA2)  | Passing through Tether, using [DWAP](fundamentals/dwap.md), 200k depth |
+| RIF/USD(TMA3)  | Passing through Tether, using [DWAP](fundamentals/dwap.md), 600k depth |
+| RIF/USD(WMTB)  | Passing through Tether & Bitcoin using weighted median                 |
+| RIF/USDT       |                                                                        |
+| RIF/USDT(MA)   | Using [DWAP](fundamentals/dwap.md), 100k depth                         |
+| RIF/USDT(MA2)  | Using [DWAP](fundamentals/dwap.md), 200k depth                         |
+| RIF/USDT(MA3)  | Using [DWAP](fundamentals/dwap.md), 600k depth                         |
+| RIF/USDT(mp1%) | To move the price 1 percent                                            |
+| USDT/USD       |                                                                        |
 
 
 ## Formulas used in the computed coinpairs
 
 ```
-RIF/USD        =  rif_btc * btc_usd
-RIF/USD(B)     =  rif_btc * btc_usd
-RIF/USD(T)     =  rif_usdt * usdt_usd
-RIF/USD(TB)    =  rif_usdt * btc_usd / btc_usdt
-RIF/USD(WMTB)  =  weighted_median(
-                  [(rif_usdt * btc_usd / btc_usdt), (rif_btc * btc_usd)],
-                  [0.75, 0.25])
+RIF/USD        =  rif_btc × btc_usd
+RIF/USD(B)     =  rif_btc × btc_usd
+RIF/USD(T)     =  rif_usdt × usdt_usd
+RIF/USD(TB)    =  rif_usdt × btc_usd / btc_usdt
+RIF/USD(TBMA)  =  rif_usdt_ma × btc_usd / btc_usdt
+RIF/USD(TMA)   =  rif_usdt_ma × usdt_usd
+RIF/USD(TMA2)  =  rif_usdt_ma2 × usdt_usd
+RIF/USD(TMA3)  =  rif_usdt_ma3 × usdt_usd
+RIF/USD(WMTB)  =  Weighted(
+                    (rif_usdt × btc_usd / btc_usdt) at 75%,
+                    (rif_btc × btc_usd) at 25%
+                  )
 ```
 
 
@@ -123,53 +141,55 @@ sources and if necessary we apply the changes to the parameterization.
 | Gemini   |     0.17 | https://api.gemini.com/v1/pubticker/BTCUSD           |
 
 
-### For coinpair RIF/BTC (from RIF Token to Bitcoin)
+### For coinpair RIF/BTC (from RIF to Bitcoin)
 
 Only Binance (URI: https://api.binance.com/api/v3/ticker/24hr?symbol=RIFBTC)
 
 
-### For coinpair RIF/USDT (from RIF Token to Tether)
+### For coinpair RIF/USDT (from RIF to Tether)
 
 Only Binance (URI: https://api.binance.com/api/v3/ticker/24hr?symbol=RIFUSDT)
 
 
-### For coinpair RIF/USDT(mp1%) (from RIF Token to Tether)
+### For coinpair RIF/USDT(mp1%) (from RIF to Tether)
 
 Only Binance (URI: https://api.binance.com/api/v3/depth?symbol=RIFUSDT)
 
 
-### For coinpair RIF/USDT(MA) (from RIF Token to Tether)
+### For coinpair RIF/USDT(MA) (from RIF to Tether)
 
 Only Binance (URI: https://api.binance.com/api/v3/depth?symbol=RIFUSDT)
 
 
-### For coinpair RIF/USDT(MA2) (from RIF Token to Tether)
+### For coinpair RIF/USDT(MA2) (from RIF to Tether)
 
 Only Binance (URI: https://api.binance.com/api/v3/depth?symbol=RIFUSDT)
 
 
-### For coinpair RIF/USDT(MA3) (from RIF Token to Tether)
+### For coinpair RIF/USDT(MA3) (from RIF to Tether)
 
 Only Binance (URI: https://api.binance.com/api/v3/depth?symbol=RIFUSDT)
 
 
 ### For coinpair BTC/USDT (from Bitcoin to Tether)
 
-| Source   |   Weight | URI                                                       |
-|----------|----------|-----------------------------------------------------------|
-| Binance  |     0.80 | https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT |
-| Bitfinex |     0.05 | https://api-pub.bitfinex.com/v2/ticker/tBTCUST            |
-| Kraken   |     0.05 | https://api.kraken.com/0/public/Ticker?pair=XBTUSDT       |
-| Coinbase |     0.10 | https://api.coinbase.com/v2/exchange-rates?currency=BTC   |
+| Source   |   Weight | URI                                                                   |
+|----------|----------|-----------------------------------------------------------------------|
+| Binance  |     0.65 | https://api.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT       |
+| OKX      |     0.15 | https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT              |
+| Bybit    |     0.10 | https://api.bybit.com/v5/market/tickers?category=spot&symbol=BTCUSDT  |
+| Huobi    |     0.05 | https://api.huobi.pro/market/detail/merged?symbol=btcusdt             |
+| KuCoin   |     0.05 | https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=BTC-USDT |
 
 
 ### For coinpair USDT/USD (from Tether to Dollar)
 
-| Source   |   Weight | URI                                                      |
-|----------|----------|----------------------------------------------------------|
-| Bitstamp |     0.15 | https://www.bitstamp.net/api/v2/ticker/usdtusd/          |
-| Coinbase |     0.45 | https://api.coinbase.com/v2/exchange-rates?currency=USDT |
-| Kraken   |     0.40 | https://api.kraken.com/0/public/Ticker?pair=USDTZUSD     |
+| Source   |   Weight | URI                                                        |
+|----------|----------|------------------------------------------------------------|
+| Bitstamp |     0.15 | https://www.bitstamp.net/api/v2/ticker/usdtusd/            |
+| Coinbase |     0.35 | https://api.exchange.coinbase.com/products/USDT-USD/ticker |
+| Gemini   |     0.15 | https://api.gemini.com/v1/pubticker/usdtusd                |
+| Kraken   |     0.35 | https://api.kraken.com/0/public/Ticker?pair=USDTUSD        |
 
 ## The `moc_prices_source_check` tool
 
@@ -193,10 +213,12 @@ Usage: moc_prices_source_check [OPTIONS] [COINPAIRS_FILTER]
       Default value: "*" (all available pairs)
 
 Options:
-  -v, --version                   Show version and exit.
+  -v, --verbose                   Verbose mode.
+  --version                       Show version and exit.
   -j, --json                      Show data in JSON format and exit.
   -w, --weighing                  Show the default weighing and exit.
   -c, --computed                  Show the computed pairs formula and exit.
+  -e, --show-envs                 Show used ENV variables used and exit.
   -s, --summary                   Show the summary and exit.
   -m, --markdown                  Set markdown for the summary format.
   -n, --not-ignore-zero-weighing  Not ignore sources with zero weighing.
@@ -204,45 +226,51 @@ Options:
 
 user@workstation:~$ moc_prices_source_check "RIF/USD*"
 
-From       To       V.    Exchnage    Response        Weight    %  Time
----------  -------  ----  ----------  ------------  --------  ---  ------
-Bitcoin    Dollar         Bitfinex    $  67.14200K      0.18   18  1.17s
-Bitcoin    Dollar         Bitstamp    $  67.03900K      0.22   22  2.29s
-Bitcoin    Dollar         Coinbase    $  67.02841K      0.25   25  0.96s
-Bitcoin    Dollar         Gemini      $  67.02645K      0.17   17  1.56s
-Bitcoin    Dollar         Kraken      $  67.01880K      0.18   18  1.97s
-Bitcoin    Tether         Binance     ₮  67.09889K      0.8    80  1.83s
-Bitcoin    Tether         Bitfinex    ₮  67.08600K      0.05    5  1.17s
-Bitcoin    Tether         Coinbase    ₮  67.08416K      0.1    10  0.96s
-Bitcoin    Tether         Kraken      ₮  67.10070K      0.05    5  1.17s
-RIF Token  Bitcoin        Binance     ₿   2.28000µ      1     100  1.84s
-RIF Token  Tether   MA    Binance     ₮ 152.52785m      1     100  1.82s
-RIF Token  Tether   MA2   Binance     ₮ 152.52229m      1     100  1.85s
-RIF Token  Tether   MA3   Binance     ₮ 152.41438m      1     100  1.85s
-RIF Token  Tether   mp1%  Binance     ₮  53.38290K      1     100  3.0s
-RIF Token  Tether         Binance     ₮ 152.40000m      1     100  1.82s
-Tether     Dollar         Bitstamp    $ 999.18000m      0.15   15  1.83s
-Tether     Dollar         Coinbase    $ 999.17500m      0.45   45  1.19s
-Tether     Dollar         Kraken      $ 999.12000m      0.4    40  1.38s
+Coinpair    V.    Short description     Exchnage    Response        Weight    %  Time
+----------  ----  --------------------  ----------  ------------  --------  ---  ------
+BTC/USD           Bitcoin to Dollar     Bitfinex    $  66.80000K      0.18   18  384ms
+BTC/USD           Bitcoin to Dollar     Bitstamp    $  66.67400K      0.22   22  311ms
+BTC/USD           Bitcoin to Dollar     Coinbase    $  66.68054K      0.25   25  1.03s
+BTC/USD           Bitcoin to Dollar     Gemini      $  66.66932K      0.17   17  1.02s
+BTC/USD           Bitcoin to Dollar     Kraken      $  66.68000K      0.18   18  656ms
+BTC/USDT          Bitcoin to Tether     Binance     ₮  66.70712K      0.65   65  690ms
+BTC/USDT          Bitcoin to Tether     Bybit       ₮  66.71285K      0.1    10  661ms
+BTC/USDT          Bitcoin to Tether     Huobi       ₮  66.69838K      0.05    5  629ms
+BTC/USDT          Bitcoin to Tether     KuCoin      ₮  66.71045K      0.05    5  791ms
+BTC/USDT          Bitcoin to Tether     OKX         ₮  66.71575K      0.15   15  1.01s
+RIF/BTC           RIF to Bitcoin        Binance     ₿ 380.00000p      1     100  690ms
+RIF/USDT    MA    RIF to Tether         Binance     ₮  33.23568m      1     100  699ms
+RIF/USDT    MA2   RIF to Tether         Binance     ₮  33.23451m      1     100  664ms
+RIF/USDT    MA3   RIF to Tether         Binance     ₮  33.26227m      1     100  656ms
+RIF/USDT    mp1%  To move the price 1%  Binance     ₮  40.51633K      1     100  610ms
+RIF/USDT          RIF to Tether         Binance     ₮  33.20000m      1     100  682ms
+USDT/USD          Tether to Dollar      Bitstamp    $ 999.63000m      0.15   15  671ms
+USDT/USD          Tether to Dollar      Coinbase    $ 999.64000m      0.35   35  819ms
+USDT/USD          Tether to Dollar      Gemini      $ 999.49500m      0.15   15  1.01s
+USDT/USD          Tether to Dollar      Kraken      $ 999.68500m      0.35   35  650ms
 
-    Coin pair             Mediam          Mean    Weighted median  Sources    Ok
---  --------------  ------------  ------------  -----------------  ---------  ----
-↓   BTC/USD         67028.4       67050.9            67028.4       5 of 5     ✓
-↓   BTC/USDT        67092.4       67092.4            67099         4 of 4     ✓
-↓   RIF/BTC             2.28e-06      2.28e-06           2.28e-06  1 of 1     ✓
-ƒ   RIF/USD             0.152825      0.152876           0.152825  N/A        ✓
-ƒ   RIF/USD(B)          0.152825      0.152876           0.152825  N/A        ✓
-ƒ   RIF/USD(T)          0.152274      0.152272           0.152274  N/A        ✓
-ƒ   RIF/USD(TB)         0.152255      0.152306           0.15224   N/A        ✓
-ƒ   RIF/USD(WMTB)       0.152397      0.152448           0.152386  N/A        ✓
-↓   RIF/USDT            0.1524        0.1524             0.1524    1 of 1     ✓
-↓   RIF/USDT(MA)        0.152528      0.152528           0.152528  1 of 1     ✓
-↓   RIF/USDT(MA2)       0.152522      0.152522           0.152522  1 of 1     ✓
-↓   RIF/USDT(MA3)       0.152414      0.152414           0.152414  1 of 1     ✓
-↓   RIF/USDT(mp1%)  53382.9       53382.9            53382.9       1 of 1     ✓
-↓   USDT/USD            0.999175      0.999158           0.999175  3 of 3     ✓
+    Coinpair                Value   Sources count    Ok   Time
+--  --------------  -------------  ---------------  ----  ------
+⇓   BTC/USD         66,680.000000      5 of 5        ✓    1.03s
+⇓   BTC/USDT        66,707.125000      5 of 5        ✓    1.01s
+↓   RIF/BTC          3.800 × 10⁻⁷      1 of 1        ✓    690ms
+ƒ   RIF/USD              0.025338        N/A         ✓    <10ms
+ƒ   RIF/USD(B)           0.025338        N/A         ✓    <10ms
+ƒ   RIF/USD(T)           0.033187        N/A         ✓    <10ms
+ƒ   RIF/USD(TB)          0.033186        N/A         ✓    <10ms
+ƒ   RIF/USD(TBMA)        0.033222        N/A         ✓    <10ms
+ƒ   RIF/USD(TMA)         0.033222        N/A         ✓    <10ms
+ƒ   RIF/USD(TMA2)        0.033221        N/A         ✓    <10ms
+ƒ   RIF/USD(TMA3)        0.033249        N/A         ✓    <10ms
+ƒ   RIF/USD(WMTB)        0.031224        N/A         ✓    <10ms
+↓   RIF/USDT             0.033200      1 of 1        ✓    682ms
+↓   RIF/USDT(MA)         0.033236      1 of 1        ✓    699ms
+↓   RIF/USDT(MA2)        0.033235      1 of 1        ✓    664ms
+↓   RIF/USDT(MA3)        0.033262      1 of 1        ✓    656ms
+↓   RIF/USDT(mp1%)  40,516.325400      1 of 1        ✓    610ms
+⇓   USDT/USD             0.999596      4 of 4        ✓    1.01s
 
-Response time 4.39s
+Response time 1.28s
 
 user@workstation:~$
 ```

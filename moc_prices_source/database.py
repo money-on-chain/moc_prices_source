@@ -1,25 +1,20 @@
-import datetime, sys
+import datetime
 from influxdb import InfluxDBClient
 from os.path import dirname, abspath
-
-bkpath   = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
-
-from moc_prices_source.conf import get
-from moc_prices_source.my_logging import make_log, INFO, DEBUG, VERBOSE
-
-sys.path = bkpath
+from .conf import get
+from .my_logging import get_logger 
 
 
-DEBUG = False
 
+DEBUG_MODE = False
+ENABLED_COIRRECTION_TO_GMT = True
 
-to_gmt = int(round(float((datetime.datetime.utcnow() -
-                          datetime.datetime.now()).seconds)/3600))
-if to_gmt==24:
-    to_gmt=0
-
+to_gmt=0
+if ENABLED_COIRRECTION_TO_GMT:
+    to_gmt = int(round(float((datetime.datetime.utcnow() -
+                              datetime.datetime.now()).seconds)/3600))
+    if to_gmt==24:
+        to_gmt=0
 
 db_conf = None
 envs = {}
@@ -46,20 +41,18 @@ kargs = dict(
 get(**kargs)
 
 
-
-
 class Database(object):
 
     def __init__(self, name, **kargs):
 
-        self._log = make_log('database')
+        self._log = get_logger('database')
 
         self.name = name
         
         str_kargs = ', '.join( [f"{k}: {v}" for k, v in kargs.items()])
         self._log.info(f'Try to connect to InfluxDB... ({str_kargs})')
 
-        if not DEBUG:
+        if not DEBUG_MODE:
             try:
                 self.client = InfluxDBClient(**kargs)
                 if not self.name in [ d['name'] for d in self.client.get_list_database() ]:
@@ -97,7 +90,7 @@ class Database(object):
         body = []
         body.append(item)
 
-        if DEBUG:
+        if DEBUG_MODE:
             return
         
         out = self.client.write_points(body, time_precision='s')
@@ -230,14 +223,3 @@ class Database(object):
 
 def make_db_conn():
     return Database(**db_conf)
-
-
-
-if __name__ == '__main__':
-
-    print("File: {}, Ok!".format(repr(__file__)))
-    print("Config file: {}, Ok!".format(repr(config_file)))
-    try:
-        database = make_db_conn()
-    except Exception as e:
-        exit(0)

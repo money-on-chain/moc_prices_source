@@ -13,3 +13,6 @@ flask-restx
 flask_cors
 cachelib
 flask_caching
+eth-utils
+eth-abi
+python-dotenv>=1.0.0

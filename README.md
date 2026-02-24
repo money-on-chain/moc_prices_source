@@ -10,10 +10,7 @@ This package includes a CLI tool that allows you to query the coinpair values in
 A simple example, do some imports first
 
 ```python
-user@host:~$ python3
-Python 3.8.5 (default, Jul 28 2020, 12:59:40) 
-[GCC 9.3.0] on linux
-Type "help", "copyright", "credits" or "license" for more information.
+user@host:~$ python3 -q
 >>> from moc_prices_source import get_price, BTC_USD
 >>>
 ```
@@ -22,7 +19,7 @@ Get de `BTC/USD` coin pair
 
 ```python
 >>> get_price(BTC_USD)
-Decimal('29395.82')
+Decimal('89561.50000')
 >>> 
 ```
 
@@ -37,21 +34,30 @@ More [usage examples](docs/examples.md) can be seen [here](docs/examples.md)
 Here you can see how the output of the `moc_prices_source_check` command looks like
 
 ```shell
-user@host:~$ moc_prices_source_check "BTC/USD"
+user@host:~$ moc_prices_source_check "BTC/USD*"
 
-From     To      V.    Exchnage    Response        Weight    %  Time
--------  ------  ----  ----------  ------------  --------  ---  ------
-Bitcoin  Dollar        Bitfinex    $  67.10800K      0.18   18  1.64s
-Bitcoin  Dollar        Bitstamp    $  66.99300K      0.22   22  1.82s
-Bitcoin  Dollar        Coinbase    $  66.98946K      0.25   25  1.42s
-Bitcoin  Dollar        Gemini      $  67.01356K      0.17   17  2.05s
-Bitcoin  Dollar        Kraken      $  67.00500K      0.18   18  1.64s
+Coinpair    V.    Short description    Exchnage     Response        Weight    %  Time
+----------  ----  -------------------  -----------  ------------  --------  ---  ------
+BTC/USD     och   Bitcoin to Dollar    MOC onchain  $  89.08900K      1     100  1.66s
+BTC/USD           Bitcoin to Dollar    Bitfinex     $  89.18400K      0.18   18  214ms
+BTC/USD           Bitcoin to Dollar    Bitstamp     $  89.06700K      0.22   22  553ms
+BTC/USD           Bitcoin to Dollar    Coinbase     $  89.06769K      0.25   25  261ms
+BTC/USD           Bitcoin to Dollar    Gemini       $  89.05753K      0.17   17  787ms
+BTC/USD           Bitcoin to Dollar    Kraken       $  89.05310K      0.18   18  226ms
+BTC/USDT          Bitcoin to Tether    Binance      ₮  89.19590K      0.65   65  374ms
+BTC/USDT          Bitcoin to Tether    Bybit        ₮  89.19105K      0.1    10  467ms
+BTC/USDT          Bitcoin to Tether    Huobi        ₮  89.19650K      0.05    5  472ms
+BTC/USDT          Bitcoin to Tether    KuCoin       ₮  89.19595K      0.05    5  756ms
+BTC/USDT          Bitcoin to Tether    OKX          ₮  89.19965K      0.15   15  759ms
 
-    Coin pair      Mediam     Mean    Weighted median  Sources    Ok
---  -----------  --------  -------  -----------------  ---------  ----
-↓   BTC/USD         67005  67021.8              67005  5 of 5     ✓
+    Coinpair              Value   Sources count    Ok   Time
+--  ------------  -------------  ---------------  ----  ------
+⇓   BTC/USD       89,067.000000      5 of 5        ✓    787ms
+ƒ   BTC/USD(24h)        ▼ 0.25%        N/A         ✓    2.66s
+⛓   BTC/USD(och)  89,089.000000      1 of 1        ✓    1.66s
+⇓   BTC/USDT      89,195.905000      5 of 5        ✓    759ms
 
-Response time 2.06s
+Response time 4.36s
 
 user@host:~$ 
 ```

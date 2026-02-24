@@ -1,23 +1,18 @@
-import datetime, requests, sys
+import datetime, requests
 from os.path import dirname, abspath
 from json import load, dumps, loads
 from json.decoder import JSONDecodeError
 from sys import stderr
-from statistics import median, mean
+from statistics import median as median_base
+from statistics import mean as mean_base
 from tabulate import tabulate
 from decimal import Decimal
 from os import environ
+from .conf import get
 
-bkpath   = sys.path[:]
-base_dir = dirname(abspath(__file__))
-sys.path.insert(0, dirname(base_dir))
 
-from moc_prices_source.conf import get
-
-sys.path = bkpath
 
 env_pre = 'MOC_PRICES_SOURCE'
-
 on_remote_differences_options = ['halt', 'error', 'remote', 'local']
 
 enabled = None
@@ -202,6 +197,8 @@ weighing = Weighing()
 
 def weighted_median(values, weights):
 
+    is_bool = all([v in [True, False] for v in values])
+
     if not all(weights):
         non_zero = [(v, w) for (v, w) in zip(values, weights) if w]
         values = [v for (v, w) in non_zero]
@@ -229,7 +226,12 @@ def weighted_median(values, weights):
     if isinstance(b, Decimal) and not isinstance(q, Decimal):
         q = Decimal(q)      
     
-    return (a * p) + (b * q)
+    value = (a * p) + (b * q)
+    
+    if is_bool:
+        value = bool(value>Decimal('0.5'))
+
+    return value
 
 
 def weighted_median_idx(values, weights):
@@ -266,12 +268,17 @@ def weighted_median_idx(values, weights):
     return sorted_tuples[-1][2]
 
 
+def median(*args):
+    data = args[0] if len(args)==1 and isinstance(args[0], list) else args
+    value = median_base(data)
+    if all([(v is True or v is False) for v in data]):
+        value = bool(value>0.5)
+    return value
 
-if __name__ == '__main__':
-    print("File: {}, Ok!".format(repr(__file__)))
-    print("Config file: {}".format(repr(filename)))
-    print()
-    print('weighing.as_dict = {}'.format(repr(weighing.as_dict)))
-    print()
-    print(weighing)
-    print()
+
+def mean(*args):
+    data = args[0] if len(args)==1 and isinstance(args[0], list) else args
+    value = mean_base(data)
+    if all([(v is True or v is False) for v in data]):
+        value = bool(value>0.5)
+    return value
