@@ -142,15 +142,15 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | RIF/USD(B)     | Passing through Bitcoin                                                |
 | RIF/USD(T)     | Passing through Tether                                                 |
 | RIF/USD(TB)    | Passing through Tether & Bitcoin                                       |
-| RIF/USD(TBMA)  | Passing through Tether & Bitcoin, using [WDAP](fundamentals/wdap.md)   |
-| RIF/USD(TMA)   | Passing through Tether, using [WDAP](fundamentals/wdap.md), 100k depth |
-| RIF/USD(TMA2)  | Passing through Tether, using [WDAP](fundamentals/wdap.md), 200k depth |
-| RIF/USD(TMA3)  | Passing through Tether, using [WDAP](fundamentals/wdap.md), 600k depth |
+| RIF/USD(TBMA)  | Passing through Tether & Bitcoin, using [DWAP](fundamentals/dwap.md)   |
+| RIF/USD(TMA)   | Passing through Tether, using [DWAP](fundamentals/dwap.md), 100k depth |
+| RIF/USD(TMA2)  | Passing through Tether, using [DWAP](fundamentals/dwap.md), 200k depth |
+| RIF/USD(TMA3)  | Passing through Tether, using [DWAP](fundamentals/dwap.md), 600k depth |
 | RIF/USD(WMTB)  | Passing through Tether & Bitcoin using weighted median                 |
 | RIF/USDT       |                                                                        |
-| RIF/USDT(MA)   | Using [WDAP](fundamentals/wdap.md), 100k depth                         |
-| RIF/USDT(MA2)  | Using [WDAP](fundamentals/wdap.md), 200k depth                         |
-| RIF/USDT(MA3)  | Using [WDAP](fundamentals/wdap.md), 600k depth                         |
+| RIF/USDT(MA)   | Using [DWAP](fundamentals/dwap.md), 100k depth                         |
+| RIF/USDT(MA2)  | Using [DWAP](fundamentals/dwap.md), 200k depth                         |
+| RIF/USDT(MA3)  | Using [DWAP](fundamentals/dwap.md), 600k depth                         |
 | RIF/USDT(mp1%) | To move the price 1 percent                                            |
 | USD/ARS        | Free, from press portals                                               |
 | USD/ARS(CCB)   | Paid in Bitcoin                                                        |
