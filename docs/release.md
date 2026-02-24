@@ -16,7 +16,7 @@ This summary is based on the repository history from [v0.7.3](https://github.com
 
 ### September–November 2025
 
-- Major work around **RIF/USD [Weighted Depth Average Price (WDAP)](https://github.com/money-on-chain/moc_prices_source/tree/master/docs/fundamentals/wdap.md) variants** (`TMA`, `TBMA`) and related monitoring/documentation updates.
+- Major work around **RIF/USD [Depth Weighted Average Price (DWAP)](https://github.com/money-on-chain/moc_prices_source/tree/master/docs/fundamentals/dwap.md) variants** (`TMA`, `TBMA`) and related monitoring/documentation updates.
 - Expanded reporting and source updates for `BTC/USDT` and `USDT/USD` price feeds.
 - Hardening against exchange/API issues (e.g., Bybit API restrictions, URI and engine handling updates).
 - Improvements in on-chain reliability and HTTP provider behavior.

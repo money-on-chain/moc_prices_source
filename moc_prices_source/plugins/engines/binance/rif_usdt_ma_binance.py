@@ -24,7 +24,7 @@ class Engine(BaseWithFailover):
     def _map(self, data: Dict[str, List[List[Any]]]
              ) -> Dict[str, Optional[Decimal]]:
         """
-        Compute WDAP up to self._max_quantity on both sides of the order book.
+        Compute DWAP up to self._max_quantity on both sides of the order book.
 
         Expected input:
             data = {
@@ -32,7 +32,7 @@ class Engine(BaseWithFailover):
                 "bids": [[price, qty], ...],  # best bid (unsorted)
             }
         
-        Reference in `docs/fundamentals/wdap.md`
+        Reference in `docs/fundamentals/dwap.md`
         """
         types_ = ['asks', 'bids']
         if all(map(lambda t: isinstance(data.get(t), list

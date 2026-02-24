@@ -50,13 +50,13 @@ depth_2 = f"{int(depth_2/1000)}k"
 depth_3 = f"{int(depth_3/1000)}k"
 
 RIF_USDT_MA = CoinPair(RIF, USDT, "MA",
-    f"Using [WDAP](fundamentals/wdap.md), {depth} depth")
+    f"Using [DWAP](fundamentals/dwap.md), {depth} depth")
 
 RIF_USDT_MA2 = CoinPair(RIF, USDT, "MA2",
-    f"Using [WDAP](fundamentals/wdap.md), {depth_2} depth")
+    f"Using [DWAP](fundamentals/dwap.md), {depth_2} depth")
 
 RIF_USDT_MA3 = CoinPair(RIF, USDT, "MA3",
-    f"Using [WDAP](fundamentals/wdap.md), {depth_3} depth")
+    f"Using [DWAP](fundamentals/dwap.md), {depth_3} depth")
 
 # USD/ARS
 USD_ARS = CoinPair(USD, ARS, min_ok_sources_count=1,
