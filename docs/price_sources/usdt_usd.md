@@ -1,6 +1,6 @@
 # Report – USDT/USD price sources
 
-Last Reviewed on 2025-09-23
+Last Reviewed on 2026-03-03
 
 ---
 
