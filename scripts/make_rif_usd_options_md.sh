@@ -75,9 +75,11 @@ We have selected **RIF/USD(TMA)** as the official price source for the \`RIF/USD
 
 ![usdt_usd_comparison_2026-03-03.jpg](images/usdt_usd_comparison_2026-03-03.jpg)
 
-(¹) It is the same data for \`USDT/USD\` weighted median
+_Example data from 2026-03-03_
 
-(²) Respond to the formula \`BTC/USD\` ÷ \`BTC/USDT\`
+(¹) _It is the same data for \`USDT/USD\` weighted median_
+
+(²) _Respond to the formula \`BTC/USD\` ÷ \`BTC/USDT\`_
 
 
 ---
