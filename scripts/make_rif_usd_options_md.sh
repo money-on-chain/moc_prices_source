@@ -40,7 +40,7 @@ report () {
     cat <<EOL
 # **Options for the \`RIF/USD\` price source**
 
-Date: **$DATE**
+Last Reviewed on **$DATE**
 
 
 

@@ -1,6 +1,6 @@
 # **Options for the `RIF/USD` price source**
 
-Date: **2026-03-03**
+Last Reviewed on **2026-03-03**
 
 
 
@@ -233,51 +233,51 @@ user@workstation:~$ moc_prices_source_check "RIF/USD*"
 
 Coinpair    V.    Short description     Exchnage    Response        Weight    %  Time
 ----------  ----  --------------------  ----------  ------------  --------  ---  ------
-BTC/USD           Bitcoin to Dollar     Bitfinex    $  68.55100K      0.18   18  4.18s
-BTC/USD           Bitcoin to Dollar     Bitstamp    $  68.51200K      0.22   22  353ms
-BTC/USD           Bitcoin to Dollar     Coinbase    $  68.50812K      0.25   25  983ms
-BTC/USD           Bitcoin to Dollar     Gemini      $  68.51400K      0.17   17  988ms
-BTC/USD           Bitcoin to Dollar     Kraken      $  68.50540K      0.18   18  479ms
-BTC/USDT          Bitcoin to Tether     Binance     ₮  68.49696K      0.65   65  390ms
-BTC/USDT          Bitcoin to Tether     Bybit       ₮  68.49305K      0.1    10  445ms
-BTC/USDT          Bitcoin to Tether     Huobi       ₮  68.48939K      0.05    5  584ms
-BTC/USDT          Bitcoin to Tether     KuCoin      ₮  68.48935K      0.05    5  720ms
-BTC/USDT          Bitcoin to Tether     OKX         ₮  68.49155K      0.15   15  723ms
-RIF/BTC           RIF to Bitcoin        Binance     ₿ 380.00000p      1     100  401ms
-RIF/USDT    MA    RIF to Tether         Binance     ₮  31.15000m      1     100  395ms
-RIF/USDT    MA2   RIF to Tether         Binance     ₮  31.15823m      1     100  396ms
-RIF/USDT    MA3   RIF to Tether         Binance     ₮  31.15274m      1     100  383ms
-RIF/USDT    mp1%  To move the price 1%  Binance     ₮  48.41397K      1     100  329ms
-RIF/USDT          RIF to Tether         Binance     ₮  31.20000m      1     100  382ms
-USDT/USD          Tether to Dollar      Bitstamp    $   1.00005       0.15   15  342ms
-USDT/USD          Tether to Dollar      Coinbase    $   1.00012       0.35   35  507ms
-USDT/USD          Tether to Dollar      Gemini      $ 999.95500m      0.15   15  970ms
-USDT/USD          Tether to Dollar      Kraken      $ 999.96500m      0.35   35  526ms
+BTC/USD           Bitcoin to Dollar     Bitfinex    $  68.48000K      0.18   18  206ms
+BTC/USD           Bitcoin to Dollar     Bitstamp    $  68.43800K      0.22   22  344ms
+BTC/USD           Bitcoin to Dollar     Coinbase    $  68.43358K      0.25   25  1.09s
+BTC/USD           Bitcoin to Dollar     Gemini      $  68.45960K      0.17   17  885ms
+BTC/USD           Bitcoin to Dollar     Kraken      $  68.43070K      0.18   18  669ms
+BTC/USDT          Bitcoin to Tether     Binance     ₮  68.42392K      0.65   65  395ms
+BTC/USDT          Bitcoin to Tether     Bybit       ₮  68.42105K      0.1    10  457ms
+BTC/USDT          Bitcoin to Tether     Huobi       ₮  68.42422K      0.05    5  657ms
+BTC/USDT          Bitcoin to Tether     KuCoin      ₮  68.42395K      0.05    5  900ms
+BTC/USDT          Bitcoin to Tether     OKX         ₮  68.41785K      0.15   15  902ms
+RIF/BTC           RIF to Bitcoin        Binance     ₿ 380.00000p      1     100  376ms
+RIF/USDT    MA    RIF to Tether         Binance     ₮  31.05000m      1     100  381ms
+RIF/USDT    MA2   RIF to Tether         Binance     ₮  31.04945m      1     100  390ms
+RIF/USDT    MA3   RIF to Tether         Binance     ₮  31.04982m      1     100  380ms
+RIF/USDT    mp1%  To move the price 1%  Binance     ₮  49.67928K      1     100  334ms
+RIF/USDT          RIF to Tether         Binance     ₮  31.10000m      1     100  379ms
+USDT/USD          Tether to Dollar      Bitstamp    $   1.00005       0.15   15  1.08s
+USDT/USD          Tether to Dollar      Coinbase    $   1.00010       0.35   35  627ms
+USDT/USD          Tether to Dollar      Gemini      $ 999.95500m      0.15   15  885ms
+USDT/USD          Tether to Dollar      Kraken      $ 999.96500m      0.35   35  611ms
 
     Coinpair                Value   Sources count    Ok   Time
 --  --------------  -------------  ---------------  ----  ------
-⇓   BTC/USD         68,512.000000      5 of 5        ✓    4.18s
-⇓   BTC/USDT        68,496.965000      5 of 5        ✓    723ms
-↓   RIF/BTC          3.800 × 10⁻⁷      1 of 1        ✓    401ms
-ƒ   RIF/USD              0.026035        N/A         ✓    <10ms
-ƒ   RIF/USD(B)           0.026035        N/A         ✓    <10ms
-ƒ   RIF/USD(T)           0.031199        N/A         ✓    <10ms
-ƒ   RIF/USD(TB)          0.031207        N/A         ✓    <10ms
-ƒ   RIF/USD(TBMA)        0.031157        N/A         ✓    <10ms
-ƒ   RIF/USD(TBMA2)       0.031165        N/A         ✓    <10ms
-ƒ   RIF/USD(TBMA3)       0.031160        N/A         ✓    <10ms
-ƒ   RIF/USD(TMA)         0.031149        N/A         ✓    <10ms
-ƒ   RIF/USD(TMA2)        0.031157        N/A         ✓    <10ms
-ƒ   RIF/USD(TMA3)        0.031152        N/A         ✓    <10ms
-ƒ   RIF/USD(WMTB)        0.029914        N/A         ✓    <10ms
-↓   RIF/USDT             0.031200      1 of 1        ✓    382ms
-↓   RIF/USDT(MA)         0.031150      1 of 1        ✓    395ms
-↓   RIF/USDT(MA2)        0.031158      1 of 1        ✓    396ms
-↓   RIF/USDT(MA3)        0.031153      1 of 1        ✓    383ms
-↓   RIF/USDT(mp1%)  48,413.969600      1 of 1        ✓    329ms
-⇓   USDT/USD             0.999962      4 of 4        ✓    970ms
+⇓   BTC/USD         68,438.000000      5 of 5        ✓    1.09s
+⇓   BTC/USDT        68,423.925000      5 of 5        ✓    902ms
+↓   RIF/BTC          3.800 × 10⁻⁷      1 of 1        ✓    376ms
+ƒ   RIF/USD              0.026006        N/A         ✓    <10ms
+ƒ   RIF/USD(B)           0.026006        N/A         ✓    <10ms
+ƒ   RIF/USD(T)           0.031099        N/A         ✓    <10ms
+ƒ   RIF/USD(TB)          0.031106        N/A         ✓    <10ms
+ƒ   RIF/USD(TBMA)        0.031056        N/A         ✓    <10ms
+ƒ   RIF/USD(TBMA2)       0.031056        N/A         ✓    <10ms
+ƒ   RIF/USD(TBMA3)       0.031056        N/A         ✓    <10ms
+ƒ   RIF/USD(TMA)         0.031049        N/A         ✓    <10ms
+ƒ   RIF/USD(TMA2)        0.031048        N/A         ✓    <10ms
+ƒ   RIF/USD(TMA3)        0.031049        N/A         ✓    <10ms
+ƒ   RIF/USD(WMTB)        0.029831        N/A         ✓    <10ms
+↓   RIF/USDT             0.031100      1 of 1        ✓    379ms
+↓   RIF/USDT(MA)         0.031050      1 of 1        ✓    381ms
+↓   RIF/USDT(MA2)        0.031049      1 of 1        ✓    390ms
+↓   RIF/USDT(MA3)        0.031050      1 of 1        ✓    380ms
+↓   RIF/USDT(mp1%)  49,679.277200      1 of 1        ✓    334ms
+⇓   USDT/USD             0.999962      4 of 4        ✓    1.08s
 
-Response time 4.22s
+Response time 1.13s
 
 user@workstation:~$
 ```
