@@ -1,3 +1,4 @@
+import ast
 from os import getenv
 from decimal import Decimal
 from fnmatch import fnmatch as match
@@ -90,7 +91,11 @@ class HashMethod():
 
     def __call__(self, x) -> None:
         self.out = []
-        for key, value in eval(x):
+        try:
+            values = ast.literal_eval(x)
+        except (ValueError, SyntaxError):
+            values = []
+        for key, value in values:
             key=str(key).strip().lower()
             if key in self.options:
                 value=str(value).strip().lower()
@@ -472,4 +477,5 @@ def server_cli(host, port):
 
 
 if __name__ == '__main__':
-    main(debug=True)
+    debug_env = str(getenv('FLASK_DEBUG', '')).strip().lower()
+    main(debug=debug_env in ('1', 'true', 'yes', 'on'))
