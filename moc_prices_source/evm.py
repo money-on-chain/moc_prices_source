@@ -280,7 +280,7 @@ class Address(str):
             if len(addr) != 40:
                 raise ValueError('addr has less o more than 40 digits')
 
-        addr = Web3.to_checksum_address('0x' + addr.lower())
+        addr = '0x' + addr.lower()
 
         return super().__new__(cls, addr)
 
