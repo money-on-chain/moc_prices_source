@@ -489,7 +489,6 @@ class Multicall():
             raise ValueError('Invalid RPC URI or Web3 object or EVM object')
         self.web3: Web3 = self.evm.web3
         self.address = Address(address)
-        self._already_been_executed_once = {}
         self.clear_calls()
 
     def clear_calls(self):
