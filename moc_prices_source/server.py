@@ -1,5 +1,4 @@
 import ast
-from os import getenv
 from decimal import Decimal
 from fnmatch import fnmatch as match
 from tabulate import tabulate
@@ -48,6 +47,7 @@ all_coinpairs = list([str(x) for x in AllCoinPairs])
 all_coinpairs.sort()
 max_coinpair_limit = envs(
     'MAX_COINPAIR_LIMIT', 12, envs.types.positive_integer)
+flask_debug = envs('FLASK_DEBUG', False, envs.types.bool)
 
 
 cache = Cache()
@@ -658,10 +658,9 @@ def server_cli(host, port, show_envs=False):
     if show_envs:
         print(envs)
         return
-    main(host=host, port=port)
+    main(debug=flask_debug, host=host, port=port)
 
 
 
 if __name__ == '__main__':
-    debug_env = str(getenv('FLASK_DEBUG', '')).strip().lower()
-    main(debug=debug_env in ('1', 'true', 'yes', 'on'))
+    main(debug=flask_debug)
