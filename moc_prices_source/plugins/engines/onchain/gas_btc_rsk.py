@@ -1,9 +1,9 @@
 from ...pairs.onchain import GAS_BTC
-from ...base import BaseOnChain, engine_register, EVM, Decimal
+from ...base import BaseOnChain, Engines, EVM, Decimal
 
 
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(BaseOnChain):
 
     _description = "RSK onchain"

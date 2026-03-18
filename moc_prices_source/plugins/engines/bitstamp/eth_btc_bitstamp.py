@@ -1,9 +1,9 @@
 from ...pairs.simple import ETH_BTC
-from ...base import Base, engine_register
+from ...base import Base, Engines
 
 
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(Base):
 
     _description = "Bitstamp"

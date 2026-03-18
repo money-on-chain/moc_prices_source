@@ -1,16 +1,15 @@
 from typing import Dict, List, Any, Optional
 from ...pairs.simple import RIF_USDT_MA
-from ...base import BaseWithFailover, engine_register, get_env, Decimal
-from ....types import Bool
+from ...base import Decimal, BaseWithFailover, Engines, envs
 
 
 
 # Some params
 base_uri = "https://{}/api/v3/depth?symbol=RIFUSDT"
-max_quantity = Decimal(get_env('MA_MAX_QUANTITY', 100000, int))
-allow_degraded = bool(get_env('MA_ALLOW_DEGRADED', False, Bool.from_string))
+max_quantity = Decimal(envs.value_of('RIF_USD_MA_DEPTH'))
+allow_degraded = envs('MA_ALLOW_DEGRADED', False, bool)
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(BaseWithFailover):
 
     _description = "Binance"
@@ -25,7 +24,7 @@ class Engine(BaseWithFailover):
     def _map(self, data: Dict[str, List[List[Any]]]
              ) -> Dict[str, Optional[Decimal]]:
         """
-        Compute WDAP up to self._max_quantity on both sides of the order book.
+        Compute DWAP up to self._max_quantity on both sides of the order book.
 
         Expected input:
             data = {
@@ -33,7 +32,7 @@ class Engine(BaseWithFailover):
                 "bids": [[price, qty], ...],  # best bid (unsorted)
             }
         
-        Reference in `docs/fundamentals/wdap.md`
+        Reference in `docs/fundamentals/dwap.md`
         """
         types_ = ['asks', 'bids']
         if all(map(lambda t: isinstance(data.get(t), list

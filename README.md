@@ -19,7 +19,7 @@ Get de `BTC/USD` coin pair
 
 ```python
 >>> get_price(BTC_USD)
-Decimal('97467.53')
+Decimal('89561.50000')
 >>> 
 ```
 
@@ -34,21 +34,30 @@ More [usage examples](docs/examples.md) can be seen [here](docs/examples.md)
 Here you can see how the output of the `moc_prices_source_check` command looks like
 
 ```shell
-user@host:~$ moc_prices_source_check "BTC/USD"
+user@host:~$ moc_prices_source_check "BTC/USD*"
 
-Coinpair    V.    Short description    Exchnage    Response        Weight    %  Time
-----------  ----  -------------------  ----------  ------------  --------  ---  ------
-BTC/USD           Bitcoin to Dollar    Bitfinex    $  88.09500K      0.18   18  316ms
-BTC/USD           Bitcoin to Dollar    Bitstamp    $  88.01000K      0.22   22  363ms
-BTC/USD           Bitcoin to Dollar    Coinbase    $  87.94955K      0.25   25  811ms
-BTC/USD           Bitcoin to Dollar    Gemini      $  87.98747K      0.17   17  1.28s
-BTC/USD           Bitcoin to Dollar    Kraken      $  87.95270K      0.18   18  783ms
+Coinpair    V.    Short description    Exchnage     Response        Weight    %  Time
+----------  ----  -------------------  -----------  ------------  --------  ---  ------
+BTC/USD     och   Bitcoin to Dollar    MOC onchain  $  89.08900K      1     100  1.66s
+BTC/USD           Bitcoin to Dollar    Bitfinex     $  89.18400K      0.18   18  214ms
+BTC/USD           Bitcoin to Dollar    Bitstamp     $  89.06700K      0.22   22  553ms
+BTC/USD           Bitcoin to Dollar    Coinbase     $  89.06769K      0.25   25  261ms
+BTC/USD           Bitcoin to Dollar    Gemini       $  89.05753K      0.17   17  787ms
+BTC/USD           Bitcoin to Dollar    Kraken       $  89.05310K      0.18   18  226ms
+BTC/USDT          Bitcoin to Tether    Binance      ₮  89.19590K      0.65   65  374ms
+BTC/USDT          Bitcoin to Tether    Bybit        ₮  89.19105K      0.1    10  467ms
+BTC/USDT          Bitcoin to Tether    Huobi        ₮  89.19650K      0.05    5  472ms
+BTC/USDT          Bitcoin to Tether    KuCoin       ₮  89.19595K      0.05    5  756ms
+BTC/USDT          Bitcoin to Tether    OKX          ₮  89.19965K      0.15   15  759ms
 
-    Coinpair            Value   Sources count    Ok   Time
---  ----------  -------------  ---------------  ----  ------
-⇓   BTC/USD     87,987.470000      5 of 5        ✓    1.28s
+    Coinpair              Value   Sources count    Ok   Time
+--  ------------  -------------  ---------------  ----  ------
+⇓   BTC/USD       89,067.000000      5 of 5        ✓    787ms
+ƒ   BTC/USD(24h)        ▼ 0.25%        N/A         ✓    2.66s
+⛓   BTC/USD(och)  89,089.000000      1 of 1        ✓    1.66s
+⇓   BTC/USDT      89,195.905000      5 of 5        ✓    759ms
 
-Response time 1.29s
+Response time 4.36s
 
 user@host:~$ 
 ```

@@ -1,11 +1,11 @@
 from ....pairs.simple import USD_ARS_CCL
-from ....base import EngineWebScraping, engine_register, Decimal
+from ....base import EngineWebScraping, Engines, Decimal
 
 
 
 to_dec = lambda x: Decimal(str(x).replace('.', '').replace(',', '.'))
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(EngineWebScraping):
 
     _description = "Cronista.com"

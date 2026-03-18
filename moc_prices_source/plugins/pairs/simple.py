@@ -1,4 +1,4 @@
-from ..base import CoinPair, register_pairs, get_env
+from ..base import CoinPairs, CoinPair, envs
 from ..coins import ARS, BNB, BTC, COP, ETH, MXN, RIF, USD, USDT
 
 
@@ -10,11 +10,15 @@ BNB_USDT = CoinPair(BNB, USDT)
 
 # BTC/ARS
 BTC_ARS = CoinPair(BTC, ARS,
-    min_ok_sources_count=get_env('BTC_ARS_MIN_OK_SOURCES_COUNT', 3, int))
+    min_ok_sources_count=envs('BTC_ARS_MIN_OK_SOURCES_COUNT', 3,
+        envs.types.positive_integer,
+        description = "Minimum number of sources to consider BTC/ARS valid"))
 
 # BTC/COP
 BTC_COP = CoinPair(BTC, COP,
-    min_ok_sources_count=get_env('BTC_COP_MIN_OK_SOURCES_COUNT', 2, int))
+    min_ok_sources_count=envs('BTC_COP_MIN_OK_SOURCES_COUNT', 2,
+        envs.types.positive_integer,
+        description = "Minimum number of sources to consider BTC/COP valid"))
 
 # BTC/USD
 BTC_USD = CoinPair(BTC, USD, min_ok_sources_count=1)
@@ -33,9 +37,26 @@ RIF_BTC = CoinPair(RIF, BTC)
 
 # RIF/USDT
 RIF_USDT = CoinPair(RIF, USDT)
-RIF_USDT_MA = CoinPair(RIF, USDT, "MA", "Using [WDAP](fundamentals/wdap.md)")
-RIF_USDT_MA2 = CoinPair(RIF, USDT, "MA2")
-RIF_USDT_MA3 = CoinPair(RIF, USDT, "MA3")
+
+depth = envs('RIF_USD_MA_DEPTH', 100000, int,
+             description = "Depth in RIF for RIF/USDT(MA) or RIF/USD(MA)")
+depth_2 = envs('RIF_USD_MA2_DEPTH', 200000, int,
+               description = "Depth in RIF for RIF/USDT(MA2) or RIF/USD(MA2)")
+depth_3 = envs('RIF_USD_MA3_DEPTH', 600000, int,
+               description = "Depth in RIF for RIF/USDT(MA3) or RIF/USD(MA3)")
+
+depth = f"{int(depth/1000)}k"
+depth_2 = f"{int(depth_2/1000)}k"
+depth_3 = f"{int(depth_3/1000)}k"
+
+RIF_USDT_MA = CoinPair(RIF, USDT, "MA",
+    f"Using [DWAP](fundamentals/dwap.md), {depth} depth")
+
+RIF_USDT_MA2 = CoinPair(RIF, USDT, "MA2",
+    f"Using [DWAP](fundamentals/dwap.md), {depth_2} depth")
+
+RIF_USDT_MA3 = CoinPair(RIF, USDT, "MA3",
+    f"Using [DWAP](fundamentals/dwap.md), {depth_3} depth")
 
 # USD/ARS
 USD_ARS = CoinPair(USD, ARS, min_ok_sources_count=1,
@@ -52,4 +73,4 @@ USD_MXN = CoinPair(USD, MXN, min_ok_sources_count=1)
 # USDT/USD
 USDT_USD = CoinPair(USDT, USD, min_ok_sources_count=1)
 
-register_pairs()
+CoinPairs.register()

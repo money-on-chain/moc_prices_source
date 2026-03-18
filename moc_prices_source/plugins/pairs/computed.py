@@ -1,9 +1,10 @@
 from ...weighing import weighted_median
 from ...weighing import median as Median
-from ..base import CoinPair, Formula, register_pairs
+from ..base import CoinPairs, CoinPair, Formula, envs
 from ..coins import BTC, USD, RIF, MOC, ETH, USDT, BNB, ARS, COP, BPRO
 from .simple import BNB_USDT,  BTC_ARS, BTC_COP, BTC_USD, BTC_USDT, \
-    ETH_BTC, RIF_USDT, RIF_USDT_MA, USDT_USD, RIF_BTC
+    ETH_BTC, RIF_USDT, RIF_USDT_MA, RIF_USDT_MA2, RIF_USDT_MA3, USDT_USD, \
+    RIF_BTC
 from .onchain import BPRO_BTC, MOC_BTC_SOV, MOC_USD_OKU
 
 
@@ -90,16 +91,35 @@ RIF_USD_TB = CoinPair(RIF, USD, "TB",
 
 RIF_USD_TBMA = CoinPair(RIF, USD, "TBMA",
     description = "Passing through Tether & Bitcoin, "
-                  "using [WDAP](fundamentals/wdap.md)",
+                  "using [DWAP](fundamentals/dwap.md)",
     requirements = [RIF_USDT_MA, BTC_USD, BTC_USDT],
     formula = lambda rif_usdt_ma, btc_usd, btc_usdt\
         : rif_usdt_ma * btc_usd / btc_usdt)
 
+depth = f"{int(envs.value_of('RIF_USD_MA_DEPTH')/1000)}k"
+depth_2 = f"{int(envs.value_of('RIF_USD_MA2_DEPTH')/1000)}k"
+depth_3 = f"{int(envs.value_of('RIF_USD_MA3_DEPTH')/1000)}k"
+
 RIF_USD_TMA = CoinPair(RIF, USD, "TMA",
     description = "Passing through Tether, "
-                  "using [WDAP](fundamentals/wdap.md)",
+                  "using [DWAP](fundamentals/dwap.md)"
+                  f", {depth} depth",
     requirements = [RIF_USDT_MA, USDT_USD],
     formula = lambda rif_usdt_ma, usdt_usd: rif_usdt_ma * usdt_usd)
+
+RIF_USD_TMA2 = CoinPair(RIF, USD, "TMA2",
+    description = "Passing through Tether, "
+                  "using [DWAP](fundamentals/dwap.md)"
+                  f", {depth_2} depth",
+    requirements = [RIF_USDT_MA2, USDT_USD],
+    formula = lambda rif_usdt_ma2, usdt_usd: rif_usdt_ma2 * usdt_usd)
+
+RIF_USD_TMA3 = CoinPair(RIF, USD, "TMA3",
+    description = "Passing through Tether, "
+                  "using [DWAP](fundamentals/dwap.md)"
+                  f", {depth_3} depth",
+    requirements = [RIF_USDT_MA3, USDT_USD],
+    formula = lambda rif_usdt_ma3, usdt_usd: rif_usdt_ma3 * usdt_usd)
 
 class RIF_USD_WMTB_Formula(Formula):
     """
@@ -136,4 +156,4 @@ USDT_USD_B = CoinPair(USDT, USD, "B", "Passing through Bitcoin",
     requirements = [BTC_USD, BTC_USDT],
     formula = lambda btc_usd, btc_usdt: btc_usd / btc_usdt)
 
-register_pairs()
+CoinPairs.register()

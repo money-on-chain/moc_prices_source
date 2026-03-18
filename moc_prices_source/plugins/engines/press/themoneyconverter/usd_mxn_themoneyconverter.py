@@ -1,9 +1,9 @@
 from ....pairs.simple import USD_MXN
-from ....base import EngineWebScraping, engine_register, Decimal
+from ....base import EngineWebScraping, Engines, Decimal
 
 
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(EngineWebScraping):
 
     _description = "TheMoneyConverter.com"

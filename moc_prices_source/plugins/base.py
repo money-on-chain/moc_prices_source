@@ -10,7 +10,7 @@ from ..redis_conn import get_redis
 from ..evm import OneShotHTTPProvider, HTTPProvider, Web3, EVM, Address, \
     URI, get_addr_env, get_uri_env, get_node_rpc_uri_env, \
         get_multicall_addr_env
-from ..cli import get_env
+from ..my_envs import envs as envs
 from ..my_logging import WithLogger, get_logger
 from enum import Enum
 
@@ -27,6 +27,61 @@ class classproperty:
     def __get__(self, obj, owner):
         return self.func(owner)
 
+
+class TypedDict(dict):
+    
+    value_type = object  # override in subclasses
+
+    def _validate(self, key, value):
+        if not isinstance(value, self.value_type):
+            expected = (
+                self.value_type.__name__
+                if isinstance(self.value_type, type)
+                else ", ".join(t.__name__ for t in self.value_type)
+            )
+            raise TypeError(
+                f"Invalid value {value!r}: expected type {expected}"
+            )
+        return value
+
+    def __setitem__(self, key, value):
+        value = self._validate(key, value)
+        super().__setitem__(key, value)
+
+    def update(self, *args, **kwargs):
+        pre_items = dict(*args, **kwargs)
+        post_items = {}
+        for key, value in pre_items.items():
+            post_items[key] = self._validate(key, value)
+        super().update(post_items)
+
+
+class RegistryDict(TypedDict, WithLogger):
+
+    value_type = object  # override in subclasses
+
+    def __init__(self, *args, **kwargs):
+        self._callbacks = []
+        super().__init__(*args, **kwargs)
+
+    def register_callback(self, callback: Callable):
+        if callback not in self._callbacks:
+            self._callbacks.append(callback)
+        self.update(self)
+
+    def _validate(self, key, value):
+        value = super()._validate(key, value)
+        for callback in self._callbacks:
+            callback(self, key, value)
+        return value
+
+    def register(self):
+        for name, obj in currentframe().f_back.f_locals.items():
+            if isinstance(obj, self.value_type):
+                if not name in self:
+                    self[name] = obj
+                    get_logger(__name__).info(
+                        "Register %s %s", self.value_type.__name__, obj)
 
 
 class Coin(object):
@@ -77,14 +132,11 @@ class Coin(object):
         return hash(str(self))
 
 
-Coins = {}
+class RegistryCoins(RegistryDict):
+    value_type = Coin
 
-def register_coins():
-    for name, obj in currentframe().f_back.f_locals.items():
-        if isinstance(obj, Coin):
-            if not name in Coins:
-                Coins[name] = obj
-                get_logger(__name__).info("Register coin %s", obj)
+
+Coins = RegistryCoins()
 
 
 class CoinPairType(Enum):
@@ -303,14 +355,11 @@ class CoinPair(object):
         return hash(str(self))
 
 
-CoinPairs = {}
+class RegistryCoinPairs(RegistryDict):
+    value_type = CoinPair
 
-def register_pairs():
-    for name, obj in currentframe().f_back.f_locals.items():
-        if isinstance(obj, CoinPair):
-            if not name in CoinPairs:
-                CoinPairs[name] = obj
-                get_logger(__name__).info("Register coinpair %s", obj)
+
+CoinPairs = RegistryCoinPairs()
 
 
 class NoLiquidity(Exception):
@@ -839,19 +888,23 @@ class BaseOnChain(Base):
         return True
 
 
-Engines = {}
+class RegistryEngines(RegistryDict):
+    value_type = object #FIXME
+    
+    def register_decorator(self, name_id: Optional[str] = None):
+        def engine_register_base(cls: Base):
+            nonlocal name_id
+            if name_id is None:
+                name_id = Path(getfile(cls)).stem
+            get_logger(__name__).info(
+                "Register engine '%s' (coinpair='%s', description='%s')",
+                name_id, cls._coinpair, cls._description)
+            self[name_id] = cls
+            return cls
+        return engine_register_base
 
-def engine_register(name_id: Optional[str] = None):
-    def engine_register_base(cls: Base):
-        nonlocal name_id
-        if name_id is None:
-            name_id = Path(getfile(cls)).stem
-        get_logger(__name__).info(
-            "Register engine '%s' (coinpair='%s', description='%s')",
-            name_id, cls._coinpair, cls._description)
-        Engines[name_id] = cls
-        return cls
-    return engine_register_base
+
+Engines = RegistryEngines()
 
 
 class Formula(WithLogger):

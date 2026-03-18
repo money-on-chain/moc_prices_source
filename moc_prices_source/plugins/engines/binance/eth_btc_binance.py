@@ -1,11 +1,11 @@
 from ...pairs.simple import ETH_BTC
-from ...base import BaseWithFailover, engine_register
+from ...base import BaseWithFailover, Engines
 
 
 
 base_uri = "https://{}/api/v3/ticker/24hr?symbol=ETHBTC"
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(BaseWithFailover):
 
     _description = "Binance"

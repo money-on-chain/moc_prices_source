@@ -1,9 +1,9 @@
 from ...pairs.special import BLOCK_RSK
-from ...base import BaseOnChain, engine_register, EVM
+from ...base import BaseOnChain, Engines, EVM
 
 
 
-@engine_register()
+@Engines.register_decorator()
 class Engine(BaseOnChain):
 
     _description = "RSK onchain"
