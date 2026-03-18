@@ -660,6 +660,7 @@ eth-abi==5.2.0 \
     --hash=sha256:178703fa98c07d8eecd5ae569e7e8d159e493ebb6eeb534a8fe973fbc4e40ef0 \
     --hash=sha256:17abe47560ad753f18054f5b3089fcb588f3e3a092136a416b6c1502cb7e8877
     # via
+    #   -r requirements.txt
     #   eth-account
     #   web3
 eth-account==0.13.7 \
@@ -698,6 +699,7 @@ eth-utils==5.3.1 \
     --hash=sha256:1f5476d8f29588d25b8ae4987e1ffdfae6d4c09026e476c4aad13b32dda3ead0 \
     --hash=sha256:c94e2d2abd024a9a42023b4ddc1c645814ff3d6a737b33d5cfd890ebf159c2d1
     # via
+    #   -r requirements.txt
     #   eth-abi
     #   eth-account
     #   eth-keyfile
@@ -1668,6 +1670,10 @@ python-dateutil==2.9.0.post0 \
     --hash=sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3 \
     --hash=sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
     # via influxdb
+python-dotenv==1.2.2 \
+    --hash=sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a \
+    --hash=sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3
+    # via -r requirements.txt
 pytz==2026.1.post1 \
     --hash=sha256:3378dde6a0c3d26719182142c56e60c7f9af7e968076f31aae569d72a0358ee1 \
     --hash=sha256:f2fd16142fda348286a75e1a524be810bb05d444e5a081f37f7affc635035f7a
