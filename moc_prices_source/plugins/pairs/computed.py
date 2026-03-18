@@ -89,16 +89,33 @@ RIF_USD_TB = CoinPair(RIF, USD, "TB",
     formula = lambda rif_usdt, btc_usd, btc_usdt\
         : rif_usdt * btc_usd / btc_usdt)
 
+depth = f"{int(envs.value_of('RIF_USD_MA_DEPTH')/1000)}k"
+depth_2 = f"{int(envs.value_of('RIF_USD_MA2_DEPTH')/1000)}k"
+depth_3 = f"{int(envs.value_of('RIF_USD_MA3_DEPTH')/1000)}k"
+
 RIF_USD_TBMA = CoinPair(RIF, USD, "TBMA",
     description = "Passing through Tether & Bitcoin, "
-                  "using [DWAP](fundamentals/dwap.md)",
+                  "using [DWAP](fundamentals/dwap.md)"
+                  f", {depth} depth",
     requirements = [RIF_USDT_MA, BTC_USD, BTC_USDT],
     formula = lambda rif_usdt_ma, btc_usd, btc_usdt\
         : rif_usdt_ma * btc_usd / btc_usdt)
 
-depth = f"{int(envs.value_of('RIF_USD_MA_DEPTH')/1000)}k"
-depth_2 = f"{int(envs.value_of('RIF_USD_MA2_DEPTH')/1000)}k"
-depth_3 = f"{int(envs.value_of('RIF_USD_MA3_DEPTH')/1000)}k"
+RIF_USD_TBMA2 = CoinPair(RIF, USD, "TBMA2",
+    description = "Passing through Tether & Bitcoin, "
+                  "using [DWAP](fundamentals/dwap.md)"
+                  f", {depth_2} depth",
+    requirements = [RIF_USDT_MA2, BTC_USD, BTC_USDT],
+    formula = lambda rif_usdt_ma2, btc_usd, btc_usdt\
+        : rif_usdt_ma2 * btc_usd / btc_usdt)
+
+RIF_USD_TBMA3 = CoinPair(RIF, USD, "TBMA3",
+    description = "Passing through Tether & Bitcoin, "
+                  "using [DWAP](fundamentals/dwap.md)"
+                  f", {depth_3} depth",
+    requirements = [RIF_USDT_MA3, BTC_USD, BTC_USDT],
+    formula = lambda rif_usdt_ma3, btc_usd, btc_usdt\
+        : rif_usdt_ma3 * btc_usd / btc_usdt)
 
 RIF_USD_TMA = CoinPair(RIF, USD, "TMA",
     description = "Passing through Tether, "
