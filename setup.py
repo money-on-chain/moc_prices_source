@@ -49,13 +49,13 @@ setup(
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.8'
+        'Programming Language :: Python :: 3.12'
     ],
     package_data={
         "moc_prices_source": ["version.txt",
                               "data/*.json"]
     },
-    python_requires='>=3.8',
+    python_requires='>=3.12',
     install_requires=requirements,
     scripts=['moc_prices_source_check',
              'moc_prices_source_to_db',

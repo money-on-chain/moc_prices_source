@@ -1,3 +1,4 @@
+import ast
 from decimal import Decimal
 from fnmatch import fnmatch as match
 from tabulate import tabulate
@@ -46,6 +47,7 @@ all_coinpairs = list([str(x) for x in AllCoinPairs])
 all_coinpairs.sort()
 max_coinpair_limit = envs(
     'MAX_COINPAIR_LIMIT', 12, envs.types.positive_integer)
+flask_debug = envs('FLASK_DEBUG', False, envs.types.bool)
 
 
 cache = Cache()
@@ -148,7 +150,11 @@ class HashMethod():
 
     def __call__(self, x) -> None:
         self.out = []
-        for key, value in eval(x):
+        try:
+            values = ast.literal_eval(x)
+        except (ValueError, SyntaxError):
+            values = []
+        for key, value in values:
             key=str(key).strip().lower()
             if key in self.options:
                 value=str(value).strip().lower()
@@ -652,9 +658,9 @@ def server_cli(host, port, show_envs=False):
     if show_envs:
         print(envs)
         return
-    main(host=host, port=port)
+    main(debug=flask_debug, host=host, port=port)
 
 
 
 if __name__ == '__main__':
-    main(debug=True)
+    main(debug=flask_debug)
