@@ -843,6 +843,7 @@ class BaseOnChain(Base):
             start_time = datetime.datetime.now()
 
         price = None
+        self._clean_output_values()
 
         if self._redis is not None:
 
