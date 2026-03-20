@@ -36,7 +36,7 @@ with chain.rsk_testnet as network:
             env.default = 'rootstock_testnet'
         with network.env.mcg_addr as env:
             env.name = 'MULTI_COLLATERAL_GUARD_TESTNET_ADDR'
-            env.default = Address(0)
+            env.default = '0x0E6B7d25f2fD1847423D782942027b2f2eaC6DF4'
 
 # Initialize EVM instances and other network-specific settings
 
