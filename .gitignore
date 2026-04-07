@@ -9,6 +9,7 @@ __pycache__
 # Package stuff
 build/
 moneyonchain_prices_source.egg-info/
+moc_prices_source.egg-info/
 dist/
 
 # Virtual env stuff
