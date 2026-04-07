@@ -173,4 +173,12 @@ USDT_USD_B = CoinPair(USDT, USD, "B", "Passing through Bitcoin",
     requirements = [BTC_USD, BTC_USDT],
     formula = lambda btc_usd, btc_usdt: btc_usd / btc_usdt)
 
+# RIF/MOC
+RIF_MOC = CoinPair(RIF, MOC,
+    description = f"Use RIF/USDT(MA) {depth} depth, USDT/USD and "
+                  "MOC/USD(Oku)",
+    requirements = [RIF_USDT_MA, USDT_USD, MOC_USD_OKU],
+    formula = lambda rif_usdt_ma, usdt_usd, moc_usd_oku \
+        : rif_usdt_ma * usdt_usd / moc_usd_oku)
+
 CoinPairs.register()

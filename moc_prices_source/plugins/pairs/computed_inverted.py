@@ -9,7 +9,7 @@ from ..pairs.special import BLOCK_RSK
 
 # Pairs to invert
 wildcard_pairs_to_invert_include = envs(
-    'AUTO_INVERT_PAIRS_WILDCARD_INCLUDE', 'btc/*,bpro/*,moc/*,*(ccb)',
+    'AUTO_INVERT_PAIRS_WILDCARD_INCLUDE', 'btc/*,bpro/*,moc/*,*(ccb),rif/moc',
     description = "Willcards that match pairs to include their reversed pair")
 wildcard_pairs_to_invert_exclude = envs(
     'AUTO_INVERT_PAIRS_WILDCARD_EXCLUDE', 'btc/*(*),bpro/*(*),moc/*(*)',
