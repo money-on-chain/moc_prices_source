@@ -123,7 +123,7 @@ if chain.rsk_mainnet.enabled and chain.rsk_mainnet.mcg_addr!=Address(0):
 
     ISLIQ_FLIP = CoinPair(
         name="ISLIQ_FLIP",
-        short_description = "If FLip is in liquidation (mainnet)",
+        short_description = "If Flip is in liquidation (mainnet)",
         requirements = ISLIQ_FLIP_MAIN_Formula.requirements,
         formula = ISLIQ_FLIP_MAIN_Formula)
 
@@ -146,7 +146,7 @@ if chain.rsk_testnet.enabled and chain.rsk_testnet.mcg_addr!=Address(0):
     ISLIQ_FLIP_TEST = CoinPair(
         name="ISLIQ_FLIP",
         variant="test",
-        short_description = "If FLip is in liquidation (testnet)",
+        short_description = "If Flip is in liquidation (testnet)",
         requirements = ISLIQ_FLIP_TEST_Formula.requirements,
         formula = ISLIQ_FLIP_TEST_Formula)
 
