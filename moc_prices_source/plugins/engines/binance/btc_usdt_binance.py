@@ -1,18 +1,16 @@
 from ...pairs.simple import BTC_USDT
-from ...base import BaseWithFailover, Engines, Decimal
+from .base import EngineBinance, Engines, Decimal, uri
 
 
-
-base_uri = "https://{}/api/v3/ticker/bookTicker?symbol=BTCUSDT"
 
 @Engines.register_decorator()
-class Engine(BaseWithFailover):
+class Engine(EngineBinance):
 
-    _description = "Binance"
-    _uri = base_uri.format("api.binance.com")
-    _uri_failover = base_uri.format("moc-proxy-api-binance.moneyonchain.com")
+    _uri = uri(symbol="BTCUSDT", path="api/v3/ticker/bookTicker")
+    _uri_failover = uri(symbol="BTCUSDT", failover=True, path="api/v3/ticker/bookTicker")
     _coinpair = BTC_USDT
     _max_time_without_price_change = 600 # 10m, zero means infinity
+
 
     def _map(self, data):
         return {

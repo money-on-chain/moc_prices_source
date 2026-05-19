@@ -1,24 +1,20 @@
 from typing import Dict, List, Any, Optional
 from ...pairs.simple import RIF_USDT_MA
-from ...base import Decimal, BaseWithFailover, Engines, envs
-
+from .base import EngineBinance, Engines, Decimal, uri, envs
 
 
 # Some params
-base_uri = "https://{}/api/v3/depth?symbol=RIFUSDT"
 max_quantity = Decimal(envs.value_of('RIF_USD_MA_DEPTH'))
 allow_degraded = envs('MA_ALLOW_DEGRADED', False, bool)
 
 @Engines.register_decorator()
-class Engine(BaseWithFailover):
+class Engine(EngineBinance):
 
-    _description = "Binance"
-    _uri = base_uri.format("api.binance.com")
-    _uri_failover = base_uri.format("moc-proxy-api-binance.moneyonchain.com")
+    _uri = uri(symbol="RIFUSDT", path="api/v3/depth")
+    _uri_failover = uri(symbol="RIFUSDT", failover=True, path="api/v3/depth")
     _coinpair = RIF_USDT_MA
     _max_quantity = max_quantity
     _allow_degraded = allow_degraded
-    _max_time_without_price_change = 0 # zero means infinity
 
 
     def _map(self, data: Dict[str, List[List[Any]]]
