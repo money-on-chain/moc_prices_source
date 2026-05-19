@@ -1,20 +1,17 @@
 from ...pairs.special import RIF_BTC_MP1P
-from ...base import BaseWithFailover, Engines, Decimal
+from .base import EngineBinance, Engines, Decimal, uri
 from .rif_btc_binance import Engine as RifBtcEngine
 
 
 
-base_uri = "https://{}/api/v3/depth?symbol=RIFBTC"
 factor = 0.01
 
 @Engines.register_decorator()
-class Engine(BaseWithFailover):
+class Engine(EngineBinance):
 
-    _description = "Binance"
-    _uri = base_uri.format("api.binance.com")
-    _uri_failover = base_uri.format("moc-proxy-api-binance.moneyonchain.com")
-    _coinpair= RIF_BTC_MP1P
-    _max_time_without_price_change = 0 # zero means infinity
+    _uri = uri(symbol="RIFBTC", path="api/v3/depth")
+    _uri_failover = uri(symbol="RIFBTC", failover=True, path="api/v3/depth")
+    _coinpair = RIF_BTC_MP1P
 
 
     def __call__(self):
@@ -23,7 +20,7 @@ class Engine(BaseWithFailover):
         self._error = price_engine.error
         self.base_price = price_engine.price
         if ok:
-            ok = BaseWithFailover.__call__(self)
+            ok = EngineBinance.__call__(self)
         return ok
 
 
