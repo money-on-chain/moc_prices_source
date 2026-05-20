@@ -76,7 +76,7 @@ More information about this CLI tool can be seen [here](docs/cli.md).
 
 ## Requirements
 
-* Python 3.6+ support
+* Python 3.12+ support
 
 
 

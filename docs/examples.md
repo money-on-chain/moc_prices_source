@@ -10,10 +10,7 @@ This package includes a CLI tool that allows you to query the coinpair values in
 Do some imports first
 
 ```python
-user@host:~$ python3
-Python 3.8.5 (default, Jul 28 2020, 12:59:40) 
-[GCC 9.3.0] on linux
-Type "help", "copyright", "credits" or "license" for more information.
+user@host:~$ python3 -q
 >>> from moc_prices_source import get_price, BTC_USD, RIF_BTC, ALL
 >>>
 ```
