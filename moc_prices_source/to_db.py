@@ -213,6 +213,9 @@ def get_values(log,
                 else:
                     row[key] = v[key]
 
+                if row[key] is True or row[key] is False:
+                    row[f"int_{key}"] = 1 if row[key] else 0
+
         value = None
         for key in ['ok_value',
                     'weighted_median_price',
@@ -221,9 +224,6 @@ def get_values(log,
             if key in v:
                 value = v[key]
                 break
-
-        if 'ok' in v:
-            row['int_ok'] = 1 if v['ok'] else 0
 
         if coinpair in sources_count:
             row['sources_count'] = sources_count[coinpair]

@@ -20,10 +20,10 @@ tag:
 
 build:
 	rm -rf dist
-	python3 setup.py sdist
+	python3 setup.py sdist bdist_wheel
 
 upload:
-	twine upload dist/*
+	python3 -m twine upload dist/*
 
 dist: build upload
 

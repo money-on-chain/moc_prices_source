@@ -1,8 +1,21 @@
+
+# Python stuff
+__pycache__/
 __pycache__
 *.pyc
 .vscode
+.python-version
+
+# Package stuff
 build/
+moneyonchain_prices_source.egg-info/
 moc_prices_source.egg-info/
 dist/
+
+# Virtual env stuff
 venv/
-moneyonchain_prices_source.egg-info/
+.venv/
+
+# dotenv
+.env
+.env.*
