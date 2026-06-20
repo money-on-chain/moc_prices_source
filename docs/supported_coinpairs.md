@@ -57,7 +57,8 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | ETH/USD          | ETH/USD      |           | Weighted |
 | ETH/USD(B)       | ETH/USD      | B         | Computed |
 | GAS/BTC          | GAS/BTC      |           | Onchain  |
-| ISLIQ_FLIP(test) | ISLIQ_FLIP   | test      | Computed |
+| ISLIQ_ROC        | ISLIQ_ROC    |           | Computed |
+| ISLIQ_ROC(TEST)  | ISLIQ_ROC    | test      | Computed |
 | MOC/BPRO         | MOC/BPRO     |           | Computed |
 | MOC/BTC          | MOC/BTC      |           | Computed |
 | MOC/BTC(sov)     | MOC/BTC      | sov       | Onchain  |
@@ -135,7 +136,8 @@ This package includes a CLI tool that allows you to query the coinpair values in
 | ETH/USD          |                                                                                  |
 | ETH/USD(B)       | Passing through Bitcoin                                                          |
 | GAS/BTC          | Rootstock gas price from nodes                                                   |
-| ISLIQ_FLIP(test) | If Flip is in liquidation (testnet)                                              |
+| ISLIQ_ROC        | If RoC is in liquidation                                                         |
+| ISLIQ_ROC(test)  | If RoC is in liquidation (testnet)                                               |
 | MOC/BPRO         |                                                                                  |
 | MOC/BTC          |                                                                                  |
 | MOC/BTC(sov)     | Obtained from Sovryn onchain                                                     |
@@ -194,9 +196,13 @@ COP/BPRO          =  (bpro_btc × btc_cop)⁻¹
 COP/BTC           =  (btc_cop)⁻¹
 COP/USD(CCB)      =  (btc_cop / btc_usd)⁻¹
 ETH/USD(B)        =  eth_btc × btc_usd
-ISLIQ_FLIP(test)  =  MultiCollateralGuardTestnet.readyToLiquidate([
-                         [bpro_ars, bpro_cop],
-                         [usd_ars, usd_cop]
+ISLIQ_ROC         =  RocMultiCollateralGuard.readyToLiquidate([
+                         [rif_usd_tma],
+                         [doc_usd_tec]
+                     ])
+ISLIQ_ROC(test)   =  RocMultiCollateralGuardTestnet.readyToLiquidate([
+                         [rif_usd_tma],
+                         [doc_usd_tec_test]
                      ])
 MOC/BPRO          =  Median((moc_btc_sov × btc_usd), moc_usd_oku) / btc_usd × bpro_btc
 MOC/BTC           =  Median((moc_btc_sov × btc_usd), moc_usd_oku) / btc_usd

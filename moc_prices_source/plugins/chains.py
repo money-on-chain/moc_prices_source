@@ -20,9 +20,9 @@ with chain.rsk_mainnet as network:
         with network.env.btc_usd_oracle_addr as env:
             env.name = 'BTC_USD_ORACLE_ADDR'
             env.default = '0xe2927A0620b82A66D67F678FC9b826B0E01B1bFD'
-        with network.env.mcg_addr as env:
-            env.name = 'MULTI_COLLATERAL_GUARD_ADDR'
-            env.default = Address(0)
+        with network.env.roc_mcg_addr as env:
+            env.name = 'ROC_MULTI_COLLATERAL_GUARD_ADDR'
+            env.default = '0x0237Ad1f0831b479a344E56646BC48B0885cF46F'
 
 with chain.rsk_testnet as network:
     network.name = "RSK Testnet"
@@ -34,9 +34,9 @@ with chain.rsk_testnet as network:
         with network.env.multicall_addr as env:
             env.name = 'MULTICALL_ADDR_TESTNET'
             env.default = 'rootstock_testnet'
-        with network.env.mcg_addr as env:
-            env.name = 'MULTI_COLLATERAL_GUARD_TESTNET_ADDR'
-            env.default = '0x0E6B7d25f2fD1847423D782942027b2f2eaC6DF4'
+        with network.env.roc_mcg_addr as env:
+            env.name = 'ROC_MULTI_COLLATERAL_GUARD_TESTNET_ADDR'
+            env.default = '0xBc3669954b4c513140294ECF9B7b540cf964f0a3'
 
 # Initialize EVM instances and other network-specific settings
 
@@ -66,12 +66,12 @@ for network in chain:
                 default_uri = env.node_rpc_uri.default)
         network.evm = EVM(network.node_rpc_uri,
                         multicall_addr=network.multicall_addr)
-        network.mcg_addr = get_addr_env(
-            env.mcg_addr.name,
-            env.mcg_addr.default)
-        if network.mcg_addr == Address(0):
+        network.roc_mcg_addr = get_addr_env(
+            env.roc_mcg_addr.name,
+            env.roc_mcg_addr.default)
+        if network.roc_mcg_addr == Address(0):
             logger.warning("%s MultiCollateralGuard address is not set. You "
                            "can set the %s environment variable to correct "
-                           "that.", network.name, env.mcg_addr.name)
+                           "that.", network.name, env.roc_mcg_addr.name)
 
 chain.freeze()

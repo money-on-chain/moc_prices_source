@@ -1,5 +1,5 @@
 from ..base import CoinPairs, CoinPair, CoinPairType
-from ..coins import BPRO, BTC, GAS, MOC, USD
+from ..coins import DOC, BPRO, BTC, GAS, MOC, USD
 
 
 
@@ -30,5 +30,11 @@ MOC_BTC_SOV = CoinPair(MOC, BTC, "sov",
 MOC_USD_OKU = CoinPair(MOC, USD, "Oku",
                           description = "Obtained from Oku onchain",
                           type_= CoinPairType.ONCHAIN)
+
+# DOC/USD technical price from protocol collateral
+DOC_USD_TEC = CoinPair(name="doc_usd_tec", description="On chain DOC/USD technical price", type_ = CoinPairType.ONCHAIN)
+
+# DOC/USD technical price from protocol collateral
+DOC_USD_TEC_TEST = CoinPair(name="doc_usd_tec_testnet", description="On chain DOC/USD technical price for testnet", type_ = CoinPairType.ONCHAIN)
 
 CoinPairs.register()
