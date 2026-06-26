@@ -28,13 +28,17 @@ MOC_BTC_SOV = CoinPair(MOC, BTC, "sov",
 
 # MOC/USD
 MOC_USD_OKU = CoinPair(MOC, USD, "Oku",
-                          description = "Obtained from Oku onchain",
-                          type_= CoinPairType.ONCHAIN)
+                       description = "Obtained from Oku onchain",
+                       type_= CoinPairType.ONCHAIN)
 
 # DOC/USD technical price from protocol collateral
-DOC_USD_TEC = CoinPair(name="doc_usd_tec", description="On chain DOC/USD technical price", type_ = CoinPairType.ONCHAIN)
+DOC_USD_TEC = CoinPair(DOC, USD, "tec",
+                       description="On chain DOC/USD technical price",
+                       type_ = CoinPairType.ONCHAIN)
 
 # DOC/USD technical price from protocol collateral
-DOC_USD_TEC_TEST = CoinPair(name="doc_usd_tec_testnet", description="On chain DOC/USD technical price for testnet", type_ = CoinPairType.ONCHAIN)
+DOC_USD_TEC_TEST = CoinPair(DOC, USD, "tec-test",
+    description="On chain DOC/USD technical price for testnet",
+    type_ = CoinPairType.ONCHAIN)
 
 CoinPairs.register()
