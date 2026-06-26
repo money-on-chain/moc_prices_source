@@ -1,5 +1,5 @@
 from .simple import RIF_USDT_MA, BTC_USD
-from .onchain import BPRO_BTC, DOC_USD_TEC, DOC_USD_TEC_TEST
+from .onchain import DOC_USD_TEC, DOC_USD_TEC_TEST
 from ..chains import EVM, chain
 from ..base import CoinPairs, CoinPair, Formula, Decimal
 from ...types import PercentageDecimal, Yes, No
