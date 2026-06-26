@@ -2,24 +2,36 @@ FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app/moc_prices_source
+RUN apt-get update && \
+    apt-get install -y \
+        ca-certificates locales redis supervisor
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    python3-venv \
-    && rm -rf /var/lib/apt/lists/*
+RUN update-ca-certificates
 
-COPY . .
+RUN echo $TZ > /etc/timezone && \
+    apt-get update && apt-get install -y tzdata && \
+    rm /etc/localtime && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata && \
+    apt-get clean
 
-RUN python -m venv .venv
+RUN /usr/local/bin/python -m pip install --upgrade pip
 
-RUN .venv/bin/pip install --upgrade pip setuptools wheel
+RUN pip3 install rusty-rlp
 
-RUN .venv/bin/pip install -r requirements.txt
+COPY ./files/moneyonchain_prices_source.tar.gz /
+COPY ./requirements.lock.txt /requirements.lock.txt
+RUN pip3 install /moneyonchain_prices_source.tar.gz
+RUN pip3 install --no-cache-dir -r /requirements.lock.txt
+RUN rm /moneyonchain_prices_source.tar.gz
+RUN rm /requirements.lock.txt
 
-RUN .venv/bin/pip install .
+RUN mkdir /root/.moc_prices_source
+COPY ./files/conf/redis.json /root/.moc_prices_source/
+COPY ./files/run.sh /
+COPY ./files/check.sh /
 
-ENV API_HOST=0.0.0.0
-ENV API_PORT=7990
+RUN mkdir -p /etc/supervisor/conf.d
+COPY ./files/supervisord.conf /etc/supervisor/supervisord.conf
 
-CMD ["/bin/sh", "-c", ".venv/bin/moc_prices_source_api --addr \"$API_HOST\" --port \"$API_PORT\""]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
