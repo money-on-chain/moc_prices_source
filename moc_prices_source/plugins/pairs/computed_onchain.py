@@ -112,7 +112,7 @@ if chain.rsk_mainnet.enabled and chain.rsk_mainnet.roc_mcg_addr!=Address(0):
         roc_mcg_addr_env = chain.rsk_mainnet.env.roc_mcg_addr.name
         requirements = [RIF_USDT_MA, DOC_USD_TEC]
 
-    ISLIQ_FLIP = CoinPair(
+    ISLIQ_ROC = CoinPair(
         name="ISLIQ_ROC",
         short_description = "If RoC is in liquidation (mainnet)",
         requirements = ISLIQ_ROC_MAIN_Formula.requirements,
