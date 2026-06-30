@@ -91,6 +91,10 @@
     "bpro_btc_onchain": 1,
 
     "doc_usd_constant": 1,
+    
+    "doc_usd_tec":      1,
+    
+    "doc_usd_tec_test": 1,
 
     "gas_btc_rsk": 1,
 
@@ -111,4 +115,5 @@
     "rsk_blocknumber_onchain": 1,
     
     "btc_usd_onchain": 1
+
 }
