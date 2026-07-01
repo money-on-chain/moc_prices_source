@@ -2,36 +2,28 @@ FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1
 
-RUN apt-get update && \
-    apt-get install -y \
-        ca-certificates locales redis supervisor
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    python3-venv \
+    redis \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN update-ca-certificates
-
-RUN echo $TZ > /etc/timezone && \
-    apt-get update && apt-get install -y tzdata && \
-    rm /etc/localtime && \
-    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    dpkg-reconfigure -f noninteractive tzdata && \
-    apt-get clean
-
-RUN /usr/local/bin/python -m pip install --upgrade pip
-
-RUN pip3 install rusty-rlp
-
-COPY ./files/moneyonchain_prices_source.tar.gz /
-COPY ./requirements.lock.txt /requirements.lock.txt
-RUN pip3 install /moneyonchain_prices_source.tar.gz
-RUN pip3 install --no-cache-dir -r /requirements.lock.txt
-RUN rm /moneyonchain_prices_source.tar.gz
-RUN rm /requirements.lock.txt
-
-RUN mkdir /root/.moc_prices_source
-COPY ./files/conf/redis.json /root/.moc_prices_source/
-COPY ./files/run.sh /
-COPY ./files/check.sh /
+WORKDIR /app/moc_prices_source
+COPY . .
+RUN python -m venv ../venv
+RUN ../venv/bin/pip install --upgrade pip setuptools wheel
+RUN ../venv/bin/pip install -r requirements.lock.txt
+RUN ../venv/bin/pip install .
+WORKDIR /app
+RUN rm -rf ./moc_prices_source
+WORKDIR /
 
 RUN mkdir -p /etc/supervisor/conf.d
-COPY ./files/supervisord.conf /etc/supervisor/supervisord.conf
+RUN mkdir /root/.moc_prices_source
+COPY Docker/files/supervisord.conf /etc/supervisor/supervisord.conf
+COPY Docker/files/conf/redis.json /root/.moc_prices_source/
+COPY Docker/files/run.sh /
+COPY Docker/files/check.sh /
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
