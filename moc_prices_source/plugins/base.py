@@ -792,16 +792,20 @@ class BaseWithFailover(Base):
 
 class BaseOnChain(Base):
 
-    _evm = chain.rsk_mainnet.evm
+    _evm = None if not chain.rsk_mainnet.enabled else chain.rsk_mainnet.evm
 
     Web3 = Web3
 
     @property
     def uri(self):
+        if self._evm is None:
+            return None
         return self._evm.web3.provider.endpoint_uri
 
     @property
     def evm(self):
+        if self._evm is None:
+            return None
         return EVM(self._evm.web3.provider.endpoint_uri,
                    multicall_addr=self._evm.multicall.address) # Why?
 
@@ -818,10 +822,13 @@ class BaseOnChain(Base):
 
         value, str_error = None, None
 
-        try:
-            value, str_error = self._get_value_from_evm(self.evm)
-        except Exception as e:
-            str_error = str(e)
+        if self.evm is None:
+            str_error = 'Disabled EVM'
+        else:
+            try:
+                value, str_error = self._get_value_from_evm(self.evm)
+            except Exception as e:
+                str_error = str(e)
 
         if value is None:
             self._error = str_error
