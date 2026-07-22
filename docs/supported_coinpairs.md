@@ -201,11 +201,11 @@ COP/BTC          =  (btc_cop)⁻¹
 COP/USD(CCB)     =  (btc_cop / btc_usd)⁻¹
 ETH/USD(B)       =  eth_btc × btc_usd
 ISLIQ_ROC        =  MultiCollateralGuard.readyToLiquidate([
-                        [rif_usdt_ma],
+                        [rif_usdt_ma * usdt_usd],
                         [doc_usd_tec]
                     ])
 ISLIQ_ROC(test)  =  MultiCollateralGuardTestnet.readyToLiquidate([
-                        [rif_usdt_ma],
+                        [rif_usdt_ma × usdt_usd],
                         [doc_usd_tec_test]
                     ])
 MOC/BPRO         =  Median((moc_btc_sov × btc_usd), moc_usd_oku) / btc_usd × bpro_btc

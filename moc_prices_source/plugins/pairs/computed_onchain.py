@@ -1,4 +1,4 @@
-from .simple import RIF_USDT_MA, BTC_USD
+from .simple import RIF_USDT_MA, BTC_USD, USDT_USD
 from .onchain import DOC_USD_TEC, DOC_USD_TEC_TEST
 from ..chains import EVM, chain
 from ..base import CoinPairs, CoinPair, Formula, Decimal
@@ -62,9 +62,10 @@ class ISLIQ_ROC_Formula(Formula):
     fn_list = ['readyToLiquidate(uint256[][])(bool)',
                'readyToMicroLiquidate(uint256[][])(bool)']
 
-    def init(self, rif_usd, doc_usd):
-                       
+    def init(self, rif_usdt_ma, usdt_usd, doc_usd):
+
         wei = lambda value: int(value * Decimal("1e18"))
+        rif_usd = rif_usdt_ma * usdt_usd
 
         call_args = [[wei(rif_usd)], [wei(doc_usd)]]
         
@@ -102,7 +103,7 @@ if chain.rsk_mainnet.enabled and chain.rsk_mainnet.roc_mcg_addr!=Address(0):
     class ISLIQ_ROC_MAIN_Formula(ISLIQ_ROC_Formula):
         """
             MultiCollateralGuard.readyToLiquidate([
-                [rif_usdt_ma],
+                [rif_usdt_ma * usdt_usd],
                 [doc_usd_tec]
             ])
         """
@@ -110,7 +111,7 @@ if chain.rsk_mainnet.enabled and chain.rsk_mainnet.roc_mcg_addr!=Address(0):
         evm: EVM = chain.rsk_mainnet.evm
         roc_mcg_addr = chain.rsk_mainnet.roc_mcg_addr
         roc_mcg_addr_env = chain.rsk_mainnet.env.roc_mcg_addr.name
-        requirements = [RIF_USDT_MA, DOC_USD_TEC]
+        requirements = [RIF_USDT_MA, USDT_USD, DOC_USD_TEC]
 
     ISLIQ_ROC = CoinPair(
         name="ISLIQ_ROC",
@@ -125,7 +126,7 @@ if chain.rsk_testnet.enabled and chain.rsk_testnet.roc_mcg_addr!=Address(0):
     class ISLIQ_ROC_TEST_Formula(ISLIQ_ROC_Formula):
         """
             MultiCollateralGuardTestnet.readyToLiquidate([
-                [rif_usdt_ma],
+                [rif_usdt_ma × usdt_usd],
                 [doc_usd_tec_test]
             ])
         """
@@ -133,7 +134,7 @@ if chain.rsk_testnet.enabled and chain.rsk_testnet.roc_mcg_addr!=Address(0):
         evm: EVM = chain.rsk_testnet.evm
         roc_mcg_addr = chain.rsk_testnet.roc_mcg_addr
         roc_mcg_addr_env = chain.rsk_testnet.env.roc_mcg_addr.name
-        requirements = [RIF_USDT_MA, DOC_USD_TEC_TEST]
+        requirements = [RIF_USDT_MA, USDT_USD, DOC_USD_TEC_TEST]
     
     ISLIQ_ROC_TEST = CoinPair(
         name="ISLIQ_ROC",
