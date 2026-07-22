@@ -412,7 +412,7 @@ Only DOC/USD onchain (URI: https://public-node.rsk.co)
 
 ### For coinpair DOC/USD(tec-test) (from DOC to Dollar)
 
-Only DOC/USD onchain (testnet) (URI: https://public-node.rsk.co)
+Only DOC/USD onchain (testnet) (URI: https://public-node.testnet.rsk.co)
 
 
 ### For coinpair GAS/BTC (from Gas to Bitcoin)
