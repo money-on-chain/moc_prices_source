@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# This script is used to run the moc_prices_source application inside a Docker container.
+
+
+
+# Constants
+
+BIN_DIR=/app/venv/bin
 
 
 
@@ -18,6 +25,10 @@ log() {
 }
 
 main() {
+
+    local VERSION=$($BIN_DIR/moc_prices_source_check --version)
+    log "moc_prices_source" "INFO" "Running version $VERSION"
+
     local cmd_list=("moc_prices_source_api" "moc_prices_source_to_db")
     
     if [ -z "$COMMAND" ]; then
@@ -27,7 +38,7 @@ main() {
     
     if [[ " ${cmd_list[@]} " =~ " $COMMAND " ]]; then
         log "$COMMAND" "INFO" "Arguments: \"$MOC_PRICES_SOURCE_ARGS\""
-        "/usr/local/bin/$COMMAND" $MOC_PRICES_SOURCE_ARGS
+        "$BIN_DIR/$COMMAND" $MOC_PRICES_SOURCE_ARGS
     else
         log "moc_prices_source" "CRITICAL" "COMMAND env variable ($COMMAND) is not in the allowed list (${cmd_list[@]})"
         exit 1

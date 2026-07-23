@@ -1,11 +1,9 @@
-from .simple import BTC_ARS, BTC_COP, BTC_USD
-from .onchain import BPRO_BTC
+from .simple import RIF_USDT_MA, BTC_USD, USDT_USD
+from .onchain import DOC_USD_TEC, DOC_USD_TEC_TEST
 from ..chains import EVM, chain
 from ..base import CoinPairs, CoinPair, Formula, Decimal
 from ...types import PercentageDecimal, Yes, No
 from ...evm import Address
-
-
 
 ### Computed onchain pairs
 
@@ -55,40 +53,26 @@ if chain.rsk_mainnet.enabled and \
         formula = BTC_USD_24h_Formula)
 
 
-class ISLIQ_FLIP_Formula(Formula):
-    """
-        MultiCollateralGuard.readyToLiquidate([
-            [bpro_ars, bpro_cop],
-            [usd_ars, usd_cop]
-        ])
-    """
-
+class ISLIQ_ROC_Formula(Formula):
     evm: EVM = ...
-    mcg_addr = ...
-    mcg_addr_env = ...
+    roc_mcg_addr = ...
+    roc_mcg_addr_env = ...
+    requirements = ...
 
-    requirements = [BTC_ARS, BTC_COP, BTC_USD, BPRO_BTC]
     fn_list = ['readyToLiquidate(uint256[][])(bool)',
                'readyToMicroLiquidate(uint256[][])(bool)']
 
-    def init(self, btc_ars, btc_cop, btc_usd, bpro_btc):
-                       
-        wei = lambda value: int(value * Decimal("1e18"))
+    def init(self, rif_usdt_ma, usdt_usd, doc_usd):
 
-        usd_ars = wei(btc_ars / btc_usd)
-        usd_cop = wei(btc_cop / btc_usd)
-        bpro_ars =  wei(bpro_btc * btc_ars)
-        bpro_cop = wei(bpro_btc * btc_cop)
-        
-        call_args = [
-                [bpro_ars, bpro_cop],
-                [usd_ars, usd_cop]
-            ]
+        wei = lambda value: int(value * Decimal("1e18"))
+        rif_usd = rif_usdt_ma * usdt_usd
+
+        call_args = [[wei(rif_usd)], [wei(doc_usd)]]
         
         self.call_ids = []
         for fn_spec in self.fn_list:
             self.call_ids.append(
-                self.evm.multicall.add_call(self.mcg_addr, fn_spec, call_args)
+                self.evm.multicall.add_call(self.roc_mcg_addr, fn_spec, call_args)
             )
         
     def step(self, *args):
@@ -98,8 +82,8 @@ class ISLIQ_FLIP_Formula(Formula):
         if all([ans is not None for ans in values]):
             return Yes if any(values) else No
         else:
-            env = self.mcg_addr_env
-            addr = Address(self.mcg_addr).make_abbreviation(sep='...')
+            env = self.roc_mcg_addr_env
+            addr = Address(self.roc_mcg_addr).make_abbreviation(sep='...')
             fn_list = [f"{fn.split('(')[0]}(...)" for v, fn in zip(
                 values, self.fn_list) if v is None]
             fn_str = (' and '.join([', '.join(fn_list[:-1]), fn_list[-1]]
@@ -113,42 +97,51 @@ class ISLIQ_FLIP_Formula(Formula):
         self.evm.multicall.clear_calls()
 
 
-# ISLIQ_FLIP
-if chain.rsk_mainnet.enabled and chain.rsk_mainnet.mcg_addr!=Address(0):
+# ISLIQ_ROC
+if chain.rsk_mainnet.enabled and chain.rsk_mainnet.roc_mcg_addr!=Address(0):
 
-    class ISLIQ_FLIP_MAIN_Formula(ISLIQ_FLIP_Formula):
+    class ISLIQ_ROC_MAIN_Formula(ISLIQ_ROC_Formula):
+        """
+            MultiCollateralGuard.readyToLiquidate([
+                [rif_usdt_ma * usdt_usd],
+                [doc_usd_tec]
+            ])
+        """
+
         evm: EVM = chain.rsk_mainnet.evm
-        mcg_addr = chain.rsk_mainnet.mcg_addr
-        mcg_addr_env = chain.rsk_mainnet.env.mcg_addr.name
+        roc_mcg_addr = chain.rsk_mainnet.roc_mcg_addr
+        roc_mcg_addr_env = chain.rsk_mainnet.env.roc_mcg_addr.name
+        requirements = [RIF_USDT_MA, USDT_USD, DOC_USD_TEC]
 
-    ISLIQ_FLIP = CoinPair(
-        name="ISLIQ_FLIP",
-        short_description = "If Flip is in liquidation (mainnet)",
-        requirements = ISLIQ_FLIP_MAIN_Formula.requirements,
-        formula = ISLIQ_FLIP_MAIN_Formula)
+    ISLIQ_ROC = CoinPair(
+        name="ISLIQ_ROC",
+        short_description = "If RoC is in liquidation (mainnet)",
+        requirements = ISLIQ_ROC_MAIN_Formula.requirements,
+        formula = ISLIQ_ROC_MAIN_Formula)
 
 
-# ISLIQ_FLIP_TEST
-if chain.rsk_testnet.enabled and chain.rsk_testnet.mcg_addr!=Address(0):
+# ISLIQ_ROC_TEST
+if chain.rsk_testnet.enabled and chain.rsk_testnet.roc_mcg_addr!=Address(0):
 
-    class ISLIQ_FLIP_TEST_Formula(ISLIQ_FLIP_Formula):
+    class ISLIQ_ROC_TEST_Formula(ISLIQ_ROC_Formula):
         """
             MultiCollateralGuardTestnet.readyToLiquidate([
-                [bpro_ars, bpro_cop],
-                [usd_ars, usd_cop]
+                [rif_usdt_ma × usdt_usd],
+                [doc_usd_tec_test]
             ])
         """
 
         evm: EVM = chain.rsk_testnet.evm
-        mcg_addr = chain.rsk_testnet.mcg_addr
-        mcg_addr_env = chain.rsk_testnet.env.mcg_addr.name
+        roc_mcg_addr = chain.rsk_testnet.roc_mcg_addr
+        roc_mcg_addr_env = chain.rsk_testnet.env.roc_mcg_addr.name
+        requirements = [RIF_USDT_MA, USDT_USD, DOC_USD_TEC_TEST]
     
-    ISLIQ_FLIP_TEST = CoinPair(
-        name="ISLIQ_FLIP",
+    ISLIQ_ROC_TEST = CoinPair(
+        name="ISLIQ_ROC",
         variant="test",
-        short_description = "If Flip is in liquidation (testnet)",
-        requirements = ISLIQ_FLIP_TEST_Formula.requirements,
-        formula = ISLIQ_FLIP_TEST_Formula)
+        short_description = "If RoC is in liquidation (testnet)",
+        requirements = ISLIQ_ROC_TEST_Formula.requirements,
+        formula = ISLIQ_ROC_TEST_Formula)
 
 
 CoinPairs.register()

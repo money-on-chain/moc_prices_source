@@ -1,4 +1,5 @@
 import requests, datetime, json
+from enum import Enum
 from typing import Optional, Callable, Tuple, Any, Union
 from pathlib import Path
 from inspect import getfile, currentframe, getsource, isclass
@@ -7,12 +8,10 @@ from decimal import Decimal, InvalidOperation
 from bs4 import BeautifulSoup
 from requests import Response
 from ..redis_conn import get_redis
-from ..evm import OneShotHTTPProvider, HTTPProvider, Web3, EVM, Address, \
-    URI, get_addr_env, get_uri_env, get_node_rpc_uri_env, \
-        get_multicall_addr_env
+from ..evm import Web3, EVM, get_addr_env
 from ..my_envs import envs as envs
 from ..my_logging import WithLogger, get_logger
-from enum import Enum
+from .chains import chain
 
 
 
@@ -793,28 +792,25 @@ class BaseWithFailover(Base):
 
 class BaseOnChain(Base):
 
-    _uri = get_node_rpc_uri_env()
-    _multicall_addr = get_multicall_addr_env()
+    _evm = None if not chain.rsk_mainnet.enabled else chain.rsk_mainnet.evm
 
     Web3 = Web3
-    EVM = EVM
-    Address = Address
-    URI = URI
-    HTTPProvider = HTTPProvider
-    OneShotHTTPProvider = OneShotHTTPProvider
+
+    @property
+    def uri(self):
+        if self._evm is None:
+            return None
+        return self._evm.web3.provider.endpoint_uri
+
+    @property
+    def evm(self):
+        if self._evm is None:
+            return None
+        return EVM(self._evm.web3.provider.endpoint_uri,
+                   multicall_addr=self._evm.multicall.address) # Why?
 
     def to_checksum_address(self, value):
         return self.Web3.to_checksum_address(value)
-
-    def make_web3_obj_with_uri(self, timeout=10):
-        return self.Web3(OneShotHTTPProvider(self._uri, request_kwargs={
-            'timeout': timeout,
-            'headers': {'Connection': 'close'}
-            }))
-
-    def make_evm_with_uri(self, timeout=10):
-        return EVM(self.make_web3_obj_with_uri(timeout=timeout),
-                   multicall_addr = self._multicall_addr)
 
     def _get_value_from_evm(self, evm: EVM
                             ) -> Tuple[Optional[Decimal], Optional[str]]:
@@ -826,11 +822,13 @@ class BaseOnChain(Base):
 
         value, str_error = None, None
 
-        try:
-            evm = self.make_evm_with_uri()
-            value, str_error = self._get_value_from_evm(evm)
-        except Exception as e:
-            str_error = str(e)
+        if self.evm is None:
+            str_error = 'Disabled EVM'
+        else:
+            try:
+                value, str_error = self._get_value_from_evm(self.evm)
+            except Exception as e:
+                str_error = str(e)
 
         if value is None:
             self._error = str_error

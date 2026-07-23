@@ -27,13 +27,14 @@ $ sudo docker run --rm --name some_moc_prices_source -it moc_prices_source /chec
 
 ### 3.1 Run `moc_prices_source_api`
 
+Useful if you want to run it as part of end-to-end testing.
 
 ```
 sudo docker run -d \
 -p 7989:7989 \
 --name some_moc_prices_source \
 --env COMMAND="moc_prices_source_api" \
---env MOC_PRICES_SOURCE_ARGS="--port 7989" \
+--env MOC_PRICES_SOURCE_ARGS="--addr 0.0.0.0 --port 7989" \
 moc_prices_source
 ```
 
@@ -44,10 +45,9 @@ sudo docker run --rm \
 -p 7989:7989 \
 --name some_moc_prices_source \
 --env COMMAND="moc_prices_source_api" \
---env MOC_PRICES_SOURCE_ARGS="--port 7989" \
+--env MOC_PRICES_SOURCE_ARGS="--addr 0.0.0.0 --port 7989" \
 -it moc_prices_source
 ```
-
 
 Options to be passed by the `MOC_PRICES_SOURCE_ARGS` environment variable:
 

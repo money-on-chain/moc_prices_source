@@ -1,5 +1,5 @@
-from ...pairs.onchain import MOC_USD_OKU
-from ...base import BaseOnChain, Engines, get_addr_env, EVM, Decimal
+from ...pairs.onchain import DOC_USD_TEC
+from ...base import BaseOnChain, Engines, EVM, Decimal
 from ...chains import chain
 
 
@@ -8,10 +8,9 @@ if chain.rsk_mainnet.enabled:
     @Engines.register_decorator()
     class Engine(BaseOnChain):
 
-        _description = "Oku onchain"
-        _coinpair = MOC_USD_OKU
-        _addr = get_addr_env('MOC_BTC_ORACLE_ADDR',
-                            '0x11683439c9509C135ee4F7bB6e23835e1d86ECBA')
+        _description = "DOC/USD onchain"
+        _coinpair = DOC_USD_TEC
+        _addr = '0x6a343488338b944c6FCc89906646Fac1e8e91cE5'
 
         def _get_value_from_evm(self, evm: EVM):
             value, str_error = None, None
