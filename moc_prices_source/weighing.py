@@ -8,6 +8,7 @@ from statistics import mean as mean_base
 from tabulate import tabulate
 from decimal import Decimal
 from os import environ
+from typing import Tuple
 from .conf import get
 
 
@@ -194,78 +195,108 @@ class Weighing(object):
 weighing = Weighing()
 
 
+def validate_values_and_weights(values: list,
+                                weights: list) -> Tuple[list, list]:
 
-def weighted_median(values, weights):
+    if not isinstance(values, list):
+        raise TypeError('values must be a list')
 
-    is_bool = all([v in [True, False] for v in values])
+    if not isinstance(weights, list):
+        raise TypeError('weights must be a list')
 
-    if not all(weights):
-        non_zero = [(v, w) for (v, w) in zip(values, weights) if w]
-        values = [v for (v, w) in non_zero]
-        weights = [w for (v, w) in non_zero]
-   
-    count = len(values)
+    if len(values) != len(weights):
+        raise ValueError('values and weights must have the same length')
+
+    if values:
+
+        expected_values_type = type(values[0])
+        if not all(type(item) is expected_values_type for item in values):
+            raise TypeError('all items in values must have the same type')
+
+        expected_weights_type = type(weights[0])
+        if not all(type(item) is expected_weights_type for item in weights):
+            raise TypeError('all items in weights must have the same type')
+
+        if not isinstance(values[0], (bool, int, float, Decimal)):
+            raise TypeError(
+                'values must contain only bool, int, float, Decimal types')
+
+        if not isinstance(weights[0], (int, float, Decimal)):
+            raise TypeError(
+                'weights must contain only int, float, Decimal types')
+
+        if not all((item>=0) for item in weights):
+            raise ValueError('all items in weights must be non-negative')
+
+        # Make a table of values and weights
+        table = list(zip(values, weights))
+
+        # Remove items with zero weights
+        if not all(weights):
+            table = [(v, w) for (v, w) in table if w]
+
+        # Sort values and weights based on values
+        table = sorted(table, key=lambda item: item[0])
+        values = [item[0] for item in table]
+        weights = [item[1] for item in table]
+
+    return values, weights
+
+
+def weighted_median(values: list, weights: list):
+
+    # Normalize and validate values and weights
+    values, weights = validate_values_and_weights(values, weights)
+
+    # If not values, return None
+    if not values:
+        return None
     
+    count = len(values)
+
+    # If only one value, return it
     if 1==count:
         return values[0]
-    
-    idx = weighted_median_idx(values, weights)
 
-    if (count % 2) != 0:
-        return values[idx] 
+    # Get values type
+    value_is_bool = isinstance(values[0], bool)
+    value_type = type(values[0])
+    if value_is_bool:
+        values = [int(v) for v in values]
 
-    if count -1 == idx:
-        idx -= 1
-    
-    a, b = values[idx], values[idx + 1]
-    base = weights[idx] + weights[idx + 1]
-    p, q = weights[idx]/base, weights[idx + 1]/base
+    # Convert values and weights to Decimal for precision
+    values = [Decimal(str(v)) for v in values]
+    weights = [Decimal(str(w)) for w in weights]
 
-    if isinstance(a, Decimal) and not isinstance(p, Decimal):
-        p = Decimal(p)
-    if isinstance(b, Decimal) and not isinstance(q, Decimal):
-        q = Decimal(q)      
-    
-    value = (a * p) + (b * q)
-    
-    if is_bool:
-        value = bool(value>Decimal('0.5'))
-
-    return value
-
-
-def weighted_median_idx(values, weights):
-    '''
-    Compute the weighted median of values list.
-    The weighted median is computed as follows:
-
-    1- sort both lists (values and weights) based on values.
-    
-    2- select the 0.5 point from the weights and return the corresponding
-       values as results.
-    
-    e.g. values = [1, 3, 0] and weights=[0.1, 0.3, 0.6] assuming weights
-    are probabilities.
-    
-    sorted values = [0, 1, 3] and corresponding sorted weights = [0.6, 0.1,
-    0.3] the 0.5 point on weight corresponds to the first item which is 0.
-    so the weighted median is 0.
-    '''
-
-    # convert the weights into probabilities
+    # Convert the weights into probabilities
     sum_weights = sum(weights)
     weights = [w / sum_weights for w in weights]
     
-    # sort values and weights based on values
-    sorted_tuples = sorted(zip(values, weights, range(len(values))))
+    # Select the median point
+    cumulative_probability = Decimal('0')
+    for idx in range(count):
+        cumulative_probability += weights[idx]
+        if cumulative_probability >= Decimal('0.5'):
+            break
 
-    # select the median point
-    cumulative_probability = 0
-    for i in range(len(sorted_tuples)):
-        cumulative_probability += sorted_tuples[i][1]
-        if cumulative_probability >= 0.5:
-            return sorted_tuples[i][2]
-    return sorted_tuples[-1][2]
+    if (count % 2) != 0:
+        # If odd number of values, return the value
+        # at the median index
+        value = values[idx]
+    else:
+        # If even number of values, return the
+        # weighted average of the two middle values
+        base = weights[idx-1] + weights[idx]
+        p, q = weights[idx-1]/base, weights[idx]/base
+        value = (values[idx-1] * p) + (values[idx] * q)
+
+    # Set the value type back to original type
+    if value_is_bool:
+        value = bool(value>Decimal('0.5'))
+    else:
+        value = value_type(value)
+
+    return value
 
 
 def median(*args):
