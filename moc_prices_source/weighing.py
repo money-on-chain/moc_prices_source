@@ -280,12 +280,19 @@ def weighted_median(values: list, weights: list):
             break
 
     if (count % 2) != 0:
-        # If odd number of values, return the value
-        # at the median index
+        # If there is an odd number of values return the
+        # value at the index
         value = values[idx]
     else:
-        # If even number of values, return the
+        # If there is an even number of values, return the
         # weighted average of the two middle values
+        
+        # If the cumulative probability is exactly 0.5,
+        # we need to take the next index for the second
+        # middle value
+        if cumulative_probability == Decimal('0.5'):
+            idx +=1
+
         base = weights[idx-1] + weights[idx]
         p, q = weights[idx-1]/base, weights[idx]/base
         value = (values[idx-1] * p) + (values[idx] * q)
