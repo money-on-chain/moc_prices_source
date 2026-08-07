@@ -229,16 +229,16 @@ def validate_values_and_weights(values: list,
             raise ValueError('all items in weights must be non-negative')
 
         # Make a table of values and weights
-        table = list(zip(values, weights))
+        table = zip(values, weights)
 
         # Remove items with zero weights
-        if not all(weights):
-            table = [(v, w) for (v, w) in table if w]
-
+        table = filter(lambda item: item[1], table)
+        
         # Sort values and weights based on values
         table = sorted(table, key=lambda item: item[0])
-        values = [item[0] for item in table]
-        weights = [item[1] for item in table]
+
+        # Unzip the table back into values and weights
+        values, weights = map(list, zip(*table))
 
     return values, weights
 
