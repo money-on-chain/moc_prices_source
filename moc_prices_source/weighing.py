@@ -7,6 +7,7 @@ from statistics import median as median_base
 from statistics import mean as mean_base
 from tabulate import tabulate
 from decimal import Decimal
+from math import isfinite
 from os import environ
 from typing import Tuple
 from .conf import get
@@ -195,6 +196,15 @@ class Weighing(object):
 weighing = Weighing()
 
 
+def _is_finite_number(value):
+    """Return whether a supported numeric value is finite."""
+    if isinstance(value, Decimal):
+        return value.is_finite()
+    if isinstance(value, int):
+        return True
+    return isfinite(value)
+
+
 def validate_values_and_weights(values: list,
                                 weights: list) -> Tuple[list, list]:
 
@@ -212,6 +222,9 @@ def validate_values_and_weights(values: list,
                    for item in weights):
             raise TypeError(
                 'weights must contain only bool, int, float, Decimal types')
+
+        if not all(_is_finite_number(item) for item in weights):
+            raise ValueError('all items in weights must be finite')
 
         if not all((item>=0) for item in weights):
             raise ValueError('all items in weights must be non-negative')
@@ -235,6 +248,9 @@ def validate_values_and_weights(values: list,
             raise TypeError(
                 'values must contain only bool, int, float, Decimal types')
 
+        if not all(_is_finite_number(item[0]) for item in table):
+            raise ValueError('all positively weighted values must be finite')
+
         # Sort values and weights based on values
         table = sorted(table, key=lambda item: item[0])
 
@@ -255,18 +271,27 @@ def weighted_median(values: list, weights: list):
     If no values remain after removing zero-weight or false-weight entries,
     including when both inputs are empty, ``None`` is returned.
 
-    Two remaining values are handled as a special case: the function returns
-    their weighted arithmetic mean instead of selecting a weighted median.
-    The final result is converted back to the input value type, so fractional
-    results are truncated when the values are integers.
+    Exactly two remaining values are intentionally handled differently from
+    the textbook definition of a weighted median: both observations are
+    interpolated using their relative weights, so the function returns their
+    weighted arithmetic mean.  This is part of this function's contract and
+    lets both sources contribute to the result; for example, values ``10`` and
+    ``20`` with weights ``0.75`` and ``0.25`` produce ``12.5`` rather than
+    selecting ``10``.  Callers that require the strict weighted-median rule for
+    two observations should not rely on this special case.
+
+    Results are normally converted back to the input value type.  A fractional
+    result calculated from integer values is returned as a ``Decimal`` instead
+    of being truncated to an integer.
 
     Args:
         values: Numeric values to aggregate.
         weights: Non-negative weights corresponding to ``values``.
 
     Returns:
-        The weighted result in the input value type, or ``None`` when there
-        are no positively weighted values.
+        The weighted result in the input value type, a ``Decimal`` for a
+        fractional result from integer values, or ``None`` when there are no
+        positively weighted values.
     """
 
     # Normalize and validate values and weights
@@ -315,6 +340,10 @@ def weighted_median(values: list, weights: list):
     # Set the value type back to original type
     if value_is_bool:
         value = bool(value>Decimal('0.5'))
+    elif value_type is int:
+        if value == value.to_integral_value():
+            value = int(value)
+        # Otherwise, keep the Decimal to preserve the fractional component.
     else:
         value = value_type(value)
 

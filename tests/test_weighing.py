@@ -27,6 +27,13 @@ class WeightedMedianTests(unittest.TestCase):
         """Two values use both weights when calculating their average."""
         self.assertEqual(weighted_median([10, 20], [0.8, 0.2]), 12)
 
+    def test_fractional_result_from_integer_values_is_not_truncated(self):
+        """Integer inputs retain a fractional weighted result."""
+        result = weighted_median([10, 20], [0.75, 0.25])
+
+        self.assertEqual(result, Decimal('12.5'))
+        self.assertIsInstance(result, Decimal)
+
     def test_two_unsorted_values_keep_weights_attached(self):
         """Sorting two values preserves each value-to-weight association."""
         self.assertEqual(weighted_median([20, 10], [0.2, 0.8]), 12)
@@ -41,6 +48,13 @@ class WeightedMedianTests(unittest.TestCase):
             weighted_median([10, 20, 30], [0.3, 0.2, 0.5]),
             25,
         )
+
+    def test_fractional_exact_half_result_is_not_truncated(self):
+        """A fractional midpoint from integer values retains its precision."""
+        result = weighted_median([10, 11, 12], [1, 1, 2])
+
+        self.assertEqual(result, Decimal('11.5'))
+        self.assertIsInstance(result, Decimal)
 
     def test_zero_weight_value_is_ignored(self):
         """A zero-weight outlier does not affect the result."""
@@ -60,6 +74,24 @@ class WeightedMedianTests(unittest.TestCase):
 
                 self.assertEqual(result, Decimal('10'))
                 self.assertIsInstance(result, Decimal)
+
+    def test_non_finite_active_values_are_rejected(self):
+        """NaN and infinite active values cannot become aggregate prices."""
+        for invalid_value in (
+                float('nan'), float('inf'), float('-inf'),
+                Decimal('NaN'), Decimal('Infinity'), Decimal('-Infinity')):
+            with self.subTest(invalid_value=invalid_value):
+                with self.assertRaisesRegex(ValueError, 'values.*finite'):
+                    weighted_median([invalid_value], [1])
+
+    def test_non_finite_weights_are_rejected(self):
+        """NaN and infinite weights fail validation predictably."""
+        for invalid_weight in (
+                float('nan'), float('inf'), float('-inf'),
+                Decimal('NaN'), Decimal('Infinity'), Decimal('-Infinity')):
+            with self.subTest(invalid_weight=invalid_weight):
+                with self.assertRaisesRegex(ValueError, 'weights.*finite'):
+                    weighted_median([10], [invalid_weight])
 
     def test_decimal_input_preserves_decimal_type(self):
         """Decimal inputs produce a Decimal result without losing precision."""
