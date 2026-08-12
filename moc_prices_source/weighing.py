@@ -272,16 +272,17 @@ def weighted_median(values: list, weights: list):
     sum_weights = sum(weights)
     weights = [w / sum_weights for w in weights]
 
-    # If the weight is concentrated at the beginning
-    if count!=2 and weights[0] > Decimal('0.5'):
-        value = values[0]
+    # A source carrying more than half of the total weight is the weighted
+    # median regardless of its position in the sorted values.
+    dominant_idx = next(
+        (idx for idx, weight in enumerate(weights)
+         if count != 2 and weight > Decimal('0.5')),
+        None,
+    )
+    if dominant_idx is not None:
+        value = values[dominant_idx]
 
-    # If the weight is concentrated at the end
-    elif count!=2 and weights[count - 1] > Decimal('0.5'):
-        value = values[count - 1]
-
-    # If the weight is not concentrated
-    # at the beginning or at the end
+    # If the weight is not concentrated in a single source
     else:
 
         # Select the median point

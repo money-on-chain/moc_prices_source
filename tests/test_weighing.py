@@ -71,6 +71,24 @@ class WeightedMedianTests(unittest.TestCase):
 
         self.assertEqual(result, 10)
 
+    def test_dominant_interior_weight_returns_its_value(self):
+        """A dominant interior source is returned without blending a neighbor."""
+        result = weighted_median(
+            [10, 20, 30, 40],
+            [0.1, 0.6, 0.2, 0.1],
+        )
+
+        self.assertEqual(result, 20)
+
+    def test_dominant_interior_weight_is_found_after_sorting(self):
+        """A dominant interior source is found when the input is unsorted."""
+        result = weighted_median(
+            [40, 20, 10, 30],
+            [0.1, 0.6, 0.1, 0.2],
+        )
+
+        self.assertEqual(result, 20)
+
     def test_dominant_last_weight_does_not_wrap_to_first_value(self):
         """A dominant highest value is returned without wrapping to the lowest."""
         result = weighted_median(
