@@ -271,31 +271,47 @@ def weighted_median(values: list, weights: list):
     # Convert the weights into probabilities
     sum_weights = sum(weights)
     weights = [w / sum_weights for w in weights]
-    
-    # Select the median point
-    cumulative_probability = Decimal('0')
-    for idx in range(count):
-        cumulative_probability += weights[idx]
-        if cumulative_probability >= Decimal('0.5'):
-            break
 
-    if (count % 2) != 0:
-        # If there is an odd number of values return the
-        # value at the index
-        value = values[idx]
+    # If the weight is concentrated at the beginning
+    if count!=2 and weights[0] > Decimal('0.5'):
+        value = values[0]
+
+    # If the weight is concentrated at the end
+    elif count!=2 and weights[count - 1] > Decimal('0.5'):
+        value = values[count - 1]
+
+    # If the weight is not concentrated
+    # at the beginning or at the end
     else:
-        # If there is an even number of values, return the
-        # weighted average of the two middle values
-        
-        # If the cumulative probability is exactly 0.5,
-        # we need to take the next index for the second
-        # middle value
-        if cumulative_probability == Decimal('0.5'):
-            idx +=1
 
-        base = weights[idx-1] + weights[idx]
-        p, q = weights[idx-1]/base, weights[idx]/base
-        value = (values[idx-1] * p) + (values[idx] * q)
+        # Select the median point
+        if 2==count:
+            cumulative_probability = Decimal('0.5')
+            idx = 0
+        else:
+            cumulative_probability = Decimal('0')
+            for idx in range(count):
+                cumulative_probability += weights[idx]
+                if cumulative_probability >= Decimal('0.5'):
+                    break
+
+        if (count % 2) != 0:
+            # If there is an odd number of values return the
+            # value at the index
+            value = values[idx]
+        else:
+            # If there is an even number of values, return the
+            # weighted average of the two middle values
+
+            # If the cumulative probability is exactly 0.5,
+            # we need to take the next index for the second
+            # middle value
+            if cumulative_probability == Decimal('0.5'):
+                idx +=1
+
+            base = weights[idx-1] + weights[idx]
+            p, q = weights[idx-1]/base, weights[idx]/base
+            value = (values[idx-1] * p) + (values[idx] * q)
 
     # Set the value type back to original type
     if value_is_bool:
