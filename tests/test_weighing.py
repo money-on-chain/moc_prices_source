@@ -52,6 +52,16 @@ class WeightedMedianTests(unittest.TestCase):
             15,
         )
 
+    def test_zero_weight_value_with_different_type_is_ignored(self):
+        """A disabled value does not constrain the active values' type."""
+        result = weighted_median(
+            [Decimal('10'), 999],
+            [Decimal('1'), Decimal('0')],
+        )
+
+        self.assertEqual(result, Decimal('10'))
+        self.assertIsInstance(result, Decimal)
+
     def test_decimal_input_preserves_decimal_type(self):
         """Decimal inputs produce a Decimal result without losing precision."""
         result = weighted_median(

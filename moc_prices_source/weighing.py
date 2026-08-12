@@ -208,18 +208,9 @@ def validate_values_and_weights(values: list,
         raise ValueError('values and weights must have the same length')
 
     if values:
-
-        expected_values_type = type(values[0])
-        if not all(type(item) is expected_values_type for item in values):
-            raise TypeError('all items in values must have the same type')
-
         expected_weights_type = type(weights[0])
         if not all(type(item) is expected_weights_type for item in weights):
             raise TypeError('all items in weights must have the same type')
-
-        if not isinstance(values[0], (bool, int, float, Decimal)):
-            raise TypeError(
-                'values must contain only bool, int, float, Decimal types')
 
         if not isinstance(weights[0], (int, float, Decimal)):
             raise TypeError(
@@ -228,11 +219,20 @@ def validate_values_and_weights(values: list,
         if not all((item>=0) for item in weights):
             raise ValueError('all items in weights must be non-negative')
 
-        # Make a table of values and weights
-        table = zip(values, weights)
+        # Zero-weight values do not participate in the median, so remove them
+        # before validating value types.
+        table = [item for item in zip(values, weights) if item[1]]
 
-        # Remove items with zero weights
-        table = filter(lambda item: item[1], table)
+        if not table:
+            return [], []
+
+        expected_values_type = type(table[0][0])
+        if not all(type(item[0]) is expected_values_type for item in table):
+            raise TypeError('all items in values must have the same type')
+
+        if not isinstance(table[0][0], (bool, int, float, Decimal)):
+            raise TypeError(
+                'values must contain only bool, int, float, Decimal types')
         
         # Sort values and weights based on values
         table = sorted(table, key=lambda item: item[0])
