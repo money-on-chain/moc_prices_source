@@ -24,6 +24,9 @@ class URLTests(unittest.TestCase):
             'https://example.com:not-a-port',
             'https://example.com:70000',
             'https://example.com/a path',
+            'ftp://proxy.example.com:21',
+            'file://proxy.example.com/path',
+            'socks5://proxy.example.com:1080',
         )
 
         for value in invalid_urls:

@@ -30,6 +30,8 @@ class TypeBase():
 
 class URL(str, TypeBase):
 
+    supported_schemes = ('http', 'https')
+
     def __new__(cls, value: str):
         if value is None:
             raise ValueError('URL is None')
@@ -40,7 +42,11 @@ class URL(str, TypeBase):
 
         try:
             parsed = urlsplit(value)
-            valid = bool(parsed.scheme and parsed.netloc and parsed.hostname)
+            valid = bool(
+                parsed.scheme.lower() in cls.supported_schemes
+                and parsed.netloc
+                and parsed.hostname
+            )
             parsed.port  # Validate that the port is numeric and in range.
         except ValueError:
             valid = False

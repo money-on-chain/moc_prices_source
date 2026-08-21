@@ -564,15 +564,11 @@ class Base(object):
         if self._headers:
             kargs['headers'] = self._headers
 
-        if self._url_proxy:
+        proxy = default_proxy if self._url_proxy is None else self._url_proxy
+        if proxy:
             kargs['proxies'] = {
-                'http': self._url_proxy,
-                'https': self._url_proxy,
-            }
-        elif default_proxy:
-            kargs['proxies'] = {
-                'http': default_proxy,
-                'https': default_proxy,
+                'http': proxy,
+                'https': proxy,
             }
 
         self._clean_output_values()
