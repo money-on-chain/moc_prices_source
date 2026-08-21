@@ -7,6 +7,7 @@ from os.path import basename
 from sys import argv, stderr, exit
 import re
 from textwrap import wrap
+from urllib.parse import urlsplit
 
 
 
@@ -25,6 +26,60 @@ class TypeBase():
     
     def __str__(self):
         return camel_to_words(str(self.__class__.__name__))
+
+
+class URL(str, TypeBase):
+
+    def __new__(cls, value: str):
+        if value is None:
+            raise ValueError('URL is None')
+
+        value = str(value).strip()
+        if not value:
+            return super().__new__(cls, '')
+
+        try:
+            parsed = urlsplit(value)
+            valid = bool(parsed.scheme and parsed.netloc and parsed.hostname)
+            parsed.port  # Validate that the port is numeric and in range.
+        except ValueError:
+            valid = False
+
+        if not valid or any(character.isspace() for character in value):
+            raise ValueError('Invalid URL')
+
+        return super().__new__(cls, value)
+
+    @classmethod
+    def mask(cls, value: str) -> str:
+        try:
+            value = str(value).strip()
+            if not value:
+                return ''
+
+            parsed = urlsplit(value)
+            if not parsed.scheme or not parsed.hostname:
+                return '***'
+
+            host = parsed.hostname
+            if ':' in host and not host.startswith('['):
+                host = f'[{host}]'
+            port = f':{parsed.port}' if parsed.port is not None else ''
+
+            credentials = ''
+            if parsed.username is not None:
+                credentials = '***'
+                if parsed.password is not None:
+                    credentials += ':***'
+                credentials += '@'
+
+            return f'{parsed.scheme}://{credentials}{host}{port}'
+        except (TypeError, ValueError):
+            return '***'
+
+    @property
+    def masked(self) -> str:
+        return self.mask(self)
 
 
 class Bool(TypeBase):
@@ -104,6 +159,7 @@ class EnvsTypes():
     bool = staticmethod(Bool())
     positive_integer = staticmethod(PositiveInteger())
     positive_integer_and_zero = staticmethod(PositiveIntegerAndZero())
+    url = URL
     Options = Options
 
 
@@ -266,8 +322,11 @@ class Envs():
                 value = cast(str(value))
             except Exception as e:
                 if on_error_exit: # Show errors
+                    displayed_value = repr(value)
+                    if hasattr(cast, 'mask'):
+                        displayed_value = repr(cast.mask(value))
                     msg = ("ERROR: invalid value for env var "
-                           f"{name}: {value!r}\n{e}")
+                           f"{name}: {displayed_value}\n{e}")
                     print(msg, file=stderr)
                     exit(1)
                 else:
@@ -318,6 +377,8 @@ class Envs():
         def format(obj, name):
             if obj is None:
                 return ''
+            if name in ('value', 'default') and hasattr(obj, 'masked'):
+                return obj.masked
             if obj is int:
                 return 'Integer'
             if obj is float:

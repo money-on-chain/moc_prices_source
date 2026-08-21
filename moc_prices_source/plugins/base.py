@@ -17,7 +17,7 @@ from .chains import chain
 
 base_dir = dirname(dirname(abspath(__file__)))
 app_name = basename(base_dir)
-default_proxy = envs('DEFAULT_PROXY', None, str,
+default_proxy = envs('DEFAULT_PROXY', None, envs.types.url,
                description = "Proxy for API calling")
 
 

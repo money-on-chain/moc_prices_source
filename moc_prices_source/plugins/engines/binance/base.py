@@ -23,7 +23,7 @@ query = envs(
     description = "Query template to get the price data")
 
 proxy = envs(
-    'binance_api_proxy', api_proxy, str,
+    'binance_api_proxy', api_proxy, envs.types.url,
     description = "Proxy for Binance")
 
 

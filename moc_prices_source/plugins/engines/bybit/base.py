@@ -23,7 +23,7 @@ query = envs(
     description = "Query template to get the price data")
 
 proxy = envs(
-    'bybit_api_proxy', api_proxy, str,
+    'bybit_api_proxy', api_proxy, envs.types.url,
     description = "Proxy for Bybit")
 
 
