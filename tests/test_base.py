@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from requests import Response
+from requests import Response, exceptions
 
 from moc_prices_source.plugins.base import Base
 
@@ -88,6 +88,34 @@ class BaseRequestTests(unittest.TestCase):
                 'https': proxy_url,
             },
         )
+
+    def test_proxy_request_error_does_not_expose_credentials(self):
+        proxy_url = (
+            'http://user:supersecret@proxy.example.com:8080/'
+            'private?token=x'
+        )
+        engine = Base()
+        engine._redis = None
+        engine._uri = 'https://example.com/prices'
+        engine._url_proxy = proxy_url
+
+        rq = Mock()
+        rq.get.side_effect = exceptions.InvalidURL(
+            f'Failed to parse: {proxy_url}'
+        )
+
+        result = engine._request(rq)
+        serialized = engine.as_json
+
+        self.assertIsNone(result)
+        self.assertIn(
+            'http://***:***@proxy.example.com:8080',
+            str(engine.error),
+        )
+        for secret in ('user', 'supersecret', '/private', 'token=x'):
+            with self.subTest(secret=secret):
+                self.assertNotIn(secret, str(engine.error))
+                self.assertNotIn(secret, serialized)
 
 
 if __name__ == '__main__':

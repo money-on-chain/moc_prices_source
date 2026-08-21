@@ -24,6 +24,8 @@ class URLTests(unittest.TestCase):
             'https://example.com:not-a-port',
             'https://example.com:70000',
             'https://example.com/a path',
+            'http://user:secret@%zz:8080',
+            'http://user:secret@☃.example.com:8080',
             'ftp://proxy.example.com:21',
             'file://proxy.example.com/path',
             'socks5://proxy.example.com:1080',

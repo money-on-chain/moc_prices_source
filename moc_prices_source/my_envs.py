@@ -8,6 +8,8 @@ from sys import argv, stderr, exit
 import re
 from textwrap import wrap
 from urllib.parse import urlsplit
+from urllib3.exceptions import LocationParseError
+from urllib3.util import parse_url
 
 
 
@@ -41,14 +43,15 @@ class URL(str, TypeBase):
             return super().__new__(cls, '')
 
         try:
-            parsed = urlsplit(value)
+            # Use the same parser that requests uses for proxy URLs so a URL
+            # accepted here cannot later be reflected by requests in a parser
+            # error, potentially including its credentials.
+            parsed = parse_url(value)
             valid = bool(
-                parsed.scheme.lower() in cls.supported_schemes
-                and parsed.netloc
-                and parsed.hostname
+                parsed.scheme in cls.supported_schemes
+                and parsed.host
             )
-            parsed.port  # Validate that the port is numeric and in range.
-        except ValueError:
+        except (LocationParseError, UnicodeError, ValueError):
             valid = False
 
         if not valid or any(character.isspace() for character in value):

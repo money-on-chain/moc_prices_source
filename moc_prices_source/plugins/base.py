@@ -497,6 +497,15 @@ class Base(object):
         return out
 
 
+    @staticmethod
+    def _request_error(error, proxy):
+        if not proxy:
+            return error
+        masked_proxy = envs.types.url.mask(proxy)
+        return (f"{type(error).__name__}: request through proxy "
+                f"{masked_proxy} failed")
+
+
     def __bool__(self):
         return not(bool(self._error))
 
@@ -606,10 +615,10 @@ class Base(object):
                 response = getter(**kargs)
                 response.raise_for_status()
             except requests.exceptions.HTTPError as e:
-                self._error = e
+                self._error = self._request_error(e, proxy)
                 return None
             except Exception as e:
-                self._error = e
+                self._error = self._request_error(e, proxy)
                 return None
 
             if not response:
