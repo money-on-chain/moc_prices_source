@@ -582,6 +582,7 @@ class Base(object):
         if self._redis is not None:
 
             cache_key_dict = kargs.copy()
+            cache_key_dict.pop('proxies', None)
             cache_key_dict['method'] = method
             cache_key = \
                 f"RQCACHE({json.dumps(cache_key_dict, sort_keys=True)})"
