@@ -63,6 +63,41 @@ class BaseRequestTests(unittest.TestCase):
             url='https://example.com/prices',
             timeout=engine.timeout,
             verify=engine._ssl_verify,
+            proxies={
+                'http': None,
+                'https': None,
+                'all': None,
+            },
+        )
+
+    def test_unconfigured_proxy_disables_environment_proxies(self):
+        engine = Base()
+        engine._redis = None
+        engine._uri = 'https://example.com/prices'
+        engine._url_proxy = None
+
+        rq = Mock()
+        rq.get.return_value = self._response()
+
+        environment = {
+            'HTTP_PROXY': 'http://ambient-proxy.example.com:8080',
+            'HTTPS_PROXY': 'http://ambient-proxy.example.com:8080',
+            'ALL_PROXY': 'http://ambient-proxy.example.com:8080',
+        }
+        with patch.dict('os.environ', environment, clear=True):
+            with patch('moc_prices_source.plugins.base.default_proxy', None):
+                result = engine._request(rq)
+
+        self.assertEqual(result, {'price': 1})
+        rq.get.assert_called_once_with(
+            url='https://example.com/prices',
+            timeout=engine.timeout,
+            verify=engine._ssl_verify,
+            proxies={
+                'http': None,
+                'https': None,
+                'all': None,
+            },
         )
 
     def test_unset_url_proxy_uses_default_proxy(self):

@@ -26,4 +26,3 @@ unless the implementation deviates from the behavior described here:
 Only report a proxy-related finding when it contradicts one of these
 invariants, exposes credentials from an environment-provided URL, or causes
 behavior outside this documented scope.
-

@@ -584,6 +584,15 @@ class Base(object):
                 'http': proxy,
                 'https': proxy,
             }
+        else:
+            # Requests otherwise inherits HTTP_PROXY, HTTPS_PROXY and
+            # ALL_PROXY from the process environment. Explicit None entries
+            # keep an unconfigured (or explicitly disabled) engine direct.
+            kargs['proxies'] = {
+                'http': None,
+                'https': None,
+                'all': None,
+            }
 
         self._clean_output_values()
 

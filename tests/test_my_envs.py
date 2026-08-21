@@ -68,6 +68,25 @@ class EnvsURLTests(unittest.TestCase):
         self.assertIs(type(value), str)
         self.assertEqual(value, default)
 
+    def test_environment_url_equal_to_default_is_cast_and_masked(self):
+        proxy_url = (
+            'http://user:secret@proxy.example.com:8080/private?token=x'
+        )
+        default = URL(proxy_url)
+        envs = Envs(load_envfile_on_first_get=False)
+
+        with patch.dict('os.environ', {'TEST_PROXY': proxy_url}, clear=True):
+            value = envs('TEST_PROXY', default, envs.types.url)
+
+        rendered = str(envs)
+
+        self.assertIsInstance(value, URL)
+        self.assertNotIn('user', rendered)
+        self.assertNotIn('secret', rendered)
+        self.assertNotIn('/private', rendered)
+        self.assertNotIn('token=x', rendered)
+        self.assertIn('http://***:***@proxy.example.com:8080', rendered)
+
     def test_empty_url_environment_value_means_disabled(self):
         envs = Envs(load_envfile_on_first_get=False)
 

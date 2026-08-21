@@ -308,8 +308,10 @@ class Envs():
         # Get value from environment
         try:
             value = environ[name]
+            from_environment = True
         except KeyError:
             value = default
+            from_environment = False
 
         # Apply aliasing
         if alias:
@@ -328,7 +330,7 @@ class Envs():
         # Defaults are trusted caller-owned values and intentionally are not
         # cast. Callers that need URL validation/masking on a default must pass
         # a URL instance instead of a plain string.
-        if value!=default:
+        if from_environment:
             try:
                 value = cast(str(value))
             except Exception as e:

@@ -37,7 +37,7 @@ def uri(**kwargs):
     if not "path" in kwargs:
         kwargs["path"] = default_path
     if not "host" in kwargs:
-        kwargs["host"] = host 
+        kwargs["host"] = host
     out = base.format_map(SafeDict(kwargs))
     return out 
 
