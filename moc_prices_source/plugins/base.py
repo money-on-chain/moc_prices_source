@@ -17,6 +17,8 @@ from .chains import chain
 
 base_dir = dirname(dirname(abspath(__file__)))
 app_name = basename(base_dir)
+default_proxy = envs('DEFAULT_PROXY', None, str,
+               description = "Proxy for API calling")
 
 
 class classproperty:
@@ -566,6 +568,11 @@ class Base(object):
             kargs['proxies'] = {
                 'http': self._url_proxy,
                 'https': self._url_proxy,
+            }
+        elif default_proxy:
+            kargs['proxies'] = {
+                'http': default_proxy,
+                'https': default_proxy,
             }
 
         self._clean_output_values()
