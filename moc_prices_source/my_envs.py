@@ -322,7 +322,9 @@ class Envs():
         options = list(options)
         options.sort()
 
-        # Cast value
+        # Defaults are trusted caller-owned values and intentionally are not
+        # cast. Callers that need URL validation/masking on a default must pass
+        # a URL instance instead of a plain string.
         if value!=default:
             try:
                 value = cast(str(value))

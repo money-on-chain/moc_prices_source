@@ -578,6 +578,8 @@ class Base(object):
         if self._redis is not None:
 
             cache_key_dict = kargs.copy()
+            # Proxy routing is intentionally not part of response identity:
+            # equal upstream requests share cached data across proxy routes.
             cache_key_dict.pop('proxies', None)
             cache_key_dict['method'] = method
             cache_key = \

@@ -56,6 +56,16 @@ class URLTests(unittest.TestCase):
 
 class EnvsURLTests(unittest.TestCase):
 
+    def test_url_default_is_intentionally_not_cast(self):
+        default = 'http://proxy.example.com:8080'
+        envs = Envs(load_envfile_on_first_get=False)
+
+        with patch.dict('os.environ', {}, clear=True):
+            value = envs('TEST_PROXY', default, envs.types.url)
+
+        self.assertIs(type(value), str)
+        self.assertEqual(value, default)
+
     def test_empty_url_environment_value_means_disabled(self):
         envs = Envs(load_envfile_on_first_get=False)
 
