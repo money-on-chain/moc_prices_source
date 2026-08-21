@@ -1,10 +1,10 @@
-from ...base import BaseWithFailover, Engines, Decimal, envs
+from ...base import Base, Engines, Decimal, envs
 
 base_uri = "https://{host}/{path}?{query}"
 host = "api.bybit.com"
-host_failover = "moc-proxy-api-bybit.moneyonchain.com"
 default_path = "v5/market/tickers"
 query = "category=spot&symbol={symbol}"
+api_proxy = None
 
 base_uri = envs(
     'bybit_api_base_uri', base_uri, str,
@@ -14,10 +14,6 @@ host = envs(
     'bybit_api_host', host, str,
     description = "Host to get the price data")
 
-host_failover = envs(
-    'bybit_api_host_failover', host_failover, str,
-    description = "Host to get the price data in case of failover")
-
 default_path = envs(
     'bybit_api_default_path', default_path, str,
     description = "Path to get the price data")
@@ -26,22 +22,27 @@ query = envs(
     'bybit_api_query', query, str,
     description = "Query template to get the price data")
 
+proxy = envs(
+    'bybit_api_proxy', api_proxy, str,
+    description = "Proxy for Bybit")
+
 
 class SafeDict(dict):
     def __missing__(self, key):
         return "{" + key + "}"
 
 
-def uri(failover=False, **kwargs):
+def uri(**kwargs):
     base = base_uri.format_map(SafeDict(query=query))
     if not "path" in kwargs:
         kwargs["path"] = default_path
     if not "host" in kwargs:
-        kwargs["host"] = host if not failover else host_failover
+        kwargs["host"] = host 
     out = base.format_map(SafeDict(kwargs))
     return out 
 
-class EngineBybit(BaseWithFailover):
+class EngineBybit(Base):
 
     _description = "Bybit"
     _max_time_without_price_change = 0 # zero means infinity
+    _url_proxy = proxy

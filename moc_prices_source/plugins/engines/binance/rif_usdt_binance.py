@@ -7,7 +7,6 @@ from .base import EngineBinance, Engines, uri
 class Engine(EngineBinance):
 
     _uri = uri(symbol="RIFUSDT")
-    _uri_failover = uri(symbol="RIFUSDT", failover=True)
     _coinpair = RIF_USDT
 
     def _map(self, data):

@@ -11,7 +11,6 @@ allow_degraded = envs('MA_ALLOW_DEGRADED', False, bool)
 class Engine(EngineBinance):
 
     _uri = uri(symbol="RIFUSDT", path="api/v3/depth")
-    _uri_failover = uri(symbol="RIFUSDT", failover=True, path="api/v3/depth")
     _coinpair = RIF_USDT_MA
     _max_quantity = max_quantity
     _allow_degraded = allow_degraded

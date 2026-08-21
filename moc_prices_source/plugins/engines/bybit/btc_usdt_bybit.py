@@ -7,7 +7,6 @@ from .base import EngineBybit, Engines, Decimal, uri
 class Engine(EngineBybit):
 
     _uri = uri(symbol="BTCUSDT")
-    _uri_failover = uri(symbol="BTCUSDT", failover=True)
     _coinpair = BTC_USDT
     _max_time_without_price_change = 600 # 10m, zero means infinity
 

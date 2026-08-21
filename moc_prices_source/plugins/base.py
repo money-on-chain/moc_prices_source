@@ -373,6 +373,7 @@ class Base(object):
     _uri = "http://api.pricefetcher.com/BTCUSD"
     _payload = {}
     _headers = {}
+    _url_proxy = None
     _coinpair = None
     _timeout = 10
     _max_age = 30
@@ -560,6 +561,12 @@ class Base(object):
         
         if self._headers:
             kargs['headers'] = self._headers
+
+        if self._url_proxy:
+            kargs['proxies'] = {
+                'http': self._url_proxy,
+                'https': self._url_proxy,
+            }
 
         self._clean_output_values()
 

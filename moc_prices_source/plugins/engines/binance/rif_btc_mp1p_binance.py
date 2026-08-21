@@ -10,7 +10,6 @@ factor = 0.01
 class Engine(EngineBinance):
 
     _uri = uri(symbol="RIFBTC", path="api/v3/depth")
-    _uri_failover = uri(symbol="RIFBTC", failover=True, path="api/v3/depth")
     _coinpair = RIF_BTC_MP1P
 
 
