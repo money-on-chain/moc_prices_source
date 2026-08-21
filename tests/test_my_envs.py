@@ -95,6 +95,26 @@ class EnvsURLTests(unittest.TestCase):
         self.assertNotIn('token=x', rendered)
         self.assertIn('http://***:***@proxy.example.com:8080', rendered)
 
+    def test_repeated_url_lookup_preserves_cast_and_masking(self):
+        proxy_url = 'http://user:secret@proxy.example.com:8080/private?token=x'
+        envs = Envs(load_envfile_on_first_get=False)
+
+        with patch.dict('os.environ', {'TEST_PROXY': proxy_url}):
+            first = envs('TEST_PROXY', None, envs.types.url)
+            second = envs('TEST_PROXY')
+
+        rendered = str(envs)
+
+        self.assertIsInstance(first, URL)
+        self.assertIsInstance(second, URL)
+        self.assertIs(envs.cast_of('TEST_PROXY'), URL)
+        self.assertEqual(envs.value_of('TEST_PROXY'), first)
+        self.assertNotIn('user', rendered)
+        self.assertNotIn('secret', rendered)
+        self.assertNotIn('/private', rendered)
+        self.assertNotIn('token=x', rendered)
+        self.assertIn('http://***:***@proxy.example.com:8080', rendered)
+
     def test_invalid_url_error_does_not_expose_credentials(self):
         proxy_url = 'http://user:secret@proxy.example.com:not-a-port'
         envs = Envs(load_envfile_on_first_get=False)

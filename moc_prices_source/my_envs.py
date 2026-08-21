@@ -269,7 +269,7 @@ class Envs():
         # Try to obtain previously recorded data
         prev_description = None
         if self:
-            prev_data = envs[name]
+            prev_data = self[name]
             if len(prev_data)==1:
                 prev_data = prev_data[0]
                 prev_cast = prev_data['cast']
@@ -420,7 +420,7 @@ class Envs():
         return f"\n{str_table}\n"
 
     def _data_of(self, name, key) -> Any:
-        data = envs[name]
+        data = self[name]
         if len(data)>1:
             raise KeyError('more than one env with that name')
         if len(data)<1:

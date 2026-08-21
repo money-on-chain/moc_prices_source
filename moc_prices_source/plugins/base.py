@@ -502,6 +502,11 @@ class Base(object):
         if not proxy:
             return error
         masked_proxy = envs.types.url.mask(proxy)
+        if isinstance(error, requests.exceptions.HTTPError):
+            status = getattr(error.response, 'status_code', None)
+            status_text = f"HTTP {status}" if status is not None else "HTTP error"
+            return (f"HTTPError: upstream returned {status_text} through proxy "
+                    f"{masked_proxy}")
         return (f"{type(error).__name__}: request through proxy "
                 f"{masked_proxy} failed")
 

@@ -117,6 +117,57 @@ class BaseRequestTests(unittest.TestCase):
                 self.assertNotIn(secret, str(engine.error))
                 self.assertNotIn(secret, serialized)
 
+    def test_proxy_http_error_preserves_upstream_status(self):
+        proxy_url = (
+            'http://user:supersecret@proxy.example.com:8080/'
+            'private?token=x'
+        )
+        engine = Base()
+        engine._redis = None
+        engine._uri = 'https://example.com/prices'
+        engine._url_proxy = proxy_url
+
+        response = self._response()
+        response.status_code = 429
+        response.reason = 'Too Many Requests'
+        rq = Mock()
+        rq.get.return_value = response
+
+        result = engine._request(rq)
+        error = str(engine.error)
+
+        self.assertIsNone(result)
+        self.assertIn('upstream returned HTTP 429', error)
+        self.assertIn('http://***:***@proxy.example.com:8080', error)
+        for secret in ('user', 'supersecret', '/private', 'token=x'):
+            with self.subTest(secret=secret):
+                self.assertNotIn(secret, error)
+
+    def test_proxy_transport_error_does_not_expose_credentials(self):
+        proxy_url = (
+            'http://user:supersecret@proxy.example.com:8080/'
+            'private?token=x'
+        )
+        engine = Base()
+        engine._redis = None
+        engine._uri = 'https://example.com/prices'
+        engine._url_proxy = proxy_url
+
+        rq = Mock()
+        rq.get.side_effect = exceptions.ProxyError(
+            f'Cannot connect to proxy {proxy_url}'
+        )
+
+        result = engine._request(rq)
+        error = str(engine.error)
+
+        self.assertIsNone(result)
+        self.assertIn('ProxyError: request through proxy', error)
+        self.assertIn('http://***:***@proxy.example.com:8080', error)
+        for secret in ('user', 'supersecret', '/private', 'token=x'):
+            with self.subTest(secret=secret):
+                self.assertNotIn(secret, error)
+
 
 if __name__ == '__main__':
     unittest.main()
