@@ -17,6 +17,8 @@ from .chains import chain
 
 base_dir = dirname(dirname(abspath(__file__)))
 app_name = basename(base_dir)
+default_proxy = envs('DEFAULT_PROXY', None, envs.types.url,
+               description = "Proxy for API calling")
 
 
 class classproperty:
@@ -373,6 +375,7 @@ class Base(object):
     _uri = "http://api.pricefetcher.com/BTCUSD"
     _payload = {}
     _headers = {}
+    _url_proxy = None
     _coinpair = None
     _timeout = 10
     _max_age = 30
@@ -494,6 +497,20 @@ class Base(object):
         return out
 
 
+    @staticmethod
+    def _request_error(error, proxy):
+        if not proxy:
+            return error
+        masked_proxy = envs.types.url.mask(proxy)
+        if isinstance(error, requests.exceptions.HTTPError):
+            status = getattr(error.response, 'status_code', None)
+            status_text = f"HTTP {status}" if status is not None else "HTTP error"
+            return (f"HTTPError: upstream returned {status_text} through proxy "
+                    f"{masked_proxy}")
+        return (f"{type(error).__name__}: request through proxy "
+                f"{masked_proxy} failed")
+
+
     def __bool__(self):
         return not(bool(self._error))
 
@@ -561,6 +578,22 @@ class Base(object):
         if self._headers:
             kargs['headers'] = self._headers
 
+        proxy = default_proxy if self._url_proxy is None else self._url_proxy
+        if proxy:
+            kargs['proxies'] = {
+                'http': proxy,
+                'https': proxy,
+            }
+        else:
+            # Requests otherwise inherits HTTP_PROXY, HTTPS_PROXY and
+            # ALL_PROXY from the process environment. Explicit None entries
+            # keep an unconfigured (or explicitly disabled) engine direct.
+            kargs['proxies'] = {
+                'http': None,
+                'https': None,
+                'all': None,
+            }
+
         self._clean_output_values()
 
         response = None
@@ -568,6 +601,9 @@ class Base(object):
         if self._redis is not None:
 
             cache_key_dict = kargs.copy()
+            # Proxy routing is intentionally not part of response identity:
+            # equal upstream requests share cached data across proxy routes.
+            cache_key_dict.pop('proxies', None)
             cache_key_dict['method'] = method
             cache_key = \
                 f"RQCACHE({json.dumps(cache_key_dict, sort_keys=True)})"
@@ -593,10 +629,10 @@ class Base(object):
                 response = getter(**kargs)
                 response.raise_for_status()
             except requests.exceptions.HTTPError as e:
-                self._error = e
+                self._error = self._request_error(e, proxy)
                 return None
             except Exception as e:
-                self._error = e
+                self._error = self._request_error(e, proxy)
                 return None
 
             if not response:

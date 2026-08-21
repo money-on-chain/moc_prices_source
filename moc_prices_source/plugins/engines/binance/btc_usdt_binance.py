@@ -7,7 +7,6 @@ from .base import EngineBinance, Engines, Decimal, uri
 class Engine(EngineBinance):
 
     _uri = uri(symbol="BTCUSDT", path="api/v3/ticker/bookTicker")
-    _uri_failover = uri(symbol="BTCUSDT", failover=True, path="api/v3/ticker/bookTicker")
     _coinpair = BTC_USDT
     _max_time_without_price_change = 600 # 10m, zero means infinity
 
