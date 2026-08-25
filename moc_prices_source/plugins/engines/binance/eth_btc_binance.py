@@ -7,7 +7,6 @@ from .base import EngineBinance, Engines, uri
 class Engine(EngineBinance):
 
     _uri = uri(symbol="ETHBTC")
-    _uri_failover = uri(symbol="ETHBTC", failover=True)
     _coinpair = ETH_BTC
     _max_time_without_price_change = 600 # 10m, zero means infinity
 

@@ -7,7 +7,6 @@ from .base import EngineBinance, Engines, uri
 class Engine(EngineBinance):
 
     _uri = uri(symbol="BTCARS")
-    _uri_failover = uri(symbol="BTCARS", failover=True)
     _coinpair = BTC_ARS
     _max_age = 3600 # 1hs.
 

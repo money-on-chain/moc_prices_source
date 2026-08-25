@@ -7,6 +7,9 @@ from os.path import basename
 from sys import argv, stderr, exit
 import re
 from textwrap import wrap
+from urllib.parse import urlsplit
+from urllib3.exceptions import LocationParseError
+from urllib3.util import parse_url
 
 
 
@@ -25,6 +28,67 @@ class TypeBase():
     
     def __str__(self):
         return camel_to_words(str(self.__class__.__name__))
+
+
+class URL(str, TypeBase):
+
+    supported_schemes = ('http', 'https')
+
+    def __new__(cls, value: str):
+        if value is None:
+            raise ValueError('URL is None')
+
+        value = str(value).strip()
+        if not value:
+            return super().__new__(cls, '')
+
+        try:
+            # Use the same parser that requests uses for proxy URLs so a URL
+            # accepted here cannot later be reflected by requests in a parser
+            # error, potentially including its credentials.
+            parsed = parse_url(value)
+            valid = bool(
+                parsed.scheme in cls.supported_schemes
+                and parsed.host
+            )
+        except (LocationParseError, UnicodeError, ValueError):
+            valid = False
+
+        if not valid or any(character.isspace() for character in value):
+            raise ValueError('Invalid URL')
+
+        return super().__new__(cls, value)
+
+    @classmethod
+    def mask(cls, value: str) -> str:
+        try:
+            value = str(value).strip()
+            if not value:
+                return ''
+
+            parsed = urlsplit(value)
+            if not parsed.scheme or not parsed.hostname:
+                return '***'
+
+            host = parsed.hostname
+            if ':' in host and not host.startswith('['):
+                host = f'[{host}]'
+            port = f':{parsed.port}' if parsed.port is not None else ''
+
+            credentials = ''
+            if parsed.username is not None:
+                credentials = '***'
+                if parsed.password is not None:
+                    credentials += ':***'
+                credentials += '@'
+
+            return f'{parsed.scheme}://{credentials}{host}{port}'
+        except (TypeError, ValueError):
+            return '***'
+
+    @property
+    def masked(self) -> str:
+        return self.mask(self)
 
 
 class Bool(TypeBase):
@@ -104,6 +168,7 @@ class EnvsTypes():
     bool = staticmethod(Bool())
     positive_integer = staticmethod(PositiveInteger())
     positive_integer_and_zero = staticmethod(PositiveIntegerAndZero())
+    url = URL
     Options = Options
 
 
@@ -204,7 +269,7 @@ class Envs():
         # Try to obtain previously recorded data
         prev_description = None
         if self:
-            prev_data = envs[name]
+            prev_data = self[name]
             if len(prev_data)==1:
                 prev_data = prev_data[0]
                 prev_cast = prev_data['cast']
@@ -243,8 +308,10 @@ class Envs():
         # Get value from environment
         try:
             value = environ[name]
+            from_environment = True
         except KeyError:
             value = default
+            from_environment = False
 
         # Apply aliasing
         if alias:
@@ -260,14 +327,19 @@ class Envs():
         options = list(options)
         options.sort()
 
-        # Cast value
-        if value!=default:
+        # Defaults are trusted caller-owned values and intentionally are not
+        # cast. Callers that need URL validation/masking on a default must pass
+        # a URL instance instead of a plain string.
+        if from_environment:
             try:
                 value = cast(str(value))
             except Exception as e:
                 if on_error_exit: # Show errors
+                    displayed_value = repr(value)
+                    if hasattr(cast, 'mask'):
+                        displayed_value = repr(cast.mask(value))
                     msg = ("ERROR: invalid value for env var "
-                           f"{name}: {value!r}\n{e}")
+                           f"{name}: {displayed_value}\n{e}")
                     print(msg, file=stderr)
                     exit(1)
                 else:
@@ -318,6 +390,8 @@ class Envs():
         def format(obj, name):
             if obj is None:
                 return ''
+            if name in ('value', 'default') and hasattr(obj, 'masked'):
+                return obj.masked
             if obj is int:
                 return 'Integer'
             if obj is float:
@@ -348,7 +422,7 @@ class Envs():
         return f"\n{str_table}\n"
 
     def _data_of(self, name, key) -> Any:
-        data = envs[name]
+        data = self[name]
         if len(data)>1:
             raise KeyError('more than one env with that name')
         if len(data)<1:

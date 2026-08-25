@@ -323,9 +323,10 @@ class CoinPairValue(Resource):
             sub_coinpair = p.get('coinpair', 'unknown')
             sources_count[sub_coinpair] = sources_count.get(
                 sub_coinpair, 0) + 1
+            sources_count_ok[sub_coinpair] = sources_count_ok.get(
+                sub_coinpair, 0)
             if p.get('ok'):
-                sources_count_ok[sub_coinpair] = sources_count_ok.get(
-                    sub_coinpair, 0) + 1
+                sources_count_ok[sub_coinpair] += 1
             else:
                 source = p.get('description', 'unknown')
                 error = p.get('error', 'unknown')
