@@ -4,25 +4,19 @@
 
 ### Intentional proxy behavior
 
-The following are deliberate design decisions. Do not report them as defects
-unless the implementation deviates from the behavior described here:
+Treat the following as intentional design invariants:
 
-- Binance and Bybit intentionally inherit from `Base`, not
-  `BaseWithFailover`.
-- Legacy failover hosts and the environment variables
-  `BINANCE_API_HOST_FAILOVER` and `BYBIT_API_HOST_FAILOVER` are intentionally
-  unsupported.
-- When no proxy is configured, requests intentionally use only the direct
-  endpoint. No automatic failover is expected.
+- Proxy routing is transport-only and does not imply automatic endpoint
+  failover.
+- Proxy resolution follows this precedence:
+  - A non-empty per-engine proxy overrides `DEFAULT_PROXY`.
+  - `None` falls back to `DEFAULT_PROXY`.
+  - An empty per-engine proxy explicitly disables `DEFAULT_PROXY`.
+  - If the resolved proxy is empty, requests go directly to the upstream
+    endpoint and must not inherit `HTTP_PROXY`, `HTTPS_PROXY`, or `ALL_PROXY`.
 - Redis HTTP cache keys intentionally exclude proxy configuration. Cached
-  responses for the same request are considered interchangeable regardless
-  of which proxy produced them.
-- `Envs` intentionally does not cast default values. URL masking applies only
-  to values converted to `URL`. Current production proxy defaults must remain
-  `None`; callers that need a non-`None` URL default must construct a `URL`
-  explicitly.
-- An empty per-engine proxy intentionally disables `DEFAULT_PROXY`.
-
-Only report a proxy-related finding when it contradicts one of these
-invariants, exposes credentials from an environment-provided URL, or causes
-behavior outside this documented scope.
+  upstream requests share cached responses regardless of their proxy route.
+- `Envs` intentionally does not cast default values. Production proxy defaults
+  must remain `None`; a non-`None` URL default must be constructed as `URL`.
+- Proxy credentials, paths, and query parameters must never appear in errors,
+  logs, or rendered configuration, regardless of where the URL originated.
