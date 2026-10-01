@@ -20,18 +20,20 @@ class Engine(EngineWebScraping):
         value = None
         table = html.find('table', id="CompraVenta")
         if table:
-            values = []
-            try:
-                for s in table.find_all('td', attrs={'class': 'colCompraVenta'}):
-                    raw = next(s.strings).strip().replace('$', '').strip()
-                    values.append(to_dec(raw))
-            except (InvalidOperation, StopIteration):
-                values = []
-            if len(values)==2:
+            for row in table.find_all('tr'):
+                name = row.find('td', class_='colNombre')
+                if name is None or name.get_text(' ', strip=True) != 'Dólar Blue':
+                    continue
+                cells = row.find_all('td', class_='colCompraVenta')
+                if len(cells) != 2:
+                    break
                 try:
-                    value = (Decimal(values[0]) + Decimal(values[1]))/Decimal(2) 
-                except:
-                    value = None
+                    prices = [to_dec(next(cell.stripped_strings).replace('$', '').strip())
+                              for cell in cells]
+                    value = (prices[0] + prices[1]) / Decimal(2)
+                except (InvalidOperation, StopIteration):
+                    pass
+                break
 
         if not value:
             self._error = "Response format error"

@@ -37,8 +37,26 @@ class Engine(EngineWebScraping):
                         if v is not None:
                             values.append(v)
         
-        if len(values)==2:
+        if len(values)==2 and all(v > 0 for v in values):
             value = sum(values)/2
+
+        if not value:
+            for heading in html.find_all('h2'):
+                if 'trm' not in heading.get_text(' ', strip=True).lower():
+                    continue
+                for node in heading.next_elements:
+                    if getattr(node, 'name', None) == 'h3':
+                        break
+                    if isinstance(node, str):
+                        try:
+                            candidate = to_dec(node)
+                        except InvalidOperation:
+                            continue
+                        if candidate > 0:
+                            value = candidate
+                            break
+                if value:
+                    break
 
         if not value:
             self._error = "Response format error"
