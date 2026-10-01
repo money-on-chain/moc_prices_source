@@ -1,5 +1,6 @@
 from ....pairs.simple import USD_ARS
-from ....base import EngineWebScraping, Engines, Decimal 
+from ....base import EngineWebScraping, Engines, Decimal
+from decimal import InvalidOperation
 
 
 
@@ -20,10 +21,12 @@ class Engine(EngineWebScraping):
         table = html.find('table', id="CompraVenta")
         if table:
             values = []
-            for s in table.find_all ('td', attrs={'class':'colCompraVenta'} ):
-                d = to_dec(list(map(lambda x: x.strip(), s.strings))[0
-                    ].replace('$', '').strip())
-                values.append(d)
+            try:
+                for s in table.find_all('td', attrs={'class': 'colCompraVenta'}):
+                    raw = next(s.strings).strip().replace('$', '').strip()
+                    values.append(to_dec(raw))
+            except (InvalidOperation, StopIteration):
+                values = []
             if len(values)==2:
                 try:
                     value = (Decimal(values[0]) + Decimal(values[1]))/Decimal(2) 
