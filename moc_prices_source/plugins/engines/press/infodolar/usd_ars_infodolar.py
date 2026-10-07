@@ -30,7 +30,8 @@ class Engine(EngineWebScraping):
                 try:
                     prices = [to_dec(next(cell.stripped_strings).replace('$', '').strip())
                               for cell in cells]
-                    value = (prices[0] + prices[1]) / Decimal(2)
+                    if all(price.is_finite() and price > 0 for price in prices):
+                        value = (prices[0] + prices[1]) / Decimal(2)
                 except (InvalidOperation, StopIteration):
                     pass
                 break

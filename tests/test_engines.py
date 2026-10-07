@@ -1,8 +1,10 @@
 import unittest
+from decimal import Decimal
 
 from bs4 import BeautifulSoup
 
 from moc_prices_source.engines import get_prices
+from moc_prices_source.plugins.engines.press.dolarhoy._parse import ars_price
 from moc_prices_source.plugins.engines.press.infodolar import (
     usd_ars_ccl_infodolar,
     usd_ars_infodolar,
@@ -73,19 +75,46 @@ class GetPricesTests(unittest.TestCase):
 
 class InfodolarTests(unittest.TestCase):
     def test_invalid_price_is_reported_as_format_error(self):
-        html = BeautifulSoup(
-            '<table id="CompraVenta">'
-            '<td class="colCompraVenta">N/A</td>'
-            '<td class="colCompraVenta">$1.234,56</td>'
-            '</table>',
-            'lxml',
-        )
+        for module, label in ((usd_ars_infodolar, 'Dólar Blue'),
+                              (usd_ars_ccl_infodolar, 'Dólar CCL')):
+            for price in ('N/A', 'NaN', 'Infinity', '0', '-1'):
+                with self.subTest(engine=module.__name__, price=price):
+                    html = BeautifulSoup(
+                        f'<table id="CompraVenta"><tr>'
+                        f'<td class="colNombre">{label}</td>'
+                        f'<td class="colCompraVenta">{price}</td>'
+                        '<td class="colCompraVenta">$1.234,56</td>'
+                        '</tr></table>',
+                        'lxml',
+                    )
+                    engine = module.Engine()
+                    self.assertIsNone(engine._scraping(html))
+                    self.assertEqual(engine.error, 'Response format error')
 
-        for module in (usd_ars_infodolar, usd_ars_ccl_infodolar):
+    def test_valid_price_in_matching_row(self):
+        for module, label in ((usd_ars_infodolar, 'Dólar Blue'),
+                              (usd_ars_ccl_infodolar, 'Dólar CCL')):
             with self.subTest(engine=module.__name__):
-                engine = module.Engine()
-                self.assertIsNone(engine._scraping(html))
-                self.assertEqual(engine.error, 'Response format error')
+                html = BeautifulSoup(
+                    f'<table id="CompraVenta"><tr>'
+                    f'<td class="colNombre">{label}</td>'
+                    '<td class="colCompraVenta">$1.200,00</td>'
+                    '<td class="colCompraVenta">$1.400,00</td>'
+                    '</tr></table>',
+                    'lxml',
+                )
+                self.assertEqual(module.Engine()._scraping(html),
+                                 {'price': Decimal('1300.00')})
+
+
+class DolarHoyTests(unittest.TestCase):
+    def test_non_finite_price_is_rejected(self):
+        for price in ('NaN', 'Infinity', '-Infinity'):
+            with self.subTest(price=price):
+                self.assertIsNone(ars_price(price))
+
+    def test_valid_price_is_parsed(self):
+        self.assertEqual(ars_price('$1.234,56'), Decimal('1234.56'))
 
 
 if __name__ == '__main__':

@@ -7,7 +7,7 @@ def ars_price(text):
         price = Decimal(value)
     except InvalidOperation:
         return None
-    return price if price > 0 else None
+    return price if price.is_finite() and price > 0 else None
 
 
 def ars_quote(html, label):
