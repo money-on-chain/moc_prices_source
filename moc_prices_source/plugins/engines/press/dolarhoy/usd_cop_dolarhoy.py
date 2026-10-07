@@ -37,7 +37,7 @@ class Engine(EngineWebScraping):
                         if v is not None:
                             values.append(v)
         
-        if len(values)==2 and all(v > 0 for v in values):
+        if len(values)==2 and all(v.is_finite() and v > 0 for v in values):
             value = sum(values)/2
 
         if not value:
@@ -52,7 +52,7 @@ class Engine(EngineWebScraping):
                             candidate = to_dec(node)
                         except InvalidOperation:
                             continue
-                        if candidate > 0:
+                        if candidate.is_finite() and candidate > 0:
                             value = candidate
                             break
                 if value:

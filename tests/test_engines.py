@@ -5,6 +5,9 @@ from bs4 import BeautifulSoup
 
 from moc_prices_source.engines import get_prices
 from moc_prices_source.plugins.engines.press.dolarhoy._parse import ars_price
+from moc_prices_source.plugins.engines.press.dolarhoy.usd_cop_dolarhoy import (
+    Engine as DolarHoyCopEngine,
+)
 from moc_prices_source.plugins.engines.press.infodolar import (
     usd_ars_ccl_infodolar,
     usd_ars_infodolar,
@@ -115,6 +118,28 @@ class DolarHoyTests(unittest.TestCase):
 
     def test_valid_price_is_parsed(self):
         self.assertEqual(ars_price('$1.234,56'), Decimal('1234.56'))
+
+    def test_cop_trm_rejects_non_finite_prices(self):
+        for price in ('NaN', 'Infinity', '-Infinity'):
+            with self.subTest(price=price):
+                html = BeautifulSoup(f'<h2>TRM</h2><p>{price}</p>', 'lxml')
+                engine = DolarHoyCopEngine()
+                self.assertIsNone(engine._scraping(html))
+                self.assertEqual(engine.error, 'Response format error')
+
+    def test_cop_trm_accepts_valid_price(self):
+        html = BeautifulSoup('<h2>TRM</h2><p>$4,123.45</p>', 'lxml')
+        self.assertEqual(DolarHoyCopEngine()._scraping(html),
+                         {'price': Decimal('4123.45')})
+
+    def test_cop_exchange_rate_rejects_non_finite_prices(self):
+        html = BeautifulSoup(
+            '<div><h3>Precio casas cambio</h3>Infinity<span>4,100</span></div>',
+            'lxml',
+        )
+        engine = DolarHoyCopEngine()
+        self.assertIsNone(engine._scraping(html))
+        self.assertEqual(engine.error, 'Response format error')
 
 
 if __name__ == '__main__':
