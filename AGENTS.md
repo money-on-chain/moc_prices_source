@@ -2,6 +2,17 @@
 
 ## Code Review Rules
 
+### Experimental web scraping
+
+- Web scraping engines are experimental and serve as references for monitoring.
+  Do not report failures confined to their HTML parsing or scraped prices as
+  review findings.
+- Review whether a web scraping engine's failure can interrupt price collection
+  or corrupt results for other coinpairs obtained through non-scraping methods.
+  Report failures that cross that boundary.
+- Keep in mind that a configured scraping source can still contribute to its
+  own coinpair's aggregate price and to computed pairs that depend on it.
+
 ### Intentional proxy behavior
 
 Treat the following as intentional design invariants:

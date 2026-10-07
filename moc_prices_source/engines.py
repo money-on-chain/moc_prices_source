@@ -1,4 +1,5 @@
 import concurrent.futures
+from .my_logging import get_logger
 from .plugins import Engines
 
 all_engines = {}
@@ -50,35 +51,33 @@ def get_prices(coinpairs=None, engines_names=None, engines_list=None):
     if not engines_list:
         return []
 
-    ##########################################################################
-    # FIXME! I need to figure out a better fix for this. I replace this:     #
-    #                                                                        #
-    # with concurrent.futures.ThreadPoolExecutor(                            #
-    #     max_workers=len(engines_list)) as executor:                        #
-    #     concurrent.futures.wait([ executor.submit(engine                   #
-    #         ) for engine in engines_list ] )                               #
-    #                                                                        #
-    # for this:                                                              #
-    #                                                                        #
-
+    log = get_logger(__name__)
     stack = engines_list[:]
-   
+    retries_remaining = 1
+
     while stack:
-            
-        with concurrent.futures.ThreadPoolExecutor(max_workers=len(stack)
-                                                   ) as executor:
-            concurrent.futures.wait(
-                [ executor.submit(engine) for engine in stack ])
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(stack)) as executor:
+            futures = {executor.submit(engine): engine for engine in stack}
+            for future, engine in futures.items():
+                try:
+                    future.result()
+                except Exception as error:
+                    engine._clean_output_values()
+                    engine._error = f"Engine error ({type(error).__name__})"
+                    log.warning("Engine %s failed with %s", engine.name,
+                                type(error).__name__)
 
         new_stack = []
-        
-        for engine in engines_list:
+        for engine in stack:
             d = engine.as_dict
             if d['price'] not in [True, False] and not(d['price']) and d['ok']:
-                new_stack.append(engine)
+                if retries_remaining:
+                    new_stack.append(engine)
+                else:
+                    engine._error = "No price after retry"
+                    log.warning("Engine %s returned no price after retry",
+                                engine.name)
         stack = new_stack
-
-    #                                                                        #
-    ##########################################################################
+        retries_remaining -= 1
 
     return [ engine.as_dict for engine in engines_list ]
