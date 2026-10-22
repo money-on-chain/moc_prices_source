@@ -69,7 +69,7 @@ else
 fi
 
 # Build
-docker build -t "$LOCAL_NAME" -f Docker/Dockerfile .
+docker build --pull --no-cache -t "$LOCAL_NAME" -f Docker/Dockerfile .
 
 # Tags
 docker tag "$LOCAL_NAME" "$LOCAL_NAME:$TAG"

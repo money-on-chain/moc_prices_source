@@ -4,6 +4,7 @@ ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    ca-certificates \
     python3-venv \
     redis \
     supervisor \
@@ -12,7 +13,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app/moc_prices_source
 COPY . .
 RUN python -m venv ../venv
-RUN ../venv/bin/pip install --upgrade pip setuptools wheel
+RUN PIP_USE_DEPRECATED=legacy-certs \
+    PIP_CERT=/etc/ssl/certs/ca-certificates.crt \
+    ../venv/bin/pip install --upgrade 'pip>=26.2.2' setuptools wheel
 RUN ../venv/bin/pip install -r requirements.lock.txt
 RUN ../venv/bin/pip install .
 WORKDIR /app
