@@ -1,3 +1,15 @@
+# Release v0.7.11
+
+This summary is based on the repository history from [v0.7.10](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.10) onward.
+
+* Fixes the API serving the same cached price for every coinpair on `get_value` and `get_value_simple`.
+* Fixes `get_values` returning an error for plain-text responses.
+* Serves the API with gunicorn instead of the Flask development server.
+* Normalizes the `get_values` and `summary` cache keys.
+* Updates `requests` and `flask-cors` for known security issues.
+* Runs tests in CI before publishing.
+* Docker image: multi-stage build, redis and API run as non-root, redis bound to localhost.
+
 # Release v0.7.10
 
 This summary is based on the repository history from [v0.7.9](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.9) onward.
