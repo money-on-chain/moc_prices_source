@@ -48,6 +48,10 @@ all_coinpairs.sort()
 max_coinpair_limit = envs(
     'MAX_COINPAIR_LIMIT', 12, envs.types.positive_integer)
 flask_debug = envs('FLASK_DEBUG', False, envs.types.bool)
+gunicorn_workers = envs(
+    'GUNICORN_WORKERS', 2, envs.types.positive_integer)
+gunicorn_timeout = envs(
+    'GUNICORN_TIMEOUT', 60, envs.types.positive_integer)
 
 
 cache = Cache()
@@ -148,8 +152,15 @@ class HashMethod():
                                 list(options)))
         self.out = []
 
-    def __call__(self, x) -> None:
-        self.out = []
+    def __call__(self, x) -> "HashMethod":
+        # flask-caching shares this instance across requests and calls
+        # hexdigest() on the returned object, so return a new one: mutating
+        # self lets concurrent requests read each other's cache key.
+        digest = HashMethod(*self.options, info=self.info, pre=self._pre)
+        # flask-caching passes the query args as bytes, which literal_eval
+        # rejects; left undecoded, every coinpair shared one cache key.
+        if isinstance(x, bytes):
+            x = x.decode()
         try:
             values = ast.literal_eval(x)
         except (ValueError, SyntaxError):
@@ -161,8 +172,8 @@ class HashMethod():
                 if key=='coinpairs' and value:
                     value = ','.join([str(c).lower() for c in get_coin_pairs(
                         value)])
-                self.out.append((key, value))
-        return self
+                digest.out.append((key, value))
+        return digest
 
     def hexdigest(self):
         hash_ = repr(self.out) if self.out else ""
@@ -643,8 +654,43 @@ class Info(Resource):
 
 
 
+LOOPBACK_HOSTS = ('127.0.0.1', 'localhost', '::1')
+
+
+def run_gunicorn(host, port, workers=gunicorn_workers,
+                 timeout=gunicorn_timeout):
+    # Imported here so the library can be imported where gunicorn
+    # is not supported (e.g. Windows).
+    from gunicorn.app.base import BaseApplication
+
+    class Server(BaseApplication):
+
+        def load_config(self):
+            self.cfg.set('bind', f"{host}:{port}")
+            self.cfg.set('workers', workers)
+            self.cfg.set('worker_class', 'sync')
+            # Price requests can wait on slow upstream sources plus a retry
+            self.cfg.set('timeout', timeout)
+            self.cfg.set('accesslog', '-')
+            # Runtime admin socket (gunicorn >= 25.1) is not used
+            self.cfg.set('control_socket_disable', True)
+
+        def load(self):
+            return app
+
+    Server().run()
+
+
 def main(host='0.0.0.0', port=7989, debug=False):
-    app.run(debug=debug, host=host, port=port)
+    if debug:
+        # The Werkzeug debugger allows remote code execution, so the
+        # development server is never exposed beyond loopback.
+        if host not in LOOPBACK_HOSTS:
+            raise SystemExit(
+                f"FLASK_DEBUG is only allowed on loopback hosts, not {host}")
+        app.run(debug=True, host=host, port=port)
+    else:
+        run_gunicorn(host, port)
 
 
 @command()
