@@ -116,23 +116,36 @@ class CacheKeyMaker():
                  info=lambda x: None, pre="") -> None:
         self._pre = pre
         self._info = info
-        self._args = list(map(lambda x: str(x).strip().lower(),
-                              list(args)))
+        # Arg names stay case-sensitive, as reqparse reads them
+        self._args = list(map(lambda x: str(x).strip(), list(args)))
         self._headers = list(map(lambda x: str(x).strip().lower(),
                                  list(headers)))
 
     def __call__(self) -> str:
-        
+
         path = request.path
-        
-        args = {k.lower(): v for k, v in request.args.to_dict(
-            flat=True).items()}
+
+        # The key is built from what the handlers actually use, so request
+        # variants that produce the same response share one cache entry
+        # (otherwise each variant is a miss that queries every source).
+
+        args = request.args.to_dict(flat=True)
         filtered_args = {k: v for k, v in args.items() if k in self._args}
+        if 'coinpairs' in filtered_args:
+            # Only when present: reqparse returns an omitted arg's default
+            # unexpanded, which handlers treat differently from '*'.
+            filtered_args['coinpairs'] = ','.join(
+                str(c).lower() for c in get_coin_pairs(
+                    filtered_args['coinpairs']))
         sorted_args = sorted(filtered_args.items())
 
         headers = {k.lower(): v for k, v in request.headers.items()}
         filtered_headers = {k: v for k, v in headers.items(
             ) if k in self._headers}
+        if 'accept' in self._headers:
+            # Handlers only check whether text/plain is accepted
+            filtered_headers['accept'] = 'text/plain' in headers.get(
+                'accept', 'text/plain')
         sorted_headers = sorted(filtered_headers.items())
 
         key = f"{self._pre}|{path}|{sorted_args}|{sorted_headers}"
@@ -531,11 +544,13 @@ class CoinPairsValue(Resource):
         if not out:
             abort(*coinpairs_value_not_found)       
         
-        for coinpair, value in out['values'].items():
-            if value is None:
-                current_app.logger.error(f"No value for {coinpair}")
-            else:
-                current_app.logger.info(f"Value for {coinpair}: {value}")
+        # The plain text report is a str, without per-coinpair values
+        if not plain_text:
+            for coinpair, value in out['values'].items():
+                if value is None:
+                    current_app.logger.error(f"No value for {coinpair}")
+                else:
+                    current_app.logger.info(f"Value for {coinpair}: {value}")
 
         if plain_text:
             response = make_response(out, 200)

@@ -43,6 +43,67 @@ class CoinPairValueTests(unittest.TestCase):
                 self.assertEqual(response.get_json(), price)
 
 
+class CoinPairsValueCacheTests(unittest.TestCase):
+
+    url = '/api/coinpairs/get_values'
+    json = {'Accept': 'application/json'}
+
+    def setUp(self):
+        self.client = server.app.test_client()
+        with server.app.app_context():
+            server.cache.clear()
+        self.calls = []
+
+    def get_price(self, coinpairs, detail, **kwargs):
+        self.calls.append(list(coinpairs))
+        return {c: 1 for c in coinpairs}
+
+    def get(self, query_string, headers):
+        with patch.object(server, 'get_price', self.get_price):
+            return self.client.get(
+                self.url, query_string=query_string, headers=headers)
+
+    def test_equivalent_requests_share_one_cache_entry(self):
+        for coinpairs, accept in [
+                ('BTC/USD,RIF/USD', 'application/json'),
+                ('rif/usd,btc/usd', 'application/json'),
+                (' BTC/USD, RIF/USD,', 'application/json, */*;q=0.1'),
+                ('BTC/USD RIF/USD,BTC/USD', 'application/json; x=1')]:
+            response = self.get({'coinpairs': coinpairs}, {'Accept': accept})
+            self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(len(self.calls), 1)
+
+    def test_plain_text_and_json_are_cached_separately(self):
+        response = self.get({'coinpairs': 'BTC/USD'}, self.json)
+        self.assertEqual(response.mimetype, 'application/json')
+
+        with patch.object(server, 'coinpairs_report',
+                          return_value='report') as report:
+            response = self.get({'coinpairs': 'BTC/USD'},
+                                {'Accept': 'text/plain'})
+        self.assertEqual(response.mimetype, 'text/plain')
+        report.assert_called_once()
+
+    def test_wildcard_over_limit_is_not_served_from_omitted_arg_cache(self):
+        self.assertEqual(self.get({}, self.json).status_code, 200)
+
+        response = self.get({'coinpairs': '*'}, self.json)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_arg_name_is_case_sensitive_like_reqparse(self):
+        # reqparse ignores COINPAIRS and answers with every coinpair, so that
+        # response must not be cached as the BTC/USD one.
+        self.assertEqual(
+            self.get({'COINPAIRS': 'BTC/USD'}, self.json).status_code, 200)
+
+        response = self.get({'coinpairs': 'BTC/USD'}, self.json)
+
+        self.assertEqual(list(response.get_json()['values']), ['BTC/USD'])
+        self.assertEqual(self.calls[-1], ['BTC/USD'])
+
+
 class HashMethodTests(unittest.TestCase):
 
     @staticmethod
