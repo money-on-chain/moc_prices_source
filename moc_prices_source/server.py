@@ -1,5 +1,6 @@
 import ast
 from decimal import Decimal
+from ipaddress import ip_address
 from fnmatch import fnmatch as match
 from tabulate import tabulate
 from .types import normalize_obj, Serializable
@@ -672,6 +673,37 @@ class Info(Resource):
 LOOPBACK_HOSTS = ('127.0.0.1', 'localhost', '::1')
 
 
+def access_logger_class():
+    # Imported here so the library can be imported where gunicorn
+    # is not supported (e.g. Windows).
+    from gunicorn.glogging import Logger
+
+    class AccessLogger(Logger):
+
+        def atoms(self, resp, req, environ, request_time):
+            atoms = super().atoms(resp, req, environ, request_time)
+            # Behind Cloudflare and the ALB, REMOTE_ADDR is the ALB node.
+            # The ALB only accepts requests coming through Cloudflare, which
+            # sets this header; non-IP values are ignored.
+            client_ip = environ.get('HTTP_CF_CONNECTING_IP', '').strip()
+            try:
+                atoms['h'] = str(ip_address(client_ip))
+            except ValueError:
+                pass
+            return atoms
+
+        def access(self, resp, req, environ, request_time):
+            # Skip successful ALB health checks (several per minute), but
+            # keep failed ones visible.
+            status = str(resp.status).split(None, 1)[0]
+            if (environ.get('HTTP_USER_AGENT', '').startswith(
+                    'ELB-HealthChecker') and status == '200'):
+                return
+            super().access(resp, req, environ, request_time)
+
+    return AccessLogger
+
+
 def run_gunicorn(host, port, workers=gunicorn_workers,
                  timeout=gunicorn_timeout):
     # Imported here so the library can be imported where gunicorn
@@ -687,6 +719,7 @@ def run_gunicorn(host, port, workers=gunicorn_workers,
             # Price requests can wait on slow upstream sources plus a retry
             self.cfg.set('timeout', timeout)
             self.cfg.set('accesslog', '-')
+            self.cfg.set('logger_class', access_logger_class())
             # Runtime admin socket (gunicorn >= 25.1) is not used
             self.cfg.set('control_socket_disable', True)
 
