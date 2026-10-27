@@ -215,6 +215,22 @@ class AccessLoggerTests(unittest.TestCase):
         self.assertEqual(self.log(user_agent='ELB-HealthChecker/2.0',
                                   PATH_INFO='/health_check'), [])
 
+    def test_custom_user_agent_filters_only_matching_health_checks(self):
+        with patch.object(server, 'health_check_user_agent', 'Probe/'):
+            self.assertEqual(self.log(user_agent='Probe/1.0',
+                                      PATH_INFO='/health_check'), [])
+            self.assertEqual(len(self.log(user_agent='curl/8.0',
+                                          PATH_INFO='/health_check')), 1)
+
+    def test_empty_user_agent_setting_filters_all_successful_health_checks(self):
+        with patch.object(server, 'health_check_user_agent', ''):
+            self.assertEqual(self.log(user_agent='curl/8.0',
+                                      PATH_INFO='/health_check'), [])
+            self.assertEqual(len(self.log(user_agent='curl/8.0')), 1)
+            self.assertEqual(len(self.log(status='503 SERVICE UNAVAILABLE',
+                                          user_agent='curl/8.0',
+                                          PATH_INFO='/health_check')), 1)
+
     def test_other_successful_requests_with_health_check_user_agent_are_logged(self):
         self.assertEqual(len(self.log(user_agent='ELB-HealthChecker/2.0')), 1)
 

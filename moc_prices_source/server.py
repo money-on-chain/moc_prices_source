@@ -53,6 +53,8 @@ gunicorn_workers = envs(
     'GUNICORN_WORKERS', 1, envs.types.positive_integer)
 gunicorn_timeout = envs(
     'GUNICORN_TIMEOUT', 60, envs.types.positive_integer)
+health_check_user_agent = envs(
+    'HEALTH_CHECK_USER_AGENT', 'ELB-HealthChecker')
 
 
 cache = Cache()
@@ -705,13 +707,14 @@ def access_logger_class():
             return atoms
 
         def access(self, resp, req, environ, request_time):
-            # Skip successful ALB health checks (several per minute), but
-            # keep failed ones visible.
+            # Skip successful health checks, but keep failed ones visible.
             status = str(resp.status).split(None, 1)[0]
             if (environ.get('PATH_INFO') == '/health_check'
                     and environ.get('REQUEST_METHOD') == 'GET'
-                    and environ.get('HTTP_USER_AGENT', '').startswith(
-                        'ELB-HealthChecker') and status == '200'):
+                    and status == '200'
+                    and (not health_check_user_agent or
+                         environ.get('HTTP_USER_AGENT', '').startswith(
+                             health_check_user_agent))):
                 return
             super().access(resp, req, environ, request_time)
 

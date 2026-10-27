@@ -35,8 +35,10 @@ Treat the following as intentional design invariants:
 ### Health-check access logs
 
 - Suppressing successful `GET /health_check` requests from the access log when
-  their User-Agent starts with `ELB-HealthChecker` is intentional. These frequent
-  load-balancer probes would otherwise fill the logs with low-value entries.
+  their User-Agent starts with `HEALTH_CHECK_USER_AGENT` is intentional. These
+  frequent probes would otherwise fill the logs with low-value entries. An
+  empty `HEALTH_CHECK_USER_AGENT` suppresses all successful requests to this
+  endpoint, regardless of User-Agent.
 - Keep failed health checks and requests to other endpoints visible in the
   access log, even when they use the same User-Agent.
 
