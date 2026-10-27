@@ -31,3 +31,11 @@ Treat the following as intentional design invariants:
   must remain `None`; a non-`None` URL default must be constructed as `URL`.
 - Proxy credentials, paths, and query parameters must never appear in errors,
   logs, or rendered configuration, regardless of where the URL originated.
+
+### Health-check access logs
+
+- Suppressing successful `GET /health_check` requests from the access log when
+  their User-Agent starts with `ELB-HealthChecker` is intentional. These frequent
+  load-balancer probes would otherwise fill the logs with low-value entries.
+- Keep failed health checks and requests to other endpoints visible in the
+  access log, even when they use the same User-Agent.
