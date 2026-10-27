@@ -1,13 +1,10 @@
-FROM python:3.12-slim
+FROM python:3.12-slim AS build
 
 ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     ca-certificates \
-    python3-venv \
-    redis \
-    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app/moc_prices_source
@@ -18,14 +15,28 @@ RUN PIP_USE_DEPRECATED=legacy-certs \
     ../venv/bin/pip install --upgrade 'pip>=26.2.2' setuptools wheel
 RUN ../venv/bin/pip install -r requirements.lock.txt
 RUN ../venv/bin/pip install .
-WORKDIR /app
-RUN rm -rf ./moc_prices_source
-WORKDIR /
+
+
+# The runtime image ships the virtualenv only, without compilers or sources
+FROM python:3.12-slim
+
+ENV PYTHONUNBUFFERED=1
+ENV GUNICORN_WORKERS=2
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    redis \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Redis and the app run as this user (see supervisord.conf)
+RUN useradd --create-home --uid 10001 app
+
+COPY --from=build /app/venv /app/venv
 
 RUN mkdir -p /etc/supervisor/conf.d
-RUN mkdir /root/.moc_prices_source
 COPY Docker/files/supervisord.conf /etc/supervisor/supervisord.conf
-COPY Docker/files/conf/redis.json /root/.moc_prices_source/
+COPY --chown=app:app Docker/files/conf/redis.json /home/app/.moc_prices_source/
 COPY Docker/files/run.sh /
 COPY Docker/files/check.sh /
 

@@ -1,5 +1,6 @@
 import ast
 from decimal import Decimal
+from ipaddress import IPv6Address, ip_address
 from fnmatch import fnmatch as match
 from tabulate import tabulate
 from .types import normalize_obj, Serializable
@@ -10,7 +11,7 @@ from flask_caching import Cache
 from . import get_price, version
 from . import ALL as AllCoinPairs
 from .cli import command, option
-from .redis_conn import use_redis
+from .redis_conn import get_redis, use_redis
 from .cli_check import show_computed_pairs_fromula, summary, coinpairs_report
 from .my_envs import envs
 
@@ -48,6 +49,12 @@ all_coinpairs.sort()
 max_coinpair_limit = envs(
     'MAX_COINPAIR_LIMIT', 12, envs.types.positive_integer)
 flask_debug = envs('FLASK_DEBUG', False, envs.types.bool)
+gunicorn_workers = envs(
+    'GUNICORN_WORKERS', 1, envs.types.positive_integer)
+gunicorn_timeout = envs(
+    'GUNICORN_TIMEOUT', 60, envs.types.positive_integer)
+health_check_user_agent = envs(
+    'HEALTH_CHECK_USER_AGENT', 'ELB-HealthChecker')
 
 
 cache = Cache()
@@ -64,7 +71,12 @@ def create_app():
     
     app = Flask(__name__)
     
-    app.config["CACHE_TYPE"] = "SimpleCache"
+    if use_redis:
+        app.config["CACHE_TYPE"] = "RedisCache"
+        app.config["CACHE_REDIS_HOST"] = get_redis()
+        app.config["CACHE_KEY_PREFIX"] = "moc_prices_source:response:"
+    else:
+        app.config["CACHE_TYPE"] = "SimpleCache"
     cache.init_app(app)
    
     api.init_app(app)
@@ -112,23 +124,36 @@ class CacheKeyMaker():
                  info=lambda x: None, pre="") -> None:
         self._pre = pre
         self._info = info
-        self._args = list(map(lambda x: str(x).strip().lower(),
-                              list(args)))
+        # Arg names stay case-sensitive, as reqparse reads them
+        self._args = list(map(lambda x: str(x).strip(), list(args)))
         self._headers = list(map(lambda x: str(x).strip().lower(),
                                  list(headers)))
 
     def __call__(self) -> str:
-        
+
         path = request.path
-        
-        args = {k.lower(): v for k, v in request.args.to_dict(
-            flat=True).items()}
+
+        # The key is built from what the handlers actually use, so request
+        # variants that produce the same response share one cache entry
+        # (otherwise each variant is a miss that queries every source).
+
+        args = request.args.to_dict(flat=True)
         filtered_args = {k: v for k, v in args.items() if k in self._args}
+        if 'coinpairs' in filtered_args:
+            # Only when present: reqparse returns an omitted arg's default
+            # unexpanded, which handlers treat differently from '*'.
+            filtered_args['coinpairs'] = ','.join(
+                str(c).lower() for c in get_coin_pairs(
+                    filtered_args['coinpairs']))
         sorted_args = sorted(filtered_args.items())
 
         headers = {k.lower(): v for k, v in request.headers.items()}
         filtered_headers = {k: v for k, v in headers.items(
             ) if k in self._headers}
+        if 'accept' in self._headers:
+            # Handlers only check whether text/plain is accepted
+            filtered_headers['accept'] = 'text/plain' in headers.get(
+                'accept', 'text/plain')
         sorted_headers = sorted(filtered_headers.items())
 
         key = f"{self._pre}|{path}|{sorted_args}|{sorted_headers}"
@@ -148,21 +173,30 @@ class HashMethod():
                                 list(options)))
         self.out = []
 
-    def __call__(self, x) -> None:
-        self.out = []
+    def __call__(self, x) -> "HashMethod":
+        # flask-caching shares this instance across requests and calls
+        # hexdigest() on the returned object, so return a new one: mutating
+        # self lets concurrent requests read each other's cache key.
+        digest = HashMethod(*self.options, info=self.info, pre=self._pre)
+        # flask-caching passes the query args as bytes, which literal_eval
+        # rejects; left undecoded, every coinpair shared one cache key.
+        if isinstance(x, bytes):
+            x = x.decode()
         try:
             values = ast.literal_eval(x)
         except (ValueError, SyntaxError):
             values = []
         for key, value in values:
-            key=str(key).strip().lower()
+            # reqparse treats argument names and coinpair choices as
+            # case-sensitive, so the cache key must preserve both.
+            key = str(key)
             if key in self.options:
-                value=str(value).strip().lower()
+                value = str(value)
                 if key=='coinpairs' and value:
                     value = ','.join([str(c).lower() for c in get_coin_pairs(
                         value)])
-                self.out.append((key, value))
-        return self
+                digest.out.append((key, value))
+        return digest
 
     def hexdigest(self):
         hash_ = repr(self.out) if self.out else ""
@@ -205,6 +239,11 @@ def page_not_found(e):
 @app.route('/')
 def index():
     return redirect('/api/doc')
+
+
+@app.route('/health_check')
+def health_check():
+    return jsonify(status='ok'), 200
 
 
 
@@ -520,11 +559,13 @@ class CoinPairsValue(Resource):
         if not out:
             abort(*coinpairs_value_not_found)       
         
-        for coinpair, value in out['values'].items():
-            if value is None:
-                current_app.logger.error(f"No value for {coinpair}")
-            else:
-                current_app.logger.info(f"Value for {coinpair}: {value}")
+        # The plain text report is a str, without per-coinpair values
+        if not plain_text:
+            for coinpair, value in out['values'].items():
+                if value is None:
+                    current_app.logger.error(f"No value for {coinpair}")
+                else:
+                    current_app.logger.info(f"Value for {coinpair}: {value}")
 
         if plain_text:
             response = make_response(out, 200)
@@ -643,8 +684,84 @@ class Info(Resource):
 
 
 
+LOOPBACK_HOSTS = ('127.0.0.1', 'localhost', '::1')
+
+
+def access_logger_class():
+    # Imported here so the library can be imported where gunicorn
+    # is not supported (e.g. Windows).
+    from gunicorn.glogging import Logger
+
+    class AccessLogger(Logger):
+
+        def atoms(self, resp, req, environ, request_time):
+            atoms = super().atoms(resp, req, environ, request_time)
+            # Behind Cloudflare and the ALB, REMOTE_ADDR is the ALB node.
+            # The ALB only accepts requests coming through Cloudflare, which
+            # sets this header; non-IP values are ignored.
+            client_ip = environ.get('HTTP_CF_CONNECTING_IP', '').strip()
+            try:
+                atoms['h'] = str(ip_address(client_ip))
+            except ValueError:
+                pass
+            return atoms
+
+        def access(self, resp, req, environ, request_time):
+            # Skip successful health checks, but keep failed ones visible.
+            status = str(resp.status).split(None, 1)[0]
+            if (environ.get('PATH_INFO') == '/health_check'
+                    and environ.get('REQUEST_METHOD') == 'GET'
+                    and status == '200'
+                    and (not health_check_user_agent or
+                         environ.get('HTTP_USER_AGENT', '').startswith(
+                             health_check_user_agent))):
+                return
+            super().access(resp, req, environ, request_time)
+
+    return AccessLogger
+
+
+def run_gunicorn(host, port, workers=gunicorn_workers,
+                 timeout=gunicorn_timeout):
+    # Imported here so the library can be imported where gunicorn
+    # is not supported (e.g. Windows).
+    from gunicorn.app.base import BaseApplication
+
+    class Server(BaseApplication):
+
+        def load_config(self):
+            try:
+                IPv6Address(host)
+            except ValueError:
+                bind_host = host
+            else:
+                bind_host = f'[{host}]'
+            self.cfg.set('bind', f'{bind_host}:{port}')
+            self.cfg.set('workers', workers)
+            self.cfg.set('worker_class', 'sync')
+            # Price requests can wait on slow upstream sources plus a retry
+            self.cfg.set('timeout', timeout)
+            self.cfg.set('accesslog', '-')
+            self.cfg.set('logger_class', access_logger_class())
+            # Runtime admin socket (gunicorn >= 25.1) is not used
+            self.cfg.set('control_socket_disable', True)
+
+        def load(self):
+            return app
+
+    Server().run()
+
+
 def main(host='0.0.0.0', port=7989, debug=False):
-    app.run(debug=debug, host=host, port=port)
+    if debug:
+        # The Werkzeug debugger allows remote code execution, so the
+        # development server is never exposed beyond loopback.
+        if host not in LOOPBACK_HOSTS:
+            raise SystemExit(
+                f"FLASK_DEBUG is only allowed on loopback hosts, not {host}")
+        app.run(debug=True, host=host, port=port)
+    else:
+        run_gunicorn(host, port)
 
 
 @command()
