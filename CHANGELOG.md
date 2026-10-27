@@ -11,7 +11,7 @@ This summary is based on the repository history from [v0.7.10](https://github.co
 * Docker image: multi-stage build, redis and API run as non-root, redis bound to localhost.
 * Access log shows the real client IP (from Cloudflare) and skips successful load balancer health checks.
 
-# Release v0.7.10
+# Release v0.7.10 (2026-10-22)
 
 This summary is based on the repository history from [v0.7.9](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.9) onward.
 
@@ -19,7 +19,7 @@ This summary is based on the repository history from [v0.7.9](https://github.com
 * Updates the CA certificate bundle used by the application and Docker image.
 * Refreshes Docker builds by pulling the base image and disabling the build cache.
 
-# Release v0.7.9
+# Release v0.7.9 (2026-10-07)
 
 This summary is based on the repository history from [v0.7.8](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.8) onward.
 
@@ -27,7 +27,7 @@ This summary is based on the repository history from [v0.7.8](https://github.com
 * Improves price collection when a source encounters an error.
 * Updates several price sources and disables those that are no longer available.
 
-# Release v0.7.8
+# Release v0.7.8 (2026-08-26)
 
 This summary is based on the repository history from [v0.7.7](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.7) onward.
 
@@ -36,7 +36,7 @@ This summary is based on the repository history from [v0.7.7](https://github.com
 * Replaces the Binance and Bybit failover hosts with configurable proxy support, including a default proxy for all HTTP requests.
 * Adds proxy URL validation and masking to prevent credentials and sensitive URL details from appearing in errors or configuration output.
 
-# Release v0.7.4
+# Release v0.7.4 (2026-02-24)
 
 This summary is based on the repository history from [v0.7.3](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.3) onward.
 
