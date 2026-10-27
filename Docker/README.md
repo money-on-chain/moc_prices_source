@@ -56,6 +56,24 @@ Options to be passed by the `MOC_PRICES_SOURCE_ARGS` environment variable:
 -p, --port INTEGER  Server port.
 ```
 
+API environment variables can be passed with `--env` (or `-e`) to `docker run`:
+
+| Variable | Default in the image | Purpose |
+| --- | --- | --- |
+| `COMMAND` | `moc_prices_source_api` | Selects the program started by the container. |
+| `MOC_PRICES_SOURCE_ARGS` | Empty | Command-line options passed to the selected program, such as `--addr` and `--port`. |
+| `GUNICORN_WORKERS` | `2` | Number of API worker processes. Override this according to container resources and request load. |
+| `GUNICORN_TIMEOUT` | `60` seconds | Time allowed for a worker to handle a request before Gunicorn restarts it. |
+| `MAX_COINPAIR_LIMIT` | `12` | Maximum number of coinpairs accepted in a single API request. |
+| `HEALTH_CHECK_USER_AGENT` | Built-in probe prefix | Only successful `GET /health_check` requests whose User-Agent starts with this value are omitted from the access log. Set it to an empty string to omit all successful requests to that endpoint. Failed checks and other endpoints remain logged. |
+| `FLASK_DEBUG` | `false` | Runs the Flask development server when enabled. This mode requires `--addr` to be a loopback address and is not used for the published Docker port. |
+
+For example, `--env GUNICORN_WORKERS=3` changes the worker count. To suppress
+access logs for every successful health check, use
+`--env HEALTH_CHECK_USER_AGENT=`. The bundled Redis configuration is stored in
+`/home/app/.moc_prices_source/redis.json`; it is not selected by these
+environment variables.
+
 ### Run 3.2 `moc_prices_source_to_db`
 
 
