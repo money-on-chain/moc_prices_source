@@ -1,9 +1,32 @@
 import unittest
 from datetime import timedelta
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import patch, sentinel
 
 from moc_prices_source import server
+
+
+class ResponseCacheConfigurationTests(unittest.TestCase):
+
+    def test_redis_cache_uses_existing_connection_when_enabled(self):
+        with patch.object(server, 'use_redis', True), \
+                patch.object(server, 'get_redis', return_value=sentinel.redis) as get_redis:
+            app = server.create_app()
+
+        get_redis.assert_called_once_with()
+        self.assertEqual(app.config['CACHE_TYPE'], 'RedisCache')
+        self.assertEqual(app.config['CACHE_KEY_PREFIX'],
+                         'moc_prices_source:response:')
+        with app.app_context():
+            self.assertIs(server.cache.cache._read_client, sentinel.redis)
+
+    def test_simple_cache_does_not_connect_to_redis_when_disabled(self):
+        with patch.object(server, 'use_redis', False), \
+                patch.object(server, 'get_redis') as get_redis:
+            app = server.create_app()
+
+        get_redis.assert_not_called()
+        self.assertEqual(app.config['CACHE_TYPE'], 'SimpleCache')
 
 
 class CoinPairValueTests(unittest.TestCase):
