@@ -11,7 +11,7 @@ from flask_caching import Cache
 from . import get_price, version
 from . import ALL as AllCoinPairs
 from .cli import command, option
-from .redis_conn import use_redis
+from .redis_conn import get_redis, use_redis
 from .cli_check import show_computed_pairs_fromula, summary, coinpairs_report
 from .my_envs import envs
 
@@ -69,7 +69,12 @@ def create_app():
     
     app = Flask(__name__)
     
-    app.config["CACHE_TYPE"] = "SimpleCache"
+    if use_redis:
+        app.config["CACHE_TYPE"] = "RedisCache"
+        app.config["CACHE_REDIS_HOST"] = get_redis()
+        app.config["CACHE_KEY_PREFIX"] = "moc_prices_source:response:"
+    else:
+        app.config["CACHE_TYPE"] = "SimpleCache"
     cache.init_app(app)
    
     api.init_app(app)

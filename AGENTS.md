@@ -39,3 +39,13 @@ Treat the following as intentional design invariants:
   load-balancer probes would otherwise fill the logs with low-value entries.
 - Keep failed health checks and requests to other endpoints visible in the
   access log, even when they use the same User-Agent.
+
+### API response cache
+
+- When `use_redis` is enabled, Flask-Caching uses the configured Redis
+  connection for API responses so Gunicorn workers share cached values.
+- When `use_redis` is disabled, Flask-Caching intentionally uses `SimpleCache`.
+  Its entries are local to each worker, so duplicate calculations across
+  workers remain possible in that configuration.
+- Redis response cache keys use a dedicated prefix to avoid collisions with
+  other Redis data used by the application.
