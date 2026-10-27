@@ -74,6 +74,27 @@ access logs for every successful health check, use
 `/home/app/.moc_prices_source/redis.json`; it is not selected by these
 environment variables.
 
+#### Health check
+
+The API exposes `GET /health_check` for a load balancer or monitoring probe.
+Use the address of the host running the container and the host port published
+by `docker run -p`. For a request from that host with the `-p 7989:7989`
+example above:
+
+```sh
+API_HOST=localhost
+HOST_PORT=7989
+curl "http://${API_HOST}:${HOST_PORT}/health_check"
+```
+
+The endpoint returns HTTP `200` with the JSON body `{"status":"ok"}`. Configure
+the load balancer's health-check path as `/health_check`. This confirms that the
+API can respond to HTTP requests; it does not check Redis or external price
+sources.
+
+Successful probes are omitted from the access log according to
+`HEALTH_CHECK_USER_AGENT` as described above. Failed probes remain logged.
+
 ### Run 3.2 `moc_prices_source_to_db`
 
 
