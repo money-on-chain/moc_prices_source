@@ -185,9 +185,11 @@ class HashMethod():
         except (ValueError, SyntaxError):
             values = []
         for key, value in values:
-            key=str(key).strip().lower()
+            # reqparse treats argument names and coinpair choices as
+            # case-sensitive, so the cache key must preserve both.
+            key = str(key)
             if key in self.options:
-                value=str(value).strip().lower()
+                value = str(value)
                 if key=='coinpairs' and value:
                     value = ','.join([str(c).lower() for c in get_coin_pairs(
                         value)])
