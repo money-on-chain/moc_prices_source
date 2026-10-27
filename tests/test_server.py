@@ -125,6 +125,14 @@ class HashMethodTests(unittest.TestCase):
         self.assertNotEqual(btc.hexdigest(), rif.hexdigest())
 
 
+class HealthCheckTests(unittest.TestCase):
+
+    def test_health_check_returns_ok(self):
+        response = server.app.test_client().get('/health_check')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {'status': 'ok'})
+
+
 class AccessLoggerTests(unittest.TestCase):
 
     def setUp(self):
@@ -137,6 +145,7 @@ class AccessLoggerTests(unittest.TestCase):
         resp = SimpleNamespace(status=status, headers=[], sent=2)
         req = SimpleNamespace(headers=[])
         environ = {'REQUEST_METHOD': 'GET', 'RAW_URI': '/api/info',
+                   'PATH_INFO': '/api/info',
                    'SERVER_PROTOCOL': 'HTTP/1.1', 'REMOTE_ADDR': '10.0.1.169',
                    'HTTP_USER_AGENT': user_agent, **environ}
         with patch.object(self.logger.access_log, 'info') as info:
@@ -144,11 +153,21 @@ class AccessLoggerTests(unittest.TestCase):
         return [fmt % atoms for (fmt, atoms), _ in info.call_args_list]
 
     def test_successful_health_check_is_not_logged(self):
-        self.assertEqual(self.log(user_agent='ELB-HealthChecker/2.0'), [])
+        self.assertEqual(self.log(user_agent='ELB-HealthChecker/2.0',
+                                  PATH_INFO='/health_check'), [])
+
+    def test_other_successful_requests_with_health_check_user_agent_are_logged(self):
+        self.assertEqual(len(self.log(user_agent='ELB-HealthChecker/2.0')), 1)
+
+    def test_other_methods_on_health_check_are_logged(self):
+        self.assertEqual(len(self.log(user_agent='ELB-HealthChecker/2.0',
+                                      PATH_INFO='/health_check',
+                                      REQUEST_METHOD='HEAD')), 1)
 
     def test_failed_health_check_is_logged(self):
         lines = self.log(status='503 SERVICE UNAVAILABLE',
-                         user_agent='ELB-HealthChecker/2.0')
+                         user_agent='ELB-HealthChecker/2.0',
+                         PATH_INFO='/health_check')
         self.assertEqual(len(lines), 1)
         self.assertIn(' 503 ', lines[0])
 

@@ -232,6 +232,11 @@ def index():
     return redirect('/api/doc')
 
 
+@app.route('/health_check')
+def health_check():
+    return jsonify(status='ok'), 200
+
+
 
 coinpairs_ns = api.namespace('coinpairs',
                              description='Coinpairs related operations')
@@ -696,8 +701,10 @@ def access_logger_class():
             # Skip successful ALB health checks (several per minute), but
             # keep failed ones visible.
             status = str(resp.status).split(None, 1)[0]
-            if (environ.get('HTTP_USER_AGENT', '').startswith(
-                    'ELB-HealthChecker') and status == '200'):
+            if (environ.get('PATH_INFO') == '/health_check'
+                    and environ.get('REQUEST_METHOD') == 'GET'
+                    and environ.get('HTTP_USER_AGENT', '').startswith(
+                        'ELB-HealthChecker') and status == '200'):
                 return
             super().access(resp, req, environ, request_time)
 
