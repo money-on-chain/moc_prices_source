@@ -1,4 +1,6 @@
 import unittest
+from datetime import timedelta
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from moc_prices_source import server
@@ -121,6 +123,42 @@ class HashMethodTests(unittest.TestCase):
         self.assertIn('btc/usd', btc.hexdigest())
         self.assertIn('rif/usd', rif.hexdigest())
         self.assertNotEqual(btc.hexdigest(), rif.hexdigest())
+
+
+class AccessLoggerTests(unittest.TestCase):
+
+    def setUp(self):
+        from gunicorn.config import Config
+        cfg = Config()
+        cfg.set('accesslog', '-')
+        self.logger = server.access_logger_class()(cfg)
+
+    def log(self, status='200 OK', user_agent='curl/8.0', **environ):
+        resp = SimpleNamespace(status=status, headers=[], sent=2)
+        req = SimpleNamespace(headers=[])
+        environ = {'REQUEST_METHOD': 'GET', 'RAW_URI': '/api/info',
+                   'SERVER_PROTOCOL': 'HTTP/1.1', 'REMOTE_ADDR': '10.0.1.169',
+                   'HTTP_USER_AGENT': user_agent, **environ}
+        with patch.object(self.logger.access_log, 'info') as info:
+            self.logger.access(resp, req, environ, timedelta(seconds=1))
+        return [fmt % atoms for (fmt, atoms), _ in info.call_args_list]
+
+    def test_successful_health_check_is_not_logged(self):
+        self.assertEqual(self.log(user_agent='ELB-HealthChecker/2.0'), [])
+
+    def test_failed_health_check_is_logged(self):
+        lines = self.log(status='503 SERVICE UNAVAILABLE',
+                         user_agent='ELB-HealthChecker/2.0')
+        self.assertEqual(len(lines), 1)
+        self.assertIn(' 503 ', lines[0])
+
+    def test_client_ip_comes_from_cloudflare_header(self):
+        lines = self.log(HTTP_CF_CONNECTING_IP='203.0.113.7')
+        self.assertTrue(lines[0].startswith('203.0.113.7 '))
+
+    def test_invalid_cloudflare_header_falls_back_to_remote_addr(self):
+        lines = self.log(HTTP_CF_CONNECTING_IP='not-an-ip')
+        self.assertTrue(lines[0].startswith('10.0.1.169 '))
 
 
 class MainTests(unittest.TestCase):
