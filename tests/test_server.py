@@ -29,6 +29,24 @@ class ResponseCacheConfigurationTests(unittest.TestCase):
         self.assertEqual(app.config['CACHE_TYPE'], 'SimpleCache')
 
 
+class GunicornBindTests(unittest.TestCase):
+
+    def test_bind_formats_ipv4_and_ipv6_addresses(self):
+        from gunicorn.app.base import BaseApplication
+        from gunicorn.util import parse_address
+
+        for host, expected in [('127.0.0.1', '127.0.0.1:7989'),
+                               ('::1', '[::1]:7989'),
+                               ('::', '[::]:7989')]:
+            with self.subTest(host=host), \
+                    patch.object(BaseApplication, 'run', autospec=True) as run:
+                server.run_gunicorn(host, 7989)
+
+            bind = run.call_args.args[0].cfg.bind[0]
+            self.assertEqual(bind, expected)
+            self.assertEqual(parse_address(bind), (host, 7989))
+
+
 class CoinPairValueTests(unittest.TestCase):
 
     def setUp(self):
