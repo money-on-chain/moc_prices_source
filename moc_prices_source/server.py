@@ -50,7 +50,7 @@ max_coinpair_limit = envs(
     'MAX_COINPAIR_LIMIT', 12, envs.types.positive_integer)
 flask_debug = envs('FLASK_DEBUG', False, envs.types.bool)
 gunicorn_workers = envs(
-    'GUNICORN_WORKERS', 2, envs.types.positive_integer)
+    'GUNICORN_WORKERS', 1, envs.types.positive_integer)
 gunicorn_timeout = envs(
     'GUNICORN_TIMEOUT', 60, envs.types.positive_integer)
 

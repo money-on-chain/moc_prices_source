@@ -21,6 +21,7 @@ RUN ../venv/bin/pip install .
 FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1
+ENV GUNICORN_WORKERS=2
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
