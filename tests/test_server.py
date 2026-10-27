@@ -85,6 +85,24 @@ class CoinPairValueTests(unittest.TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.get_json(), price)
 
+    def test_cached_valid_coinpair_does_not_accept_invalid_case(self):
+        for path in ('/api/coinpairs/get_value',
+                     '/api/coinpairs/get_value_simple'):
+            with self.subTest(path=path):
+                with server.app.app_context():
+                    server.cache.clear()
+                with patch.object(server, 'get_price', return_value=123):
+                    valid = self.client.get(
+                        path, query_string={'coinpair': 'BTC/USD'})
+                    lowercase = self.client.get(
+                        path, query_string={'coinpair': 'btc/usd'})
+                    uppercase_arg = self.client.get(
+                        path, query_string={'COINPAIR': 'BTC/USD'})
+
+                self.assertEqual(valid.status_code, 200)
+                self.assertEqual(lowercase.status_code, 400)
+                self.assertEqual(uppercase_arg.status_code, 400)
+
 
 class CoinPairsValueCacheTests(unittest.TestCase):
 
@@ -161,8 +179,8 @@ class HashMethodTests(unittest.TestCase):
         btc = hash_method(self._args('BTC/USD'))
         rif = hash_method(self._args('RIF/USD'))
 
-        self.assertIn('btc/usd', btc.hexdigest())
-        self.assertIn('rif/usd', rif.hexdigest())
+        self.assertIn('BTC/USD', btc.hexdigest())
+        self.assertIn('RIF/USD', rif.hexdigest())
         self.assertNotEqual(btc.hexdigest(), rif.hexdigest())
 
 
