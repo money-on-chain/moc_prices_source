@@ -1,6 +1,6 @@
 import ast
 from decimal import Decimal
-from ipaddress import ip_address
+from ipaddress import IPv6Address, ip_address
 from fnmatch import fnmatch as match
 from tabulate import tabulate
 from .types import normalize_obj, Serializable
@@ -725,7 +725,13 @@ def run_gunicorn(host, port, workers=gunicorn_workers,
     class Server(BaseApplication):
 
         def load_config(self):
-            self.cfg.set('bind', f"{host}:{port}")
+            try:
+                IPv6Address(host)
+            except ValueError:
+                bind_host = host
+            else:
+                bind_host = f'[{host}]'
+            self.cfg.set('bind', f'{bind_host}:{port}')
             self.cfg.set('workers', workers)
             self.cfg.set('worker_class', 'sync')
             # Price requests can wait on slow upstream sources plus a retry
