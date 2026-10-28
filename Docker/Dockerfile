@@ -1,4 +1,5 @@
-FROM python:3.12-slim AS build
+FROM python:3.12-slim AS base
+FROM base AS build
 
 ENV PYTHONUNBUFFERED=1
 
@@ -18,7 +19,7 @@ RUN ../venv/bin/pip install .
 
 
 # The runtime image ships the virtualenv only, without compilers or sources
-FROM python:3.12-slim
+FROM base
 
 ENV PYTHONUNBUFFERED=1
 ENV GUNICORN_WORKERS=2
