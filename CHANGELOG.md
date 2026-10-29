@@ -1,3 +1,13 @@
+# Beta v0.7.11b2
+
+This summary is based on the repository history from [v0.7.11b1](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.11b1) onward.
+
+* Shares the same Python base image between Docker build and runtime stages.
+* Summarizes successful health checks every 100 requests per API worker by default; `HEALTH_CHECK_LOG_INTERVAL` configures the interval.
+* Uses a consistent timestamp, level, source, and process ID format for application and Gunicorn logs.
+* Includes the client IP in API calculation logs, using the same Cloudflare address validation and remote-address fallback as the access log.
+* Logs calculated values and their successful/total source counts in the same entry.
+
 # Beta v0.7.11b1
 
 This summary is based on the repository history from [v0.7.10](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.10) onward.
@@ -9,10 +19,7 @@ This summary is based on the repository history from [v0.7.10](https://github.co
 * Updates `requests` and `flask-cors` for known security issues.
 * Runs tests in CI before publishing.
 * Docker image: multi-stage build, redis and API run as non-root, redis bound to localhost.
-* Access log shows the real client IP (from Cloudflare). Successful load balancer health checks are summarized every 100 requests per API worker by default; `HEALTH_CHECK_LOG_INTERVAL` configures the interval.
-* Uses a consistent timestamp, level, source, and process ID format for application and Gunicorn logs.
-* Includes the client IP in API calculation logs, using the same Cloudflare address validation and remote-address fallback as the access log.
-* Logs calculated values and their successful/total source counts in the same entry.
+* Access log shows the real client IP (from Cloudflare) and skips successful load balancer health checks.
 
 # Release v0.7.10 (2026-10-22)
 
