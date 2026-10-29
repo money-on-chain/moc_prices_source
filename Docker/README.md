@@ -12,6 +12,14 @@ This can be very useful to run on AWS as a task
 $ sudo ./build.sh
 ```
 
+The script builds the image and creates local version, `latest`, and registry
+tags. It prints the created registry tags and the `docker push` commands to run
+when you are ready to upload them. Beta versions receive the registry `beta`
+tag; final versions receive `latest`.
+When an AWS account ID is supplied with `-i` (and optionally a region with
+`-r`, which defaults to `us-west-1`), the printed ECR instructions include
+the login command before the ECR push commands.
+
 
 
 ## 2. Test docker image
