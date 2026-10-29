@@ -410,21 +410,17 @@ class CoinPairValue(Resource):
                     current_app.logger.warning(
                         f"{sub_coinpair} for {coinpair} --> {error}")
 
-        if sources_count:
-            sources_count_str = ', '.join(
-                [ f"{k}: {sources_count_ok[k]} of {v}"
-                 for (k, v) in sources_count.items()])
-            if len(sources_count)>1:
-                current_app.logger.info(
-                    f"Sources count for {coinpair}: {sources_count_str}")
-            else:
-                current_app.logger.info(f"Sources count for {sources_count_str}")
+        source_parts = [
+            f"{sources_count_ok[k]} of {v}" if k == coinpair and len(sources_count) == 1
+            else f"{k}: {sources_count_ok[k]} of {v}"
+            for k, v in sources_count.items()]
+        source_suffix = f" (sources: {', '.join(source_parts)})" if source_parts else ''
 
         if value is None:
-            current_app.logger.error(f"Not value for {coinpair}")
+            current_app.logger.error(f"Not value for {coinpair}{source_suffix}")
             abort(*coinpair_value_not_found)
         else:
-            current_app.logger.info(f"Value for {coinpair}: {value}")
+            current_app.logger.info(f"Value for {coinpair}: {value}{source_suffix}")
 
         out = {}
         out['required_coinpair'] = coinpair 
@@ -580,7 +576,8 @@ class CoinPairsValue(Resource):
                                 detail = detail,
                                 plain_text = plain_text)
 
-        self._extra_log(coinpairs, detail)
+        source_summaries = self._extra_log(coinpairs, detail,
+                                           log_counts=plain_text)
 
         if not out:
             abort(*coinpairs_value_not_found)       
@@ -588,10 +585,14 @@ class CoinPairsValue(Resource):
         # The plain text report is a str, without per-coinpair values
         if not plain_text:
             for coinpair, value in out['values'].items():
+                source_suffix = (f" (sources: {source_summaries[coinpair]})"
+                                 if coinpair in source_summaries else '')
                 if value is None:
-                    current_app.logger.error(f"No value for {coinpair}")
+                    current_app.logger.error(
+                        f"No value for {coinpair}{source_suffix}")
                 else:
-                    current_app.logger.info(f"Value for {coinpair}: {value}")
+                    current_app.logger.info(
+                        f"Value for {coinpair}: {value}{source_suffix}")
 
         if plain_text:
             response = make_response(out, 200)
@@ -601,8 +602,9 @@ class CoinPairsValue(Resource):
             return out
 
     @staticmethod
-    def _extra_log(coinpairs, detail):
+    def _extra_log(coinpairs, detail, log_counts=False):
         warn, info  = current_app.logger.warning, current_app.logger.info
+        source_summaries = {}
         values = detail.get('values', {})
         prices = detail.get('prices', {})
         for coinpair in map(str, coinpairs):
@@ -627,17 +629,17 @@ class CoinPairsValue(Resource):
                         else:
                             str_title = f"{sub_coinpair} for {coinpair}"
                         warn(f"{str_title} --> {str_value}")
-            if len(sub_coinpairs)>1:
-                pass
             if sources_count:
-                sources_count_str = ', '.join([
-                    f"{k}: {sources_count_ok.get(k, 'N/A')} of {v}"
-                    for (k, v) in sources_count.items()])
-                if len(sub_coinpairs)>1:
-                    str_title = f"Sources count for {coinpair} are"
-                else:
-                    str_title = "Sources count for"
-                info(f"{str_title} {sources_count_str}")
+                source_parts = [
+                    f"{sources_count_ok.get(k, 0)} of {v}"
+                    if k == coinpair and len(sources_count) == 1
+                    else f"{k}: {sources_count_ok.get(k, 0)} of {v}"
+                    for (k, v) in sources_count.items()]
+                source_summaries[coinpair] = ', '.join(source_parts)
+                if log_counts:
+                    info(f"Sources count for {coinpair}: "
+                         f"{source_summaries[coinpair]}")
+        return source_summaries
 
 
 
