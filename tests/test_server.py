@@ -59,6 +59,37 @@ class CoinPairValueTests(unittest.TestCase):
         with server.app.app_context():
             server.cache.clear()
 
+    def test_calculation_logs_client_ip(self):
+        with patch.object(server, 'get_price', return_value=123), \
+                self.assertLogs(server.app.logger, level='INFO') as captured:
+            response = self.client.get(
+                '/api/coinpairs/get_value',
+                query_string={'coinpair': 'BTC/USD'},
+                headers={'CF-Connecting-IP': '203.0.113.7'},
+                environ_base={'REMOTE_ADDR': '10.0.1.169'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(any(
+            'client=203.0.113.7 Asking for the value of BTC/USD' in line
+            for line in captured.output))
+        self.assertTrue(any(
+            'client=203.0.113.7 Value for BTC/USD: 123' in line
+            for line in captured.output))
+
+    def test_calculation_logs_remote_address_for_invalid_client_header(self):
+        with patch.object(server, 'get_price', return_value=123), \
+                self.assertLogs(server.app.logger, level='INFO') as captured:
+            response = self.client.get(
+                '/api/coinpairs/get_value',
+                query_string={'coinpair': 'BTC/USD'},
+                headers={'CF-Connecting-IP': 'invalid'},
+                environ_base={'REMOTE_ADDR': '10.0.1.169'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(any(
+            'client=10.0.1.169 Asking for the value of BTC/USD' in line
+            for line in captured.output))
+
     def test_failed_only_sub_coinpair_reports_zero_sources_without_500(self):
         def get_price_with_failed_source(*args, detail, **kwargs):
             detail['prices'] = [{

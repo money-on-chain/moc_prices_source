@@ -5,7 +5,8 @@ from ipaddress import IPv6Address, ip_address
 from fnmatch import fnmatch as match
 from tabulate import tabulate
 from .types import normalize_obj, Serializable
-from flask import Flask, request, redirect, jsonify, make_response, current_app
+from flask import (Flask, request, redirect, jsonify, make_response,
+                   current_app, has_request_context)
 from flask_restx import Api, Resource, reqparse, abort
 from flask_cors import CORS
 from flask_caching import Cache
@@ -71,9 +72,30 @@ api = Api(
     description=description,
 )
 
+
+def client_ip(environ):
+    candidate = environ.get('HTTP_CF_CONNECTING_IP', '').strip()
+    try:
+        return str(ip_address(candidate))
+    except ValueError:
+        return environ.get('REMOTE_ADDR', '-')
+
+
+class RequestClientLogFilter(logging.Filter):
+
+    def filter(self, record):
+        if has_request_context():
+            message = record.getMessage()
+            record.msg = f'client={client_ip(request.environ)} {message}'
+            record.args = ()
+        return True
+
 def create_app():
     
     app = Flask(__name__)
+    if not any(isinstance(item, RequestClientLogFilter)
+               for item in app.logger.filters):
+        app.logger.addFilter(RequestClientLogFilter())
     
     if use_redis:
         app.config["CACHE_TYPE"] = "RedisCache"
@@ -721,11 +743,7 @@ def access_logger_class():
             # Behind Cloudflare and the ALB, REMOTE_ADDR is the ALB node.
             # The ALB only accepts requests coming through Cloudflare, which
             # sets this header; non-IP values are ignored.
-            client_ip = environ.get('HTTP_CF_CONNECTING_IP', '').strip()
-            try:
-                atoms['h'] = str(ip_address(client_ip))
-            except ValueError:
-                pass
+            atoms['h'] = client_ip(environ)
             return atoms
 
         def access(self, resp, req, environ, request_time):
