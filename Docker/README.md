@@ -66,6 +66,7 @@ API environment variables can be passed with `--env` (or `-e`) to `docker run`:
 | `GUNICORN_TIMEOUT` | `60` seconds | Time allowed for a worker to handle a request before Gunicorn restarts it. |
 | `MAX_COINPAIR_LIMIT` | `12` | Maximum number of coinpairs accepted in a single API request. |
 | `HEALTH_CHECK_USER_AGENT` | Built-in probe prefix | Only successful `GET /health_check` requests whose User-Agent starts with this value are omitted from the access log. Set it to an empty string to omit all successful requests to that endpoint. Failed checks and other endpoints remain logged. |
+| `HEALTH_CHECK_LOG_INTERVAL` | `100` | Number of omitted successful health checks per API worker before a summary is written to the access log. Must be a positive integer. |
 | `FLASK_DEBUG` | `false` | Runs the Flask development server when enabled. This mode requires `--addr` to be a loopback address and is not used for the published Docker port. |
 
 For example, `--env GUNICORN_WORKERS=3` changes the worker count. To suppress
@@ -92,8 +93,9 @@ the load balancer's health-check path as `/health_check`. This confirms that the
 API can respond to HTTP requests; it does not check Redis or external price
 sources.
 
-Successful probes are omitted from the access log according to
-`HEALTH_CHECK_USER_AGENT` as described above. Failed probes remain logged.
+Successful probes are omitted from individual access log entries according to
+`HEALTH_CHECK_USER_AGENT` as described above. Each API worker logs a summary
+after `HEALTH_CHECK_LOG_INTERVAL` omitted probes. Failed probes remain logged individually.
 
 ### Run 3.2 `moc_prices_source_to_db`
 

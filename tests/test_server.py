@@ -215,6 +215,44 @@ class AccessLoggerTests(unittest.TestCase):
         self.assertEqual(self.log(user_agent='ELB-HealthChecker/2.0',
                                   PATH_INFO='/health_check'), [])
 
+    def test_every_hundred_suppressed_health_checks_are_summarized(self):
+        with patch.object(self.logger.access_log, 'info') as info:
+            for _ in range(99):
+                self.logger.access(
+                    SimpleNamespace(status='200 OK'), None,
+                    {'PATH_INFO': '/health_check', 'REQUEST_METHOD': 'GET',
+                     'HTTP_USER_AGENT': 'ELB-HealthChecker/2.0'},
+                    timedelta(seconds=1))
+            info.assert_not_called()
+            self.logger.access(
+                SimpleNamespace(status='200 OK'), None,
+                {'PATH_INFO': '/health_check', 'REQUEST_METHOD': 'GET',
+                 'HTTP_USER_AGENT': 'ELB-HealthChecker/2.0'},
+                timedelta(seconds=1))
+            info.assert_called_once_with(
+                'Received %d successful health checks', 100)
+            info.reset_mock()
+            for _ in range(100):
+                self.logger.access(
+                    SimpleNamespace(status='200 OK'), None,
+                    {'PATH_INFO': '/health_check', 'REQUEST_METHOD': 'GET',
+                     'HTTP_USER_AGENT': 'ELB-HealthChecker/2.0'},
+                    timedelta(seconds=1))
+            info.assert_called_once_with(
+                'Received %d successful health checks', 100)
+
+    def test_configured_health_check_log_interval(self):
+        with patch.object(server, 'HEALTH_CHECK_LOG_INTERVAL', 2), \
+                patch.object(self.logger.access_log, 'info') as info:
+            for _ in range(2):
+                self.logger.access(
+                    SimpleNamespace(status='200 OK'), None,
+                    {'PATH_INFO': '/health_check', 'REQUEST_METHOD': 'GET',
+                     'HTTP_USER_AGENT': 'ELB-HealthChecker/2.0'},
+                    timedelta(seconds=1))
+            info.assert_called_once_with(
+                'Received %d successful health checks', 2)
+
     def test_custom_user_agent_filters_only_matching_health_checks(self):
         with patch.object(server, 'health_check_user_agent', 'Probe/'):
             self.assertEqual(self.log(user_agent='Probe/1.0',

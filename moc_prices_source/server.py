@@ -55,6 +55,8 @@ gunicorn_timeout = envs(
     'GUNICORN_TIMEOUT', 60, envs.types.positive_integer)
 health_check_user_agent = envs(
     'HEALTH_CHECK_USER_AGENT', 'ELB-HealthChecker')
+HEALTH_CHECK_LOG_INTERVAL = envs(
+    'HEALTH_CHECK_LOG_INTERVAL', 100, envs.types.positive_integer)
 
 
 cache = Cache()
@@ -694,6 +696,10 @@ def access_logger_class():
 
     class AccessLogger(Logger):
 
+        def __init__(self, cfg):
+            super().__init__(cfg)
+            self.suppressed_health_checks = 0
+
         def atoms(self, resp, req, environ, request_time):
             atoms = super().atoms(resp, req, environ, request_time)
             # Behind Cloudflare and the ALB, REMOTE_ADDR is the ALB node.
@@ -707,7 +713,7 @@ def access_logger_class():
             return atoms
 
         def access(self, resp, req, environ, request_time):
-            # Skip successful health checks, but keep failed ones visible.
+            # Summarize successful probes periodically; keep failures visible.
             status = str(resp.status).split(None, 1)[0]
             if (environ.get('PATH_INFO') == '/health_check'
                     and environ.get('REQUEST_METHOD') == 'GET'
@@ -715,6 +721,12 @@ def access_logger_class():
                     and (not health_check_user_agent or
                          environ.get('HTTP_USER_AGENT', '').startswith(
                              health_check_user_agent))):
+                self.suppressed_health_checks += 1
+                if self.suppressed_health_checks == HEALTH_CHECK_LOG_INTERVAL:
+                    self.access_log.info(
+                        'Received %d successful health checks',
+                        HEALTH_CHECK_LOG_INTERVAL)
+                    self.suppressed_health_checks = 0
                 return
             super().access(resp, req, environ, request_time)
 
