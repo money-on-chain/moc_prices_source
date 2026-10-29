@@ -10,6 +10,7 @@ This summary is based on the repository history from [v0.7.10](https://github.co
 * Runs tests in CI before publishing.
 * Docker image: multi-stage build, redis and API run as non-root, redis bound to localhost.
 * Access log shows the real client IP (from Cloudflare). Successful load balancer health checks are summarized every 100 requests per API worker by default; `HEALTH_CHECK_LOG_INTERVAL` configures the interval.
+* Uses a consistent timestamp, level, source, and process ID format for application and Gunicorn logs.
 
 # Release v0.7.10 (2026-10-22)
 

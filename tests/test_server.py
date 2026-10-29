@@ -1,9 +1,12 @@
 import unittest
+import logging
+import re
 from datetime import timedelta
 from types import SimpleNamespace
 from unittest.mock import patch, sentinel
 
 from moc_prices_source import server
+from moc_prices_source.my_logging import LOG_FORMAT, LOG_DATE_FORMAT
 
 
 class ResponseCacheConfigurationTests(unittest.TestCase):
@@ -45,6 +48,8 @@ class GunicornBindTests(unittest.TestCase):
             bind = run.call_args.args[0].cfg.bind[0]
             self.assertEqual(bind, expected)
             self.assertEqual(parse_address(bind), (host, 7989))
+            self.assertEqual(run.call_args.args[0].cfg.access_log_format,
+                             server.ACCESS_LOG_FORMAT)
 
 
 class CoinPairValueTests(unittest.TestCase):
@@ -198,7 +203,27 @@ class AccessLoggerTests(unittest.TestCase):
         from gunicorn.config import Config
         cfg = Config()
         cfg.set('accesslog', '-')
+        cfg.set('access_log_format', server.ACCESS_LOG_FORMAT)
         self.logger = server.access_logger_class()(cfg)
+
+    def test_gunicorn_logs_use_application_prefix(self):
+        for gunicorn_logger in (self.logger.error_log, self.logger.access_log):
+            formatter = gunicorn_logger.handlers[0].formatter
+            source = ('gunicorn' if gunicorn_logger is self.logger.error_log
+                      else 'gunicorn.access')
+            expected_format = (self.logger.error_fmt
+                               if gunicorn_logger is self.logger.error_log
+                               else LOG_FORMAT)
+            self.assertEqual(formatter._fmt, expected_format)
+            self.assertEqual(formatter.datefmt, LOG_DATE_FORMAT)
+            record = logging.LogRecord(
+                gunicorn_logger.name, logging.INFO, __file__, 1,
+                'example', (), None)
+            self.assertRegex(
+                formatter.format(record),
+                rf'^\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}} '
+                rf'[+-]\d{{4}}\tINFO\t{re.escape(source)}\t'
+                rf'pid=\d+\texample$')
 
     def log(self, status='200 OK', user_agent='curl/8.0', **environ):
         resp = SimpleNamespace(status=status, headers=[], sent=2)
@@ -282,15 +307,15 @@ class AccessLoggerTests(unittest.TestCase):
                          user_agent='ELB-HealthChecker/2.0',
                          PATH_INFO='/health_check')
         self.assertEqual(len(lines), 1)
-        self.assertIn(' 503 ', lines[0])
+        self.assertIn('status=503', lines[0])
 
     def test_client_ip_comes_from_cloudflare_header(self):
         lines = self.log(HTTP_CF_CONNECTING_IP='203.0.113.7')
-        self.assertTrue(lines[0].startswith('203.0.113.7 '))
+        self.assertIn('client=203.0.113.7 ', lines[0])
 
     def test_invalid_cloudflare_header_falls_back_to_remote_addr(self):
         lines = self.log(HTTP_CF_CONNECTING_IP='not-an-ip')
-        self.assertTrue(lines[0].startswith('10.0.1.169 '))
+        self.assertIn('client=10.0.1.169 ', lines[0])
 
 
 class MainTests(unittest.TestCase):

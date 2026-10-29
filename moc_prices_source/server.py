@@ -1,4 +1,5 @@
 import ast
+import logging
 from decimal import Decimal
 from ipaddress import IPv6Address, ip_address
 from fnmatch import fnmatch as match
@@ -14,6 +15,7 @@ from .cli import command, option
 from .redis_conn import get_redis, use_redis
 from .cli_check import show_computed_pairs_fromula, summary, coinpairs_report
 from .my_envs import envs
+from .my_logging import LOG_FORMAT, LOG_DATE_FORMAT
 
 
 
@@ -687,6 +689,9 @@ class Info(Resource):
 
 
 LOOPBACK_HOSTS = ('127.0.0.1', 'localhost', '::1')
+ACCESS_LOG_FORMAT = (
+    'client=%(h)s request="%(r)s" status=%(s)s '
+    'bytes=%(b)s referer="%(f)s" agent="%(a)s"')
 
 
 def access_logger_class():
@@ -695,6 +700,17 @@ def access_logger_class():
     from gunicorn.glogging import Logger
 
     class AccessLogger(Logger):
+
+        error_fmt = LOG_FORMAT.replace('%(name)s', 'gunicorn')
+        access_fmt = LOG_FORMAT
+        datefmt = LOG_DATE_FORMAT
+
+        def setup(self, cfg):
+            super().setup(cfg)
+            for handler in self.access_log.handlers:
+                if getattr(handler, '_gunicorn', False):
+                    handler.setFormatter(logging.Formatter(
+                        self.access_fmt, self.datefmt))
 
         def __init__(self, cfg):
             super().__init__(cfg)
@@ -754,6 +770,7 @@ def run_gunicorn(host, port, workers=gunicorn_workers,
             # Price requests can wait on slow upstream sources plus a retry
             self.cfg.set('timeout', timeout)
             self.cfg.set('accesslog', '-')
+            self.cfg.set('access_log_format', ACCESS_LOG_FORMAT)
             self.cfg.set('logger_class', access_logger_class())
             # Runtime admin socket (gunicorn >= 25.1) is not used
             self.cfg.set('control_socket_disable', True)
