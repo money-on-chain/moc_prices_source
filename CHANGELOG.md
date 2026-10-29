@@ -1,17 +1,12 @@
-# Beta v0.7.11b2
+# Release v0.7.11 (2026-10-29)
 
-This summary is based on the repository history from [v0.7.11b1](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.11b1) onward.
+This summary is based on the repository history from [v0.7.10](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.10) onward.
 
 * Shares the same Python base image between Docker build and runtime stages.
 * Summarizes successful health checks every 100 requests per API worker by default; `HEALTH_CHECK_LOG_INTERVAL` configures the interval.
 * Uses a consistent timestamp, level, source, and process ID format for application and Gunicorn logs.
 * Includes the client IP in API calculation logs, using the same Cloudflare address validation and remote-address fallback as the access log.
 * Logs calculated values and their successful/total source counts in the same entry.
-
-# Beta v0.7.11b1
-
-This summary is based on the repository history from [v0.7.10](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.10) onward.
-
 * Fixes the API serving the same cached price for every coinpair on `get_value` and `get_value_simple`.
 * Fixes `get_values` returning an error for plain-text responses.
 * Serves the API with gunicorn instead of the Flask development server.
