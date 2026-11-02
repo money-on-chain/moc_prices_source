@@ -17,10 +17,12 @@ DEFAULT_LOG_LEVEL = options.get(envs("MOC_PRICES_LOG_LEVEL", "OFF", list(options
 
 
 # Default config
+LOG_FORMAT = '%(asctime)s\t%(levelname)s\t%(name)s\tpid=%(process)d\t%(message)s'
+LOG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S %z'
 basicConfig(
     level = DEFAULT_LOG_LEVEL,
-    format = '%(asctime)s\t%(name)s\t%(levelname)s\t%(message)s',
-    datefmt = '%Y-%m-%d %H:%M:%S')
+    format = LOG_FORMAT,
+    datefmt = LOG_DATE_FORMAT)
 
 
 def get_logger(name):

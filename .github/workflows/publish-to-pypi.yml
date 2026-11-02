@@ -6,16 +6,35 @@ on:
     branches: [ "master", "develop" ]
   pull_request:
     branches: [ "master", "develop" ]
+permissions:
+  contents: read
 jobs:
   build-n-publish:
     name: Build and publish Python 🐍 distributions 📦 to PyPI
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    # Actions are pinned to commit SHAs (tag in the comment) so a moved
+    # tag can't change what runs with the PyPI token.
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
     - name: Set up Python 3.12
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
       with:
         python-version: "3.12"
+    - name: Install locked dependencies
+      run: >-
+        python -m
+        pip install
+        --require-hashes
+        -r requirements.lock.txt
+    - name: Run tests
+      run: >-
+        python -m
+        unittest
+        discover
+        -s tests
+        -t .
     - name: Install pypa/build
       run: >-
         python -m
@@ -32,6 +51,6 @@ jobs:
         .
     - name: Publish distribution 📦 to PyPI
       if: startsWith(github.ref, 'refs/tags')
-      uses: pypa/gh-action-pypi-publish@release/v1
+      uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}

@@ -31,3 +31,23 @@ Treat the following as intentional design invariants:
   must remain `None`; a non-`None` URL default must be constructed as `URL`.
 - Proxy credentials, paths, and query parameters must never appear in errors,
   logs, or rendered configuration, regardless of where the URL originated.
+
+### Health-check access logs
+
+- Suppressing successful `GET /health_check` requests from the access log when
+  their User-Agent starts with `HEALTH_CHECK_USER_AGENT` is intentional. These
+  frequent probes would otherwise fill the logs with low-value entries. An
+  empty `HEALTH_CHECK_USER_AGENT` suppresses all successful requests to this
+  endpoint, regardless of User-Agent.
+- Keep failed health checks and requests to other endpoints visible in the
+  access log, even when they use the same User-Agent.
+
+### API response cache
+
+- When `use_redis` is enabled, Flask-Caching uses the configured Redis
+  connection for API responses so Gunicorn workers share cached values.
+- When `use_redis` is disabled, Flask-Caching intentionally uses `SimpleCache`.
+  Its entries are local to each worker, so duplicate calculations across
+  workers remain possible in that configuration.
+- Redis response cache keys use a dedicated prefix to avoid collisions with
+  other Redis data used by the application.

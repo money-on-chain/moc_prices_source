@@ -75,6 +75,19 @@ docker build --pull --no-cache -t "$LOCAL_NAME" -f Docker/Dockerfile .
 docker tag "$LOCAL_NAME" "$LOCAL_NAME:$TAG"
 docker tag "$LOCAL_NAME" "$LOCAL_NAME:latest"
 
+PUSH_TAGS=()
+for NAMESPACE in "${NAMESPACES[@]}"; do
+    docker tag "$LOCAL_NAME:$TAG" "$NAMESPACE:$TAG"
+    PUSH_TAGS+=("$NAMESPACE:$TAG")
+    if [ "$IS_BETA" -ne 1 ]; then
+        docker tag "$LOCAL_NAME:$TAG" "$NAMESPACE:latest"
+        PUSH_TAGS+=("$NAMESPACE:latest")
+    else
+        docker tag "$LOCAL_NAME:$TAG" "$NAMESPACE:beta"
+        PUSH_TAGS+=("$NAMESPACE:beta")
+    fi
+done
+
 # Show local images
 IMG_ID=$( docker images --format '{{.ID}}' "$LOCAL_NAME" | sort | uniq )
 IMG_SIZE=$( docker images --format '{{.Size}}' "$LOCAL_NAME" | sort | uniq )
@@ -82,18 +95,22 @@ echo ""
 echo "Local images ($IMG_ID: $IMG_SIZE):"
 docker images --format '---> {{.Repository}}:{{.Tag}}|{{.ID}}' | grep "$IMG_ID" | cut -d '|' -f1
 
+echo ""
+echo "Local registry tags created:"
+printf '  %s\n' "${PUSH_TAGS[@]}"
+
 # Push
 echo ""
 echo "To upload the image you must run:"
 for NAMESPACE in "${NAMESPACES[@]}"; do
     echo ""
-    echo "~$ docker tag $LOCAL_NAME:$TAG $NAMESPACE:$TAG"
+    if [ -n "$AWS_ID" ] && [ "$NAMESPACE" = "$AWS_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$LOCAL_NAME" ]; then
+        echo "~$ aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+    fi
     echo "~$ docker push $NAMESPACE:$TAG"
     if [ "$IS_BETA" -ne 1 ]; then
-        echo "~$ docker tag $LOCAL_NAME:$TAG $NAMESPACE:latest"
         echo "~$ docker push $NAMESPACE:latest"
     else
-        echo "~$ docker tag $LOCAL_NAME:$TAG $NAMESPACE:beta"
         echo "~$ docker push $NAMESPACE:beta"
     fi
 done
