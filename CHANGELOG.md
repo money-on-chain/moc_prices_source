@@ -1,4 +1,4 @@
-# Release v0.7.11 (2026-10-29)
+# Release v0.7.11 (2026-11-02)
 
 This summary is based on the repository history from [v0.7.10](https://github.com/money-on-chain/moc_prices_source/releases/tag/v0.7.10) onward.
 
